@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>TRaC</title>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    </head>
+    <body>
+
+      <div class="container-fluid" id="main">
+        <nav class="navbar bg-dark navbar-dark text-muted">
+          <div class="container-fluid">
+            <div class="navbar-head">
+                <a href="/trac" class="navbar-brand"><img src="http://iro37.ru/res/trac-src/img/logo.jpg" style="max-height: 70px;"/><span class="p-3">ЗаполниТитул</span></a>
+            </div>
+            {{nav}}
+            {{nav-login}}
+          </div>
+        </nav>
+        
+        <div class="container-fluid" id="content">
+          <div class="row" >
+            <div class="col-md-3 border-right" >
+              {{sidebar}}
+            </div>
+            <div class="col-md-9" >
+              {{content}}
+            </div>
+          </div>
+        </div>
+
+        <div id="footer">
+          <div class="container-fluid bg-dark p-3">
+            <p class="text-muted">разработано на технологии <span><a href="http://iro37.ru/xqwiki/TRaC">TRaC</a></span> от (c)<span><a href="http://iro37.ru/xqwiki/Artel">artel</a></span> и (c)artmotor</p>
+          </div>
+        </div>
+       </div>
+    </body>
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="http://iro37.ru/res/trac-src/trac-web.css"/>
+
+</html>

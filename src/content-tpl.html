@@ -1,31 +1,13 @@
-    <div class="container" id="main">
-			<div class="container">
-				<div class="row text-muted">
-          <div class="p-1">
-            <h2>{{OrgLabel}}</h2>
-            <h4>
-              Для получения {{TitulLabel}} заполните
-            </h4>
-          </div>
-					<form method="GET" action="http://dbx.iro37.ru/docx/заполниТитул.docx">
-						<div>
-							<label><b>1) ФИО СТУДЕНТА (в родительном падеже): </b>
-                <p> <input type="text" size = "45" name="student" value="Иванова И.П."/></p>
-              </label>
-						</div>
-						<div>
-							<label><b>2) ТЕМУ РАБОТЫ: </b> 
-                <p><textarea rows="4" cols="45" name="theme">Дальнейшее усовершенствование хорошего...</textarea></p>
-                </label>
-						</div>
-						<div>
-							<label><b>3) ФИО РУКОВОДИТЕЛЯ (в именительном падеже): </b> 
-                <p><input type="text" size = "45" name="teacher" value="Петренко-Забубенный З.В." /></p>
-              </label>
-						</div>
-						<p>и нажмите </p>
-						<input class="btn btn-info" type="submit" value="Скачать..."/>
-					</form>
-				</div>
-			</div>
-		</div>
+<div class="container" id="main">
+  <div class="container">
+    <div class="row text-muted">
+      <div >
+        <h2>{{OrgLabel}}</h2>
+        <h4>
+          Для получения {{TitulLabel}} заполните
+        </h4>
+        {{inputForm}}
+      </div>
+    </div>
+  </div>
+</div>

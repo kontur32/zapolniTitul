@@ -7,10 +7,22 @@ import module namespace functx = "http://www.functx.com";
 declare variable $zt:rootPath := "https://docs.google.com/spreadsheets/d/e/2PACX-1vTy56_CSURLwhsG5xwkWGf1EamtjJ1ReB-5qTzRJnYsQ3dXBO57d_8pQkdSGTftVF294fpe7nAgDpt1/pub?gid=746210905&amp;single=true&amp;output=csv";
 
 declare 
-  %rest:path ( "/zapolnititul/v" )
+  %rest:path ( "/zapolnititul" )
   %output:method ("xhtml")
-function zt:main1 ( ) {
-  <a href="/zapolnititul/v/ivgpu?path=iitegn/euf&amp;form=magDiplom">/zapolnititul/v/ivgpu?path=iitegn/euf&amp;form=magDiplom</a>
+function zt:start ( ) {
+  let $content :=
+  <div>
+    <h1>ЗаполниТитул</h1>
+    <p>Сервис, который экономит время ...</p>
+    <p>
+      Публикуйте шаблоны для удобного заполнения и выгрузки. 
+      <a href="/zapolnititul/v/ivgpu?path=iitegn/euf&amp;form=magDiplom">Например, такие...</a>
+    </p>
+    
+  </div>
+ let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
+ let $templateFieldsMap := map{"sidebar": "", "content":$content, "nav": "", "nav-login" : ""}
+    return zt:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
 };
 
 declare 
@@ -18,7 +30,7 @@ declare
   %rest:query-param( "path", "{$path}", "")
   %rest:query-param( "form", "{$formID}")
   %output:method ("xhtml")
-function zt:main ( $org as xs:string, $path as xs:string , $formID as xs:string ) {
+function zt:form ( $org as xs:string, $path as xs:string , $formID as xs:string ) {
   
   let $data := formData:getFormData ( $zt:rootPath, $org || "/" || $path, $formID )
   

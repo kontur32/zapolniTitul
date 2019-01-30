@@ -6,12 +6,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
     </head>
     <body>
-
       <div class="container-fluid" id="main">
         <nav class="navbar bg-dark navbar-dark text-muted">
           <div class="container-fluid">
             <div class="navbar-head">
-                <a href="/trac" class="navbar-brand"><img src="http://iro37.ru/res/trac-src/img/logo.jpg" style="max-height: 70px;"/><span class="p-3">ЗаполниТитул</span></a>
+              <a href="/zapolnititul">
+                <span class="navbar-brand p-3">{ ЗаполниТитул }</span>
+              </a>
             </div>
             {{nav}}
             {{nav-login}}
@@ -31,7 +32,18 @@
 
         <div id="footer">
           <div class="container-fluid bg-dark p-3">
-            <p class="text-muted">разработано на технологии <span><a href="http://iro37.ru/xqwiki/TRaC">TRaC</a></span> от (c)<span><a href="http://iro37.ru/xqwiki/Artel">artel</a></span> и (c)artmotor</p>
+            <div class="text-muted">
+              <div>(tm) ЗаполниТитул - Сервис, который экономит время</div>
+              <div>(tm) TRaC before ask</div> 
+              <div>
+                <span>(c) </span>
+                <a href="http://iro37.ru/xqwiki/Artel"> artel</a>
+                <span>, (c) artmotor.</span> <span>Powered by </span>
+                <span class="badge badge-primary">
+                  <a target="_blank" href="http://iro37.ru/xqwiki/TRaC" style="color : white">TRaC</a>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
        </div>

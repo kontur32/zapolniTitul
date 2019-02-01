@@ -2,9 +2,22 @@ module namespace formData = "http://dbx.iro37.ru/zapolnititul/formData";
 
 declare function formData:getFormData ( $rootPath, $path, $formID ) {
   let $formsPath := formData:formPath ( $rootPath, $path )
-  let $formData := csv:parse ( fetch:text ( $formsPath ), map { 'header': true() } )/csv/record[ formID = $formID ]
+  let $formDataCSV := 
+    try {
+      fetch:text( $formsPath )
+    }
+    catch* { 
+      "Ошибка: не удалось получить данные о форме по адресу: " || $formsPath
+    }
+  let $formData :=  
+    try {
+     csv:parse( $formDataCSV, map { 'header': true() } ) 
+    }
+    catch * {
+      "Ошибка: не удалось отпарсить данные о форме из файла: " || $formDataCSV
+    }
     return 
-      $formData  
+      $formData/csv/record[ formID = $formID ]
 }; 
 
 declare function formData:formPath ( $dataURL, $path ) {

@@ -43,14 +43,13 @@ declare function buildForm:buildInputForm ( $inputFormData, $templatePath ){
  
   return
     <div class="form-group">
-     <form method="GET" action="/docx/api/заполниТитул.docx">
+     <form method="GET" action="/zapolnititul/api/v1/document">
        { 
-         for $field in $inputFormFields
-         return
-           $field
+         $inputFormFields
        }
         <p>и нажмите </p>
-        <input type="hidden" size = "45" name="template" value="{ $templatePath }"/>
+        <input type="hidden" name="fileName" value="ZapolniTitul.docx"/>
+        <input type="hidden" name="templatePath" value="{ $templatePath }"/>
         <input class="btn btn-info" type="submit" value="Скачать..."/>
      </form>
     </div>

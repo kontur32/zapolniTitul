@@ -35,15 +35,16 @@ let $formData :=
 
  let $content := 
     let $inputForm :=  buildForm:buildInputForm ( <a><csv>{$formData}</csv></a> , $tplPath )
+    let $formLink := <a href="{'/zapolnititul/v/form?path=' || $tplPath}">Ссылка на форму</a>
     let $templateFieldsMap := map{ 
                   "OrgLabel": "", 
                   "Title": "",
-                  "inputForm" : $inputForm
+                  "inputForm" : ($formLink, $inputForm)
                 }
     let $contentTemplate := serialize( doc("src/content-tpl.html") )
     return zt:fillHtmlTemplate( $contentTemplate, $templateFieldsMap )/child::*
 
 let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
-let $templateFieldsMap := map{"sidebar": "", "content":$content, "nav": "", "nav-login" : ""}
+let $templateFieldsMap := map{ "sidebar" : "", "content" : $content, "nav" : "", "nav-login" : "" }
 return zt:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
 };

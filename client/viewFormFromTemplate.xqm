@@ -35,7 +35,7 @@ let $formData :=
 
  let $content := 
     let $inputForm :=  buildForm:buildInputForm ( <a><csv>{$formData}</csv></a> , $tplPath )
-    let $formLink := <a href="{'/zapolnititul/v/form?path=' || $tplPath}">Ссылка на форму</a>
+    let $formLink := <a href="{'/zapolnititul/v/form?path=' || $tplPath}">Ссылка на эту форму</a>
     let $templateFieldsMap := map{ 
                   "OrgLabel": "", 
                   "Title": "",

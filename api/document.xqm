@@ -41,7 +41,7 @@ function restDocx:get ( $fileName, $templatePath as xs:string ) {
   let $response := 
     http:send-request(
       $request,
-      'http://localhost:8984/docx/api/fillTemplate'
+      'http://localhost:8984/ooxml/api/v1/docx/single'
   )
   let $ContentDispositionValue := "attachment; filename=" || $fileName
   return

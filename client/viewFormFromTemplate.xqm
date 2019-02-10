@@ -7,6 +7,22 @@ import module namespace
 
 declare namespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 declare variable $form:getFieldsAsString := 'http://localhost:8984/ooxml/api/v1/docx/fields';
+declare variable $form:delimiter := "::";
+declare variable $form:map := 
+  function ( $string ) {
+    let $map := map { 
+      "список" : "select" , "тип" : "inputType", 
+      "данные" : "itemsSourceURL", "надпись" : "label"
+    } 
+    return 
+      if ( $string = map:keys( $map ) )
+      then (
+        map:get( $map, $string )
+      )
+      else (
+        $string
+      )
+  };
 
 declare
   %rest:GET 
@@ -22,7 +38,6 @@ let $rowTpl :=
   }
   catch*{ "Ошибка: не удалось прочитать шаблон"}
 
-
 let $fieldsAsString :=
    csv:parse (
    http:send-request(
@@ -34,21 +49,14 @@ let $fieldsAsString :=
       </http:multipart>
     </http:request>,
     $form:getFieldsAsString
-    )[2]
+    )[2],
+    map { 'header': false(), 'separator' : ';' }
   )
 
-let $formData :=
-  for $i in $fieldsAsString/csv/record/entry/text()
-  return
-    <record>
-      <ID>{normalize-space( $i )}</ID>
-      <inputType>text</inputType>
-      <label>{normalize-space( $i )}</label>
-    </record>
-
+let $formData := form:buildCSV ( $fieldsAsString/csv )
 
  let $content := 
-    let $inputForm :=  buildForm:buildInputForm ( <a><csv>{$formData}</csv></a> , $tplPath )
+    let $inputForm :=  buildForm:buildInputForm ( <a>{$formData}</a> , $tplPath )
     let $formLink := <a href="{'/zapolnititul/v/form?path=' || $tplPath}">Ссылка на эту форму</a>
     let $templateFieldsMap := map{ 
                   "OrgLabel": "Здесь можно создать готовый документ из шаблона", 
@@ -61,4 +69,25 @@ let $formData :=
 let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
 let $templateFieldsMap := map{ "sidebar" : "", "content" : $content, "nav" : "", "nav-login" : "" }
 return zt:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
+};
+
+declare 
+  %private
+function form:buildCSV ( $csv as element (csv) ) as element (csv) {
+       element { "csv" } {
+       for $record in $csv/record
+       return
+         element { "record" }{
+           element { "ID" } {
+             normalize-space( $record/entry[ 1 ]/text() )
+           },
+           for $entry in $record/entry[ position() >1 ]/text()
+           return
+             let $a := tokenize( $entry, $form:delimiter )
+             return 
+               element { $form:map( normalize-space( $a[ 1 ] ) ) } {
+                 $form:map( normalize-space( $a[ 2 ] ) )
+               }
+         }
+    }
 };

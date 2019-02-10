@@ -46,12 +46,12 @@ function restDocx:get ( $fileName, $templatePath as xs:string ) {
   let $ContentDispositionValue := "attachment; filename=" || $fileName
   return
  (
-   <rest:response>
+  <rest:response>
     <http:response status="200">
       <http:header name="Content-Disposition" value="{$ContentDispositionValue}" />
       <http:header name="Content-type" value="application/octet-stream"/>
     </http:response>
   </rest:response>,
-   $response[ 2 ]
+  $response[ 2 ]
  )
 };

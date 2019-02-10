@@ -19,4 +19,8 @@
     <label>данные</label>
     <value>itemsSourceURL</value>
   </record>
+  <record>
+    <label>__ОПИСАНИЕ__</label>
+    <value>__ABOUT__</value>
+  </record>
 </csv>

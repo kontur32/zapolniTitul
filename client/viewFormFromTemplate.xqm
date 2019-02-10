@@ -26,7 +26,8 @@ declare
   %rest:path("/zapolnititul/v/form")
   %output:method ("xhtml")
   %rest:query-param( "path", "{$tplPath}" )
-function form:formFromTemplate ( $tplPath ){
+  %rest:query-param( "output", "{$output}", "main" )
+function form:formFromTemplate ( $tplPath, $output ){
 let $rowTpl := 
   try{
     fetch:binary( 
@@ -51,21 +52,29 @@ let $fieldsAsString :=
   )
 
 let $formData := form:buildCSV ( $fieldsAsString/csv )
+let $meta := $formData//record[ ID/text() = "__ABOUT__" ] 
 
  let $content := 
-    let $inputForm :=  buildForm:buildInputForm ( <a>{$formData}</a> , $tplPath )
-    let $formLink := <a href="{'/zapolnititul/v/form?path=' || $tplPath}">Ссылка на эту форму</a>
+    let $inputForm :=  buildForm:buildInputForm ( <data>{ $formData }</data>, $tplPath )
+    let $templateLink := <a href="{$tplPath}">Ссылка на шаблон</a>
     let $templateFieldsMap := map{ 
-                  "OrgLabel": "Здесь можно создать готовый документ из шаблона", 
-                  "Title": "готовой формы",
-                  "inputForm" : ($formLink, $inputForm)
+                  "OrgLabel": $meta/org/text(), 
+                  "Title": $meta/name/text(),
+                  "inputForm" : ( $templateLink, $inputForm )
                 }
-    let $contentTemplate := serialize( doc("src/content-tpl.html") )
+    let $contentTemplate := serialize( doc("src/content-tpl.html") )            
     return zt:fillHtmlTemplate( $contentTemplate, $templateFieldsMap )/child::*
 
 let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
 let $templateFieldsMap := map{ "sidebar" : "", "content" : $content, "nav" : "", "nav-login" : "" }
-return zt:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
+return 
+  if ( $output = "iframe")
+  then (
+    $content 
+  )
+  else (
+    zt:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
+  )
 };
 
 declare 
@@ -76,7 +85,7 @@ function form:buildCSV ( $csv as element (csv) ) as element (csv) {
        return
          element { "record" }{
            element { "ID" } {
-             normalize-space( $record/entry[ 1 ]/text() )
+             $form:map( normalize-space( $record/entry[ 1 ]/text() ) )
            },
            for $entry in $record/entry[ position() >1 ]/text()
            return

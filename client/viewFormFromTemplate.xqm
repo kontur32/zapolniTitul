@@ -10,14 +10,11 @@ declare variable $form:getFieldsAsString := 'http://localhost:8984/ooxml/api/v1/
 declare variable $form:delimiter := "::";
 declare variable $form:map := 
   function ( $string ) {
-    let $map := map { 
-      "список" : "select" , "тип" : "inputType", 
-      "данные" : "itemsSourceURL", "надпись" : "label"
-    } 
-    return 
-      if ( $string = map:keys( $map ) )
+    let $map := doc("src/map.xml")
+    return
+      if ( $map/csv/record/label/text() = $string ) 
       then (
-        map:get( $map, $string )
+        $map/csv/record[ label/text() = $string ]/value/text()
       )
       else (
         $string

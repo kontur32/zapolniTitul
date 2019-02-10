@@ -1,0 +1,22 @@
+<csv>
+  <record>
+    <label>список</label>
+    <value>select</value>
+  </record>
+  <record>
+    <label>текст</label>
+    <value>text</value>
+  </record>
+  <record>
+    <label>тип</label>
+    <value>inputType</value>
+  </record>
+  <record>
+    <label>надпись</label>
+    <value>label</value>
+  </record>
+  <record>
+    <label>данные</label>
+    <value>itemsSourceURL</value>
+  </record>
+</csv>

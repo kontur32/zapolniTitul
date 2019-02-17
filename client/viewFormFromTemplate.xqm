@@ -52,11 +52,11 @@ let $fieldsAsString :=
   )
 
 let $formData := form:buildCSV ( $fieldsAsString/csv )
-let $meta := $formData//record[ ID/text() = "__ABOUT__" ] 
+let $meta := $formData//record[ ID/text() = ( "__ОПИСАНИЕ__", "__ABOUT__" ) ] 
 
  let $content := 
     let $inputForm :=  buildForm:buildInputForm ( <data>{ $formData }</data>, $tplPath )
-    let $templateLink := <a href="{$tplPath}">Ссылка на шаблон</a>
+    let $templateLink := <a href="{ $tplPath }">Ссылка на шаблон</a>
     let $templateFieldsMap := map{ 
                   "OrgLabel": $meta/org/text(), 
                   "Title": $meta/name/text(),
@@ -79,7 +79,7 @@ return
 
 declare 
   %private
-function form:buildCSV ( $csv as element (csv) ) as element (csv) {
+function form:buildCSV( $csv as element(csv) ) as element(csv) {
        element { "csv" } {
        for $record in $csv/record
        return
@@ -87,7 +87,7 @@ function form:buildCSV ( $csv as element (csv) ) as element (csv) {
            element { "ID" } {
              $form:map( normalize-space( $record/entry[ 1 ]/text() ) )
            },
-           for $entry in $record/entry[ position() >1 ]/text()
+           for $entry in $record/entry[ position() > 1 ]/text()
            return
              let $a := tokenize( $entry, $form:delimiter )
              return 

@@ -8,6 +8,10 @@
     <value>text</value>
   </record>
   <record>
+    <label>скрытый</label>
+    <value>hidden</value>
+  </record>
+  <record>
     <label>тип</label>
     <value>inputType</value>
   </record>
@@ -18,9 +22,5 @@
   <record>
     <label>данные</label>
     <value>itemsSourceURL</value>
-  </record>
-  <record>
-    <label>__ОПИСАНИЕ__</label>
-    <value>__ABOUT__</value>
   </record>
 </csv>

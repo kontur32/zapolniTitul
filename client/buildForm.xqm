@@ -3,24 +3,37 @@ module namespace buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm";
 declare function buildForm:buildInputForm ( $inputFormData, $templatePath ){  
   let $inputFormFields :=
      for $field in $inputFormData/csv/record
+     let $inputType := 
+       if ( not( empty( $field/inputType/text() ) ) )
+       then ( $field/inputType/text() )
+       else ( "text" )
+   let $label := 
+     if ( not( empty( $field/label/text() ) ) )
+     then ( $field/label/text() )
+     else ( $field/ID/text() )
      return
-       switch ( $field/inputType/text() ) 
+       switch ( $inputType )
+       case ( "hidden" )
+         return 
+           <div class="form-group">
+             <input class="form-control" type="hidden"  name="{ $field/ID/text() }" value="{ $field/defaultValue/text() }"/>
+           </div>
        case ( "text" )
          return
            <div class="form-group">
-             <label>{ $field/label/text() }</label>
+             <label>{ $label }</label>
              <input class="form-control" type="text"  name="{ $field/ID/text() }" value="{ $field/defaultValue/text() }"/>
            </div>
        case  ( "textarea" ) 
          return
            <div class="form-group">
-             <label>{ $field/label/text() }</label>
+             <label>{ $label }</label>
              <textarea class="form-control" name="{ $field/ID/text() }">{ $field/defaultValue/text() }</textarea>
            </div>
        case ( "select" )
          return
              <div class="form-group">
-               <label>{ $field/label/text() }</label> 
+               <label>{ $label }</label> 
                <select class="form-control" name="{ $field/ID/text() }">
                  {
                     let $items := 

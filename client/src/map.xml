@@ -8,6 +8,10 @@
     <value>text</value>
   </record>
   <record>
+    <label>текстовое поле</label>
+    <value>textarea</value>
+  </record>
+  <record>
     <label>скрытый</label>
     <value>hidden</value>
   </record>

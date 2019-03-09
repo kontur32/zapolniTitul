@@ -32,7 +32,7 @@ function formUpload:get( $label as xs:string, $file ) {
         insert node $formData into db:open("titul24","forms")/forms,
         db:output( 
           (
-            file:write-binary( $path || "file.docx", $f),
+            file:write-binary( $path || $fileName, $f),
             web:redirect("/zapolnititul/v/form?id=" || $formID )
           )
         )

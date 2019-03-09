@@ -47,7 +47,7 @@ let $downloadName :=
   if( $tplPath )
   then ( $tplPath )
   else (
-   substring-after( db:open( "titul24", "forms" )/forms/form[ @id = $id ]/@fileName/data(), "--" )
+   db:open( "titul24", "forms" )/forms/form[ @id = $id ]/@fileNameOriginal/data()
   )
 
 let $tplPath :=

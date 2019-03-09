@@ -13,17 +13,22 @@ function formUpload:get( $label as xs:string, $file ) {
     let $f := $file( map:keys( $file )[ 1 ] )
     let $timeStamp := string( current-dateTime() )
     let $formID := random:uuid()
-    let $path := $config:param( "static" ) || $config:param( "usersTemplatePath" )
-    let $fileName := $formID || "--" || map:keys( $file )[ 1 ]
+    let $fileNameToSave := $formID || ".docx"
+    let $fileFullName := $config:param( "static" ) || $config:param( "usersTemplatePath" ) || $fileNameToSave
+    
+    let $fileFullPath := $config:param( "httpStatic" ) || $config:param( "usersTemplatePath" ) || $fileNameToSave 
+    
     let $formCSV := form:buildCSV( form:fieldsAsString( $f, $config:param( "fieldsAsStringPath" ) )/csv )
+    
+    
     let $formData :=
       <form 
-        id="{ $formID }" 
-        timestamp="{ $timeStamp }" 
-        fileName="{ $fileName }"
-        fileFullName="{ $path || $fileName }"
-        fileFullPath = '{ $config:param( "httpStatic" ) || $config:param( "usersTemplatePath" ) || $fileName}'>
-          {$formCSV}
+        id = "{ $formID }" 
+        timestamp = "{ $timeStamp }" 
+        fileNameOriginal = "{ map:keys( $file )[ 1 ] }"
+        fileFullName = "{ $fileFullName }"
+        fileFullPath = '{ $fileFullPath }'>
+          { $formCSV }
       </form>
       
     return
@@ -32,7 +37,7 @@ function formUpload:get( $label as xs:string, $file ) {
         insert node $formData into db:open("titul24","forms")/forms,
         db:output( 
           (
-            file:write-binary( $path || map:keys( $file )[ 1 ], $f),
+            file:write-binary( $fileFullName, $f),
             web:redirect("/zapolnititul/v/form?id=" || $formID )
           )
         )

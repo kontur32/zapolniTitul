@@ -25,38 +25,43 @@ declare
   %rest:GET 
   %rest:path("/zapolnititul/v/form")
   %output:method ("xhtml")
-  %rest:query-param( "path", "{$tplPath}" )
-  %rest:query-param( "output", "{$output}", "main" )
-function form:formFromTemplate ( $tplPath, $output ){
-let $rowTpl := 
-  try{
-    fetch:binary( 
-      iri-to-uri ( $tplPath )
-    )
-  }
-  catch*{ "Ошибка: не удалось прочитать шаблон"}
+  %rest:query-param( "path", "{ $tplPath }", "" )
+  %rest:query-param( "id", "{ $id }", "")
+  %rest:query-param( "output", " { $output }", "main" )
+function form:formFromTemplate ( $tplPath, $id, $output ){
 
-let $fieldsAsString :=
-   csv:parse (
-   http:send-request(
-    <http:request method='post'>
-      <http:header name="Content-type" value="multipart/form-data; boundary=----7MA4YWxkTrZu0gW"/>
-      <http:multipart media-type = "multipart/form-data" >
-          <http:header name='Content-Disposition' value='form-data; name="template"'/>
-          <http:body media-type ="application/octet-stream">{ $rowTpl }</http:body>
-      </http:multipart>
-    </http:request>,
-    $form:pathGetFieldsAsString
-    )[2],
-    map { 'header': false(), 'separator' : ';' }
+let $formData :=
+  if ( $tplPath )
+  then ( 
+    let $rowTpl := 
+      try{ fetch:binary( iri-to-uri ( $tplPath ) ) }
+      catch*{ "Ошибка: не удалось прочитать шаблон"}
+    let $fieldsAsString := form:fieldsAsString( $rowTpl, $form:pathGetFieldsAsString )
+    return form:buildCSV ( $fieldsAsString/csv )
+  )
+  else (
+    db:open( "titul24", "forms" )/forms/form[ @id = $id ]/csv
   )
 
-let $formData := form:buildCSV ( $fieldsAsString/csv )
+let $downloadName := 
+  if( $tplPath )
+  then ( $tplPath )
+  else (
+   substring-after( db:open( "titul24", "forms" )/forms/form[ @id = $id ]/@fileName/data(), "--" )
+  )
+
+let $tplPath :=
+  if( $tplPath )
+  then ( $tplPath )
+  else (
+    db:open( "titul24", "forms" )/forms/form[ @id = $id ]/@fileFullPath
+  )
+
 let $meta := $formData//record[ ID/text() = ( "__ОПИСАНИЕ__", "__ABOUT__" ) ] 
 
  let $content := 
     let $inputForm :=  buildForm:buildInputForm ( <data>{ $formData }</data>, $tplPath )
-    let $templateLink := <a href="{ $tplPath }">Ссылка на шаблон</a>
+    let $templateLink := <a href="{ $tplPath }" download="{$downloadName}">Ссылка на шаблон</a>
     let $templateFieldsMap := map{ 
                   "OrgLabel": $meta/org/text(), 
                   "Title": $meta/name/text(),

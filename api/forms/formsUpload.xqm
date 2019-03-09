@@ -37,7 +37,7 @@ function formUpload:upload( $label as xs:string, $file ) {
         db:output( 
           (
             file:write-binary( $fileFullName, $f),
-            web:redirect("/zapolnititul/v/form?id=" || $formID )
+            web:redirect("/zapolnititul/v/forms?id=" || $formID )
           )
         )
       )

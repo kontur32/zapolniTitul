@@ -23,6 +23,7 @@ function formUpload:upload( $label as xs:string, $file ) {
     let $formData :=
       <form 
         id = "{ $formID }" 
+        label = "{ $label }"
         timestamp = "{ $timeStamp }" 
         fileNameOriginal = "{ map:keys( $file )[ 1 ] }"
         fileFullName = "{ $fileFullName }"
@@ -37,7 +38,7 @@ function formUpload:upload( $label as xs:string, $file ) {
         db:output( 
           (
             file:write-binary( $fileFullName, $f),
-            web:redirect("/zapolnititul/v/forms?id=" || $formID )
+            web:redirect("/zapolnititul/v/forms/confirm/" || $formID )
           )
         )
       )

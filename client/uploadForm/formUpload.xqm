@@ -1,14 +1,14 @@
-module namespace upload = "http://dbx.iro37.ru/zapolnititul/form/upload";
+module namespace upload = "http://dbx.iro37.ru/zapolnititul/forms/upload";
 
 import module namespace htmlZT =  "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "../funct/htmlZT.xqm";
 
 declare 
-  %rest:path ( "/zapolnititul/forms/upload" )
+  %rest:path ( "/zapolnititul/v/forms/upload" )
   %output:method ("xhtml")
-function upload:start ( ) {
+function upload:main ( ) {
   let $content :=
   <div>
-    <h1>ЗагрузиШаблон</h1>
+    <h1>Загрузка шаблона</h1>
     <div class="form-group">
      <form method="POST" action="/zapolnititul/api/v1/forms/upload" enctype="multipart/form-data">
         <div class="form-group">

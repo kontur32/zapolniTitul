@@ -27,4 +27,16 @@
     <label>данные</label>
     <value>itemsSourceURL</value>
   </record>
+  <record>
+    <label>изображение</label>
+    <value>img</value>
+  </record>
+  <record>
+    <label>организация</label>
+    <value>org</value>
+  </record>
+  <record>
+    <label>название</label>
+    <value>name</value>
+  </record>
 </csv>

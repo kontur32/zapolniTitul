@@ -6,7 +6,7 @@ import module namespace
   buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "buildForm.xqm";
 
 declare namespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
-declare variable $form:getFieldsAsString := 'http://localhost:8984/ooxml/api/v1/docx/fields';
+declare variable $form:pathGetFieldsAsString := 'http://localhost:8984/ooxml/api/v1/docx/fields';
 declare variable $form:delimiter := "::";
 declare variable $form:map := 
   function ( $string ) {
@@ -46,7 +46,7 @@ let $fieldsAsString :=
           <http:body media-type ="application/octet-stream">{ $rowTpl }</http:body>
       </http:multipart>
     </http:request>,
-    $form:getFieldsAsString
+    $form:pathGetFieldsAsString
     )[2],
     map { 'header': false(), 'separator' : ';' }
   )
@@ -66,7 +66,8 @@ let $meta := $formData//record[ ID/text() = ( "__ОПИСАНИЕ__", "__ABOUT__
     return zt:fillHtmlTemplate( $contentTemplate, $templateFieldsMap )/child::*
 
 let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
-let $templateFieldsMap := map{ "sidebar" : "", "content" : $content, "nav" : "", "nav-login" : "" }
+let $sidebar := <img class="img-fluid" src="{$meta/img/text()}"></img>
+let $templateFieldsMap := map{ "sidebar" :  $sidebar, "content" : $content, "nav" : "", "nav-login" : "" }
 return 
   if ( $output = "iframe")
   then (
@@ -78,7 +79,7 @@ return
 };
 
 declare 
-  %private
+  %public
 function form:buildCSV( $csv as element(csv) ) as element(csv) {
        element { "csv" } {
        for $record in $csv/record
@@ -96,4 +97,22 @@ function form:buildCSV( $csv as element(csv) ) as element(csv) {
                }
          }
     }
+};
+
+declare 
+  %public
+function form:fieldsAsString( $rowTpl, $pathGetFieldsAsString ) {
+  csv:parse (
+   http:send-request(
+    <http:request method='post'>
+      <http:header name="Content-type" value="multipart/form-data; boundary=----7MA4YWxkTrZu0gW"/>
+      <http:multipart media-type = "multipart/form-data" >
+          <http:header name='Content-Disposition' value='form-data; name="template"'/>
+          <http:body media-type ="application/octet-stream">{ $rowTpl }</http:body>
+      </http:multipart>
+    </http:request>,
+    $pathGetFieldsAsString
+    )[2],
+    map { 'header': false(), 'separator' : ';' }
+  )
 };

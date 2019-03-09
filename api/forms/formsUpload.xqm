@@ -1,7 +1,7 @@
 module namespace formUpload = "http://dbx.iro37.ru/zapolnititul/api/form/upload";
 
-import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "config.xqm";
-import module namespace form = "http://dbx.iro37.ru/zapolnititul/" at "../client/viewFormFromTemplate.xqm";
+import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../config.xqm";
+import module namespace form = "http://dbx.iro37.ru/zapolnititul/" at "../../client/viewFormFromTemplate.xqm";
 
 declare
   %updating 
@@ -9,18 +9,17 @@ declare
   %rest:POST
   %rest:form-param ( "label", "{ $label }", "" )
   %rest:form-param ( "file", "{ $file }" )
-function formUpload:get( $label as xs:string, $file ) {
+function formUpload:upload( $label as xs:string, $file ) {
     let $f := $file( map:keys( $file )[ 1 ] )
     let $timeStamp := string( current-dateTime() )
     let $formID := random:uuid()
     let $fileNameToSave := $formID || ".docx"
     let $fileFullName := $config:param( "static" ) || $config:param( "usersTemplatePath" ) || $fileNameToSave
     
-    let $fileFullPath := $config:param( "httpStatic" ) || $config:param( "usersTemplatePath" ) || $fileNameToSave 
+    let $fileFullPath := $config:param( "httpStatic" ) || $formID 
     
     let $formCSV := form:buildCSV( form:fieldsAsString( $f, $config:param( "fieldsAsStringPath" ) )/csv )
-    
-    
+        
     let $formData :=
       <form 
         id = "{ $formID }" 

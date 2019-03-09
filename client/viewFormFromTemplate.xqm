@@ -23,7 +23,7 @@ declare variable $form:map :=
 
 declare
   %rest:GET 
-  %rest:path("/zapolnititul/v/form")
+  %rest:path("/zapolnititul/v/forms")
   %output:method ("xhtml")
   %rest:query-param( "path", "{ $tplPath }", "" )
   %rest:query-param( "id", "{ $id }", "")

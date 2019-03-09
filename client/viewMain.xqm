@@ -10,6 +10,7 @@ declare
   %rest:path ( "/zapolnititul" )
   %output:method ("xhtml")
 function zt:start ( ) {
+  let $href := "/zapolnititul/v/forms/upload"
   let $content :=
   <div>
     <h1>ЗаполниТитул</h1>
@@ -17,6 +18,10 @@ function zt:start ( ) {
     <p>
       Публикуйте шаблоны для удобного заполнения и выгрузки. 
       <a href="/zapolnititul/v/ivgpu?path=iitegn/euf&amp;form=magDiplom">Например, такие...</a>
+    </p>
+    <p>
+      Чтобы создать форму для заполнения шаблона без регистрации нажмите 
+      <a class="btn btn-info" href="{$href}">здесь</a>
     </p>
     
   </div>

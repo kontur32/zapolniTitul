@@ -1,7 +1,7 @@
 module namespace formUpload = "http://dbx.iro37.ru/zapolnititul/api/form/upload";
 
 import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../config.xqm";
-import module namespace form = "http://dbx.iro37.ru/zapolnititul/" at "../../client/viewFormFromTemplate.xqm";
+import module namespace form = "http://dbx.iro37.ru/zapolnititul/v/forms" at "../../client/viewFormFromTemplate.xqm";
 
 declare
   %updating 

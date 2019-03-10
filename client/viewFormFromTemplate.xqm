@@ -1,14 +1,15 @@
-module namespace form = "http://dbx.iro37.ru/zapolnititul/";
+module namespace view = "http://dbx.iro37.ru/zapolnititul/v/forms";
 
-import module namespace zt = "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "funct/htmlZT.xqm";
+import module namespace 
+  htmlZT = "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "funct/htmlZT.xqm";
 
 import module namespace 
   buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "funct/buildForm.xqm";
 
 declare namespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
-declare variable $form:pathGetFieldsAsString := 'http://localhost:8984/ooxml/api/v1/docx/fields';
-declare variable $form:delimiter := "::";
-declare variable $form:map := 
+declare variable $view:pathGetFieldsAsString := 'http://localhost:8984/ooxml/api/v1/docx/fields';
+declare variable $view:delimiter := "::";
+declare variable $view:map := 
   function ( $string ) {
     let $map := doc("src/map.xml")
     return
@@ -28,7 +29,7 @@ declare
   %rest:query-param( "path", "{ $tplPath }", "" )
   %rest:query-param( "id", "{ $id }", "")
   %rest:query-param( "output", " { $output }", "main" )
-function form:formFromTemplate ( $tplPath, $id, $output ){
+function view:formFromTemplate ( $tplPath, $id, $output ){
 
 let $formData :=
   if ( $tplPath )
@@ -36,8 +37,8 @@ let $formData :=
     let $rowTpl := 
       try{ fetch:binary( iri-to-uri ( $tplPath ) ) }
       catch*{ "Ошибка: не удалось прочитать шаблон"}
-    let $fieldsAsString := form:fieldsAsString( $rowTpl, $form:pathGetFieldsAsString )
-    return form:buildCSV ( $fieldsAsString/csv )
+    let $fieldsAsString := view:fieldsAsString( $rowTpl, $view:pathGetFieldsAsString )
+    return view:buildCSV ( $fieldsAsString/csv )
   )
   else (
     db:open( "titul24", "forms" )/forms/form[ @id = $id ]/csv
@@ -68,37 +69,37 @@ let $meta := $formData//record[ ID/text() = ( "__ОПИСАНИЕ__", "__ABOUT__
                   "inputForm" : ( $templateLink, $inputForm )
                 }
     let $contentTemplate := serialize( doc("src/content-tpl.html") )            
-    return zt:fillHtmlTemplate( $contentTemplate, $templateFieldsMap )/child::*
+    return htmlZT:fillHtmlTemplate( $contentTemplate, $templateFieldsMap )/child::*
 
 let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
-let $sidebar := <img class="img-fluid" src="{$meta/img/text()}"></img>
+let $sidebar := <img class="img-fluid" src="{ $meta/img/text() }"></img>
 let $templateFieldsMap := map{ "sidebar" :  $sidebar, "content" : $content, "nav" : "", "nav-login" : "" }
 return 
-  if ( $output = "iframe")
+  if ( $output = "iframe" )
   then (
     $content 
   )
   else (
-    zt:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
+    htmlZT:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
   )
 };
 
 declare 
   %public
-function form:buildCSV( $csv as element(csv) ) as element(csv) {
+function view:buildCSV( $csv as element(csv) ) as element(csv) {
        element { "csv" } {
        for $record in $csv/record
        return
          element { "record" }{
            element { "ID" } {
-             $form:map( normalize-space( $record/entry[ 1 ]/text() ) )
+             $view:map( normalize-space( $record/entry[ 1 ]/text() ) )
            },
            for $entry in $record/entry[ position() > 1 ]/text()
            return
-             let $a := tokenize( $entry, $form:delimiter )
+             let $a := tokenize( $entry, $view:delimiter )
              return 
-               element { $form:map( normalize-space( $a[ 1 ] ) ) } {
-                 $form:map( normalize-space( $a[ 2 ] ) )
+               element { $view:map( normalize-space( $a[ 1 ] ) ) } {
+                 $view:map( normalize-space( $a[ 2 ] ) )
                }
          }
     }
@@ -106,7 +107,7 @@ function form:buildCSV( $csv as element(csv) ) as element(csv) {
 
 declare 
   %public
-function form:fieldsAsString( $rowTpl, $pathGetFieldsAsString ) {
+function view:fieldsAsString( $rowTpl, $pathGetFieldsAsString ) as element( csv ) {
   csv:parse (
    http:send-request(
     <http:request method='post'>

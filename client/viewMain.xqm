@@ -1,8 +1,8 @@
 module namespace zt = "http://dbx.iro37.ru/zapolnititul/";
 
-import module namespace buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "buildForm.xqm";
-import module namespace formData = "http://dbx.iro37.ru/zapolnititul/formData" at "formData.xqm";
-import module namespace functx = "http://www.functx.com"; 
+import module namespace buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "funct/buildForm.xqm";
+import module namespace formData = "http://dbx.iro37.ru/zapolnititul/formData" at "funct/formData.xqm";
+import module namespace htmlZT = "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "funct/htmlZT.xqm";
 
 declare variable $zt:rootPath := "https://docs.google.com/spreadsheets/d/e/2PACX-1vTy56_CSURLwhsG5xwkWGf1EamtjJ1ReB-5qTzRJnYsQ3dXBO57d_8pQkdSGTftVF294fpe7nAgDpt1/pub?gid=746210905&amp;single=true&amp;output=csv";
 
@@ -27,7 +27,7 @@ function zt:start ( ) {
   </div>
  let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
  let $templateFieldsMap := map{"sidebar": "", "content":$content, "nav": "", "nav-login" : ""}
-    return zt:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
+    return htmlZT:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
 };
 
 declare 
@@ -53,21 +53,9 @@ function zt:form ( $org as xs:string, $path as xs:string , $formID as xs:string 
                   "inputForm" : $inputForm
                 }
     let $contentTemplate := serialize( doc("src/content-tpl.html") )
-    return zt:fillHtmlTemplate( $contentTemplate, $templateFieldsMap )/child::*
+    return htmlZT:fillHtmlTemplate( $contentTemplate, $templateFieldsMap )/child::*
   
   let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
   let $templateFieldsMap := map{"sidebar": $sidebar, "content":$content, "nav": "", "nav-login" : ""}
-    return zt:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
-};
-
-(: ------------------------------------------------------------------------------ :)
-
-declare function zt:fillHtmlTemplate( $template, $content )
-{
-  let $changeFrom := 
-      for $i in map:keys( $content )
-      return "\{\{" || $i || "\}\}"
-  let $changeTo := map:for-each( $content, function( $key, $value ) { serialize( $value ) } )
-  return 
-     parse-xml ( functx:replace-multi ( $template, $changeFrom, $changeTo) )
+    return htmlZT:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
 };

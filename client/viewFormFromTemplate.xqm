@@ -1,9 +1,9 @@
 module namespace form = "http://dbx.iro37.ru/zapolnititul/";
 
-import module namespace zt = "http://dbx.iro37.ru/zapolnititul/" at "viewMain.xqm";
+import module namespace zt = "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "funct/htmlZT.xqm";
 
 import module namespace 
-  buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "buildForm.xqm";
+  buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "funct/buildForm.xqm";
 
 declare namespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 declare variable $form:pathGetFieldsAsString := 'http://localhost:8984/ooxml/api/v1/docx/fields';

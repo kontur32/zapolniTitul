@@ -1,11 +1,14 @@
 module namespace view = "http://dbx.iro37.ru/zapolnititul/v/forms";
 
 import module namespace 
-  htmlZT = "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "funct/htmlZT.xqm";
+  form = "http://dbx.iro37.ru/zapolnititul/funct/form" at "../funct/functForm.xqm";
 
 import module namespace 
   buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "funct/buildForm.xqm";
-
+  
+import module namespace 
+  htmlZT = "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "funct/htmlZT.xqm";
+(:
 declare namespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 declare variable $view:pathGetFieldsAsString := 'http://localhost:8984/ooxml/api/v1/docx/fields';
 declare variable $view:delimiter := "::";
@@ -21,6 +24,7 @@ declare variable $view:map :=
         $string
       )
   };
+:)
 
 declare
   %rest:GET 
@@ -37,8 +41,7 @@ let $formData :=
     let $rowTpl := 
       try{ fetch:binary( iri-to-uri ( $tplPath ) ) }
       catch*{ "Ошибка: не удалось прочитать шаблон"}
-    let $fieldsAsString := view:fieldsAsString( $rowTpl, $view:pathGetFieldsAsString )
-    return view:buildCSV ( $fieldsAsString/csv )
+    return form:csvFromTemplate ( $rowTpl )
   )
   else (
     db:open( "titul24", "forms" )/forms/form[ @id = $id ]/csv
@@ -84,6 +87,7 @@ return
   )
 };
 
+(:
 declare 
   %public
 function view:buildCSV( $csv as element(csv) ) as element(csv) {
@@ -107,7 +111,7 @@ function view:buildCSV( $csv as element(csv) ) as element(csv) {
 
 declare 
   %public
-function view:fieldsAsString( $rowTpl, $pathGetFieldsAsString ) as element( csv ) {
+function view:fieldsAsString( $rowTpl, $pathGetFieldsAsString ) {
   csv:parse (
    http:send-request(
     <http:request method='post'>
@@ -122,3 +126,4 @@ function view:fieldsAsString( $rowTpl, $pathGetFieldsAsString ) as element( csv 
     map { 'header': false(), 'separator' : ';' }
   )
 };
+:)

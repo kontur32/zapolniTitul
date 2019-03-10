@@ -1,7 +1,10 @@
 module namespace formUpload = "http://dbx.iro37.ru/zapolnititul/api/form/upload";
 
 import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../config.xqm";
-import module namespace form = "http://dbx.iro37.ru/zapolnititul/v/forms" at "../../client/viewFormFromTemplate.xqm";
+
+import module namespace 
+  form = "http://dbx.iro37.ru/zapolnititul/funct/form" at "../../funct/functForm.xqm";
+
 
 declare
   %updating 
@@ -17,9 +20,9 @@ function formUpload:upload( $label as xs:string, $file ) {
     let $fileFullName := $config:param( "static" ) || $config:param( "usersTemplatePath" ) || $fileNameToSave
     
     let $fileFullPath := $config:param( "httpStatic" ) || $formID 
-    
-    let $formCSV := form:buildCSV( form:fieldsAsString( $f, $config:param( "fieldsAsStringPath" ) )/csv )
-        
+     
+    let $formCSV := form:csvFromTemplate ( $f )
+            
     let $formData :=
       <form 
         id = "{ $formID }" 

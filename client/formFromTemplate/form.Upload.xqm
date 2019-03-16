@@ -19,6 +19,7 @@ function upload:main ( ) {
          <label>Выберите файл с шаблоном</label>
          <input class="form-control" type="file" name="file" multiple="multiple"/>
        </div>
+        <input class="form-control" type="hidden" name="redirect" value="/zapolnititul/v/forms/complete/"/>
         <p>и нажмите </p>
         <input class="btn btn-info" type="submit" value="Загрузить..."/>
      </form>

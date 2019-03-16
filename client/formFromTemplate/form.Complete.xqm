@@ -3,7 +3,7 @@ module namespace confirm = "http://dbx.iro37.ru/zapolnititul/forms/confirm";
 import module namespace htmlZT =  "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "../funct/htmlZT.xqm";
 
 declare 
-  %rest:path ( "/zapolnititul/v/forms/confirm/{$id}" )
+  %rest:path ( "/zapolnititul/v/forms/complete/{$id}" )
   %output:method ("xhtml")
 function confirm:main ( $id ) {
   let $form := db:open("titul24", "forms")/forms/form[ @id = $id ]

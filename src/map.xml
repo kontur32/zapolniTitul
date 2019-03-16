@@ -39,4 +39,16 @@
     <label>название</label>
     <value>name</value>
   </record>
+  <record>
+    <label>включать</label>
+    <value>enable</value>
+  </record>
+  <record>
+  <label>да</label>
+    <value>true</value>
+  </record>
+  <record>
+  <label>нет</label>
+    <value>false</value>
+  </record>
 </csv>

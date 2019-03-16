@@ -5,7 +5,7 @@ declare variable $form:delimiter := "::";
 
 declare 
   %public
-function form:csvFromTemplate ( $template ) {
+function form:csvFromTemplate ( $template ) as element( csv ) {
   let $fields := form:fieldsAsString( $template, $form:pathFieldsAsCSV )
   return form:buildCSV( $fields )
 };

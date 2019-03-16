@@ -3,14 +3,15 @@ module namespace buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm";
 declare function buildForm:buildInputForm ( $inputFormData, $templatePath ){  
   let $inputFormFields :=
      for $field in $inputFormData/csv/record
-     let $inputType := 
-       if ( not( empty( $field/inputType/text() ) ) )
-       then ( $field/inputType/text() )
-       else ( "text" )
-   let $label := 
-     if ( not( empty( $field/label/text() ) ) )
-     then ( $field/label/text() )
-     else ( $field/ID/text() )
+     where not ( $field/enable/text() = "false" )
+       let $inputType := 
+         if ( not( empty( $field/inputType/text() ) ) )
+         then ( $field/inputType/text() )
+         else ( "text" )
+       let $label := 
+         if ( not( empty( $field/label/text() ) ) )
+         then ( $field/label/text() )
+         else ( $field/ID/text() )
      return
        switch ( $inputType )
        case ( "hidden" )

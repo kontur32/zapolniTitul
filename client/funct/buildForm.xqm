@@ -1,6 +1,6 @@
 module namespace buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm";
 
-declare function buildForm:buildInputForm ( $inputFormData, $templatePath ){  
+declare function buildForm:buildInputForm ( $inputFormData, $id, $templatePath ){  
   let $inputFormFields :=
      for $field in $inputFormData/csv/record
      where not ( $field/enable/text() = "false" )
@@ -37,12 +37,27 @@ declare function buildForm:buildInputForm ( $inputFormData, $templatePath ){
                <label>{ $label }</label> 
                <select class="form-control" name="{ $field/ID/text() }">
                  {
-                    let $items := 
-                         csv:parse ( 
-                           fetch:text ( 
-                             $field/itemsSourceURL/text() ),
-                             map { 'header': true() }
-                         )/csv/record/label
+                  let $itemsQueryURL :=
+                    if ( $inputFormData/csv/record[ID="__ОПИСАНИЕ__"]/itemsSourceURL/text()="true" and not ($field/itemsSourceURL) ) 
+                    then (
+                      "http://localhost:8984/zapolnititul/api/v1/forms/data/" 
+                      || $id 
+                      || "?f=" 
+                      || $field/ID/text()
+                    )
+                    else ( $field/itemsSourceURL/text() )
+                  
+                  let $csvHeader := 
+                    if ( $inputFormData/csv/record[ID="__ОПИСАНИЕ__"]/itemsSourceURL/text()="true" and not ($field/itemsSourceURL) ) 
+                    then ( false() )
+                    else ( true() )
+                    
+                  let $items := 
+                       csv:parse ( 
+                         fetch:text ( 
+                           iri-to-uri( $itemsQueryURL ) ),
+                           map { 'header': $csvHeader }
+                       )/csv/record/child::*[ 1 or name()="label" ][ 1 ]
                    for $item in $items
                    return 
                      <option value="{ $item }">

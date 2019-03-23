@@ -5,9 +5,9 @@ declare variable $form:delimiter := "::";
 
 declare 
   %public
-function form:csvFromTemplate ( $template ) as element( csv ) {
+function form:recordFromTemplate ( $template ) as element( csv ) {
   let $fields := form:fieldsAsString( $template, $form:pathFieldsAsCSV )
-  return form:buildCSV( $fields )
+  return form:buildFormRecord( $fields )
 };
 
 declare function form:map ( $string ) {
@@ -24,7 +24,7 @@ declare function form:map ( $string ) {
 
 declare 
   %public
-function form:buildCSV( $csv as element(csv) ) as element(csv) {
+function form:buildFormRecord( $csv as element(csv) ) as element(csv) {
        element { "csv" } {
        for $record in $csv/record
        return

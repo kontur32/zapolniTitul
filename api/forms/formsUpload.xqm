@@ -10,26 +10,29 @@ declare
   %rest:path ( "/zapolnititul/api/v1/forms/upload" )
   %rest:POST
   %rest:form-param ( "label", "{ $label }", "" )
-  %rest:form-param ( "file", "{ $file }" )
+  %rest:form-param ( "template", "{ $template }" )
+  %rest:form-param ( "data", "{ $data }" )
   %rest:form-param ( "redirect", "{ $redirect }", "/zapolnititul/v/forms/confirm/" )
-function formUpload:upload( $label as xs:string, $file, $redirect as xs:string ) {
-    let $f := $file( map:keys( $file )[ 1 ] )
+function formUpload:upload( $label, $template, $data, $redirect ) {
+    let $f := $template( map:keys( $template )[ 1 ] )
+    let $d := formUpload:request( $data( map:keys( $data )[ 1 ] ) )
     let $timeStamp := string( current-dateTime() )
     let $formID := random:uuid()
     let $fileNameToSave := $formID || ".docx"
     let $fileFullName := $config:param( "static" ) || $config:param( "usersTemplatePath" ) || $fileNameToSave
     let $fileFullPath := $config:param( "httpStatic" ) || $formID 
  
-    let $formCSV := form:csvFromTemplate ( $f )       
+    let $formRecord := form:recordFromTemplate ( $f )       
     let $formData :=
       <form 
         id = "{ $formID }" 
         label = "{ $label }"
         timestamp = "{ $timeStamp }" 
-        fileNameOriginal = "{ map:keys( $file )[ 1 ] }"
+        fileNameOriginal = "{ map:keys( $template )[ 1 ] }"
         fileFullName = "{ $fileFullName }"
         fileFullPath = '{ $fileFullPath }'>
-          { $formCSV }
+          { $formRecord }
+          <data>{ $d }</data>
       </form>
       
     return
@@ -43,3 +46,30 @@ function formUpload:upload( $label as xs:string, $file, $redirect as xs:string )
         )
       )
  };
+ 
+declare 
+  %private
+function formUpload:request ( $data ) {
+  let $request := 
+  <http:request method='post'>
+      <http:header name="Content-type" value="multipart/form-data; boundary=----7MA4YWxkTrZu0gW"/>
+      <http:multipart media-type = "multipart/form-data" >
+          <http:header name='Content-Disposition' value='form-data; name="data"'/>
+          <http:body media-type = "application/octet-stream">
+             { $data }
+          </http:body>
+          <http:header name='Content-Disposition' value='form-data; name="template"'/>
+          <http:body media-type = "xml">
+             <a/>
+          </http:body>
+      </http:multipart> 
+    </http:request>
+
+let $response := 
+    http:send-request(
+      $request,
+      "http://localhost:8984/xlsx/api/parse/raw-trci"
+  )
+  return
+   $response[2]
+};

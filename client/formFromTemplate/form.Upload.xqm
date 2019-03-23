@@ -4,8 +4,9 @@ import module namespace htmlZT =  "http://dbx.iro37.ru/zapolnititul/funct/htmlZT
 
 declare 
   %rest:path ( "/zapolnititul/v/forms/upload" )
+  %rest:query-param( "data", "{ $data }", "no")
   %output:method ("xhtml")
-function upload:main ( ) {
+function upload:main ( $data ) {
   let $content :=
   <div>
     <h1>Загрузка шаблона</h1>
@@ -17,8 +18,18 @@ function upload:main ( ) {
        </div>
        <div class="form-group">
          <label>Выберите файл с шаблоном</label>
-         <input class="form-control" type="file" name="file" multiple="multiple"/>
+         <input class="form-control" type="file" name="template" multiple="multiple"/>
        </div>
+       {
+         if ( $data = "yes")
+         then (
+           <div class="form-group">
+             <label>Выберите файл с данными (.xlsx)</label>
+             <input class="form-control" type="file" name="data" multiple="multiple"/>
+           </div>
+         )
+         else ()
+       }
         <input class="form-control" type="hidden" name="redirect" value="/zapolnititul/v/forms/complete/"/>
         <p>и нажмите </p>
         <input class="btn btn-info" type="submit" value="Загрузить..."/>

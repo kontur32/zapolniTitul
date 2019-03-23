@@ -46,7 +46,7 @@ function zt:form ( $org as xs:string, $path as xs:string , $formID as xs:string 
 
   let $content := 
     let $inputFormParam := csv:parse ( fetch:text ( $data/formURL/text() ), map { 'header': true() } )
-    let $inputForm := buildForm:buildInputForm (  $inputFormParam, $data/formTemplate/text() )
+    let $inputForm := buildForm:buildInputForm (  $inputFormParam, "id", $data/formTemplate/text() )
     let $templateFieldsMap := map{ 
                   "OrgLabel": $data/formTitle/text(), 
                   "Title": $data/formLabel/text(),

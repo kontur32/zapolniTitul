@@ -24,7 +24,7 @@ let $formData :=
     let $rowTpl := 
       try{ fetch:binary( iri-to-uri ( $tplPath ) ) }
       catch*{ "Ошибка: не удалось прочитать шаблон"}
-    return form:csvFromTemplate ( $rowTpl )
+    return form:recordFromTemplate ( $rowTpl )
   )
   else (
     db:open( "titul24", "forms" )/forms/form[ @id = $id ]/csv
@@ -47,7 +47,7 @@ let $tplPath :=
 let $meta := $formData//record[ ID/text() = ( "__ОПИСАНИЕ__", "__ABOUT__" ) ] 
 
  let $content := 
-    let $inputForm :=  buildForm:buildInputForm ( <data>{ $formData }</data>, $tplPath )
+    let $inputForm :=  buildForm:buildInputForm ( <data>{ $formData }</data>, $formData/parent::*/@id/data(), $tplPath )
     let $templateLink := <a href="{ $tplPath }" download="{$downloadName}">Ссылка на шаблон</a>
     let $templateFieldsMap := map{ 
                   "OrgLabel": $meta/org/text(), 

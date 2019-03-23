@@ -6,8 +6,7 @@ declare
   %rest:path ( "/zapolnititul/api/v1/forms/template/{$id}" )
   %rest:GET
 function formTpl:get( $id as xs:string ) {
-  let $fileFullName := db:open( "titul24", "forms" )//forms/form[ @id = $id ]/@fileFullName/data()
-  let $fileName := db:open( "titul24", "forms" )//forms/form[ @id = $id ]/@id/data() || ".docx"
+  let $fileFullName := $config:forms()//forms/form[ @id = $id ]/@fileFullName/data()
   let $file := file:read-binary( $fileFullName ) 
   let $ContentDispositionValue := "attachment; filename=" || "titul24.docx"
   return 

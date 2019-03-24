@@ -15,7 +15,13 @@ declare
   %rest:form-param ( "redirect", "{ $redirect }", "/zapolnititul/v/forms/confirm/" )
 function formUpload:upload( $label, $template, $data, $redirect ) {
     let $f := $template( map:keys( $template )[ 1 ] )
-    let $d := formUpload:request( $data( map:keys( $data )[ 1 ] ) )
+    let $d := 
+      if ( $data )
+      then (
+         formUpload:request( $data( map:keys( $data )[ 1 ] ) )   
+      )
+      else ()
+    
     let $timeStamp := string( current-dateTime() )
     let $formID := random:uuid()
     let $fileNameToSave := $formID || ".docx"

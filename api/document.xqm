@@ -7,10 +7,10 @@ declare
   %rest:method ( "GET" )
   %rest:query-param ( "fileName", "{ $fileName }", "ZapolniTitul.docx" )
   %rest:query-param ( "templatePath", "{ $templatePath }" )
-function restDocx:get1 ( $fileName, $templatePath as xs:string ) {
+function restDocx:document ( $fileName, $templatePath as xs:string ) {
   let $template := 
     try {
-     string( fetch:binary ( iri-to-uri ( $templatePath ) ) )
+      string( fetch:binary( iri-to-uri( $templatePath ) ) )
     }
     catch * { 
     }
@@ -21,7 +21,7 @@ function restDocx:get1 ( $fileName, $templatePath as xs:string ) {
       {
         for $param in request:parameter-names()
         return 
-          <cell id="{ $param }">{request:parameter( $param )}</cell>
+          <cell id="{ $param }">{ request:parameter( $param ) }</cell>
       }
       </row>
     </table>     
@@ -43,7 +43,7 @@ function restDocx:get1 ( $fileName, $templatePath as xs:string ) {
   let $response := 
     http:send-request(
       $request,
-      'http://localhost:8984/ooxml/api/v1/docx/single'
+      'http://localhost:8984/api/v1/ooxml/docx/template/complete'
   )
   let $ContentDispositionValue := "attachment; filename=" || $fileName
   return
@@ -65,7 +65,7 @@ declare
   %rest:method ( "GET" )
   %rest:query-param ( "fileName", "{ $fileName }", "ZapolniTitul.docx" )
   %rest:query-param ( "templatePath", "{ $templatePath }" )
-function restDocx:get2 ( $fileName, $templatePath as xs:string ) {
+function restDocx:document1 ( $fileName, $templatePath as xs:string ) {
   let $tpl := 
     try {
       fetch:binary ( iri-to-uri ( $templatePath ) )

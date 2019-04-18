@@ -47,7 +47,15 @@ let $tplPath :=
 let $meta := $formData//record[ ID/text() = ( "__ОПИСАНИЕ__", "__ABOUT__" ) ] 
 
  let $content := 
-    let $inputForm :=  buildForm:buildInputForm ( <data>{ $formData }</data>, $formData/parent::*/@id/data(), $tplPath )
+    let $inputForm :=  
+      buildForm:buildInputForm ( 
+        $formData, 
+        map{ 
+          "id" : $formData/parent::*/@id/data(), 
+          "templatePath" : $tplPath, 
+          "method" : "POST", 
+          "action" : "/zapolnititul/api/v1/document" }
+        )
     let $templateLink := <a href="{ $tplPath }" download="{$downloadName}">Ссылка на шаблон</a>
     let $templateFieldsMap := map{ 
                   "OrgLabel": $meta/org/text(), 

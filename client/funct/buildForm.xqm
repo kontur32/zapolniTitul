@@ -1,8 +1,33 @@
 module namespace buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm";
 
-declare function buildForm:buildInputForm ( $inputFormData, $id, $templatePath ){  
+declare 
+  %public
+function buildForm:buildInputForm ( 
+  $inputFormData as element( csv ), 
+  $param as item()
+){  
+
+  buildForm:buildInputForm-main ( 
+    $inputFormData, 
+    $param?id, 
+    $param?templatePath,
+    $param?method,
+    $param?action
+  )
+};
+
+
+declare 
+  %private
+function buildForm:buildInputForm-main ( 
+  $inputFormData as element( csv ), 
+  $id as xs:string, 
+  $templatePath as xs:string,
+  $method as xs:string,
+  $action as xs:string 
+){  
   let $inputFormFields :=
-     for $field in $inputFormData/csv/record
+     for $field in $inputFormData/record
      where not ( $field/enable/text() = "false" )
        let $inputType := 
          if ( not( empty( $field/inputType/text() ) ) )
@@ -72,7 +97,7 @@ declare function buildForm:buildInputForm ( $inputFormData, $id, $templatePath )
  
   return
     <div class="form-group">
-     <form method="GET" action="/zapolnititul/api/v1/document">
+     <form method="{ $method }" action="{ $action }">
        { 
          $inputFormFields
        }

@@ -5,8 +5,8 @@ import module namespace request = "http://exquery.org/ns/request";
 declare 
   %rest:path ( "/zapolnititul/api/v1/document" )
   %rest:method ( "POST" )
-  %rest:query-param ( "fileName", "{ $fileName }", "ZapolniTitul.docx" )
-  %rest:query-param ( "templatePath", "{ $templatePath }" )
+  %rest:form-param ( "fileName", "{ $fileName }", "ZapolniTitul.docx" )
+  %rest:form-param ( "templatePath", "{ $templatePath }" )
 function restDocx:document-POST ( $fileName, $templatePath as xs:string ) {
   let $template := 
     try {
@@ -20,8 +20,21 @@ function restDocx:document-POST ( $fileName, $templatePath as xs:string ) {
       <row id="fields">
       {
         for $param in request:parameter-names()
-        return 
-          <cell id="{ $param }">{ request:parameter( $param ) }</cell>
+        let $paramValue := request:parameter( $param )
+        where not ( $paramValue instance of map(*)  )
+        return
+            <cell id="{ $param }" contentType = "field">{ $paramValue }</cell>
+      }
+      </row>
+      <row id="pictures">
+      {
+        for $param in request:parameter-names()
+        let $paramValue := request:parameter( $param )
+        where ( $paramValue instance of map(*)  )
+        return
+            <cell id="{ $param }" contentType = "img"> 
+              { map:get( $paramValue, map:keys( $paramValue )[1] )  }
+            </cell>  
       }
       </row>
     </table>     
@@ -51,12 +64,13 @@ function restDocx:document-POST ( $fileName, $templatePath as xs:string ) {
       <rest:response>
         <http:response status="200">
           <http:header name="Content-Disposition" value="{$ContentDispositionValue}" />
-          <http:header name="Content-type" value="application/octet-stream"/>
+          <http:header name="Content-type" value="application/xml"/>
         </http:response>
       </rest:response>,
       $response[2]
      )
 };
+
 
 (:------------------- старые варианты GET ---------------------------- :)
 declare 

@@ -32,21 +32,27 @@ function zt:start ( ) {
 
 declare 
   %rest:path ( "/zapolnititul/v/{$org}" )
-  %rest:query-param( "path", "{$path}", "")
-  %rest:query-param( "form", "{$formID}")
+  %rest:query-param( "path", "{ $path }", "")
+  %rest:query-param( "form", "{ $formID }")
   %output:method ("xhtml")
 function zt:form ( $org as xs:string, $path as xs:string , $formID as xs:string ) {
-  
   let $data := formData:getFormData ( $zt:rootPath, $org || "/" || $path, $formID )
-  
   let $sidebar := 
     <div class = "pt-3" >
       <img class="img-fluid"  src="{ $data/logoPath/text() }"/>
     </div>
 
   let $content := 
-    let $inputFormParam := csv:parse ( fetch:text ( $data/formURL/text() ), map { 'header': true() } )
-    let $inputForm := buildForm:buildInputForm (  $inputFormParam, "id", $data/formTemplate/text() )
+    let $inputFormParam := csv:parse( fetch:text( $data/formURL/text() ), map { 'header': true() } )/csv
+    let $inputForm := buildForm:buildInputForm (  
+      $inputFormParam, 
+       map{ 
+          "id" : "id", 
+          "templatePath" :  $data/formTemplate/text(), 
+          "method" : "POST", 
+          "action" : "/zapolnititul/api/v1/document" }
+        )
+      
     let $templateFieldsMap := map{ 
                   "OrgLabel": $data/formTitle/text(), 
                   "Title": $data/formLabel/text(),

@@ -93,11 +93,17 @@ function buildForm:buildInputForm-main (
                  }
                </select>
             </div>
+       case ( "img" )
+         return
+           <div class="form-group">
+             <label>{ $label }</label>
+             <input class="form-control" type="file"  name="{ $field/ID/text() }" value="{ $field/defaultValue/text() }"/>
+           </div>
        default return ""
  
   return
     <div class="form-group">
-     <form method="{ $method }" action="{ $action }">
+     <form method="{ $method }" action="{ $action }" enctype="multipart/form-data">
        { 
          $inputFormFields
        }

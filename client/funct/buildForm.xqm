@@ -63,7 +63,7 @@ function buildForm:buildInputForm-main (
                <select class="form-control" name="{ $field/ID/text() }">
                  {
                   let $itemsQueryURL :=
-                    if ( $inputFormData/csv/record[ID="__ОПИСАНИЕ__"]/itemsSourceURL/text()="true" and not ($field/itemsSourceURL) ) 
+                    if ( $inputFormData/csv/record[ ID="__ОПИСАНИЕ__" ]/itemsSourceURL/text()="true" and not ( $field/itemsSourceURL ) ) 
                     then (
                       "http://localhost:8984/zapolnititul/api/v1/forms/data/" 
                       || $id 
@@ -78,11 +78,21 @@ function buildForm:buildInputForm-main (
                     else ( true() )
                     
                   let $items := 
-                       csv:parse ( 
-                         fetch:text ( 
-                           iri-to-uri( $itemsQueryURL ) ),
+                    let $dataSource := 
+                      try {
+                         fetch:text( iri-to-uri( $itemsQueryURL ) )
+                      }
+                      catch * {
+                        "<csv><record><label>(!) Ошибка: Источник данных для списка не доступен</label></record></csv>"
+                      }
+                      return
+                      try{
+                       csv:parse( 
+                           $dataSource,
                            map { 'header': $csvHeader }
                        )/csv/record/child::*[ 1 or name()="label" ][ 1 ]
+                     }
+                     catch* { <label>(!) Ошибка: Данные для списка пустые или недлежащего формата</label> }
                    for $item in $items
                    return 
                      <option value="{ $item }">

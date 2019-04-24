@@ -1,5 +1,6 @@
 module namespace formUpload = "http://dbx.iro37.ru/zapolnititul/api/form/upload";
 
+import module namespace Session = "http://basex.org/modules/session";
 import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../config.xqm";
 
 import module namespace 
@@ -31,7 +32,8 @@ function formUpload:upload( $label, $template, $data, $redirect ) {
     let $formRecord := form:recordFromTemplate ( $f )       
     let $formData :=
       <form 
-        id = "{ $formID }" 
+        id = "{ $formID }"
+        username = "{ Session:get( 'username' ) }" 
         label = "{ $label }"
         timestamp = "{ $timeStamp }" 
         fileNameOriginal = "{ map:keys( $template )[ 1 ] }"

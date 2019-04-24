@@ -1,5 +1,6 @@
 module namespace confirm = "http://dbx.iro37.ru/zapolnititul/forms/confirm";
 
+import module namespace Session = "http://basex.org/modules/session";
 import module namespace htmlZT =  "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "../funct/htmlZT.xqm";
 
 declare 
@@ -16,6 +17,6 @@ function confirm:main ( $id ) {
       <p>Обязательно сохраните эту ссылку</p>
     </div>
  let $siteTemplate := serialize( doc( "../src/main-tpl.html" ) )
- let $templateFieldsMap := map{ "sidebar" : "", "content" : $content, "nav" : "", "nav-login" : "" }
+ let $templateFieldsMap := map{ "sidebar" : "", "content" : $content, "nav" : "", "nav-login" : Session:get("username") }
     return htmlZT:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
 };

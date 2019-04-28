@@ -13,11 +13,11 @@ declare
   %rest:form-param ( "label", "{ $label }", "" )
   %rest:form-param ( "template", "{ $template }" )
   %rest:form-param ( "data", "{ $data }" )
-  %rest:form-param ( "redirect", "{ $redirect }", "/zapolnititul/v/forms/confirm/" )
+  %rest:form-param ( "redirect", "{ $redirect }" )
 function formUpload:upload( $label, $template, $data, $redirect ) {
     let $f := $template( map:keys( $template )[ 1 ] )
     let $d := 
-      if ( $data )
+      if ( $data instance of map(*) )
       then (
          formUpload:request( $data( map:keys( $data )[ 1 ] ) )   
       )

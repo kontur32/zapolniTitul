@@ -5,9 +5,20 @@ declare variable $form:delimiter := "::";
 
 declare 
   %public
+  %rest:POST
+  %rest:path( "/ooxml/api/v1/docx/fields/record" )
+  %rest:form-param( "template", "{ $template }")
+  %output:method ( "xml" )
 function form:recordFromTemplate ( $template ) as element( csv ) {
-  let $fields := form:fieldsAsString( $template, $form:pathFieldsAsCSV )
-  return form:buildFormRecord( $fields )
+  let $template_binary := 
+    if ( $template instance of map(*) )
+    then (
+      map:get( $template, map:keys( $template )[1] )
+    )
+    else ( $template )
+  let $fields := form:fieldsAsString( $template_binary, $form:pathFieldsAsCSV )
+  return 
+    form:buildFormRecord( $fields )
 };
 
 declare function form:map ( $string ) {

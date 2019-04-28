@@ -7,7 +7,7 @@ declare
   %rest:path ( "/zapolnititul/v/forms/upload" )
   %rest:query-param( "data", "{ $data }", "no")
   %output:method ("xhtml")
-function upload:main ( $data ) {
+function upload:main ( $data  ) {
   let $content :=
   <div>
     <h1>Загрузка шаблона</h1>

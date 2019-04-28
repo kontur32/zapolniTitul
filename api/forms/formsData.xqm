@@ -11,10 +11,9 @@ function formData:get( $id as xs:string, $field ) {
   let $data := 
     for $r in $config:forms()//forms/form[ @id = $id ]/data/table/row
     return 
-      <row>{ $r/cell[ @label = $field ] }</row>
-    
+      <row>{ $r/cell[ @label = $field ] }</row>  
   return
     (
-    <data>{$data}</data>
-  )
+      <data>{$data}</data>
+    )
 };

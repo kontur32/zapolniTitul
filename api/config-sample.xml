@@ -3,4 +3,5 @@
   <param id="static">C:\BaseX-projects\webapp\static\</param>
   <param id="usersTemplatePath">raw/users/templates/</param>
   <param id="httpStatic">http://localhost:8984/static/</param>
+  <param id="JWTEndpoint">http://localhost/subversum/</param>
 </config>

@@ -5,5 +5,14 @@ declare variable $config:param := function( $param ) {
 };
 
 declare variable $config:forms := function( ) {
-   db:open( "titul24", "forms" )
+   db:open( "titul24", "forms" )/forms
+};
+
+declare variable $config:userForms := 
+  function( $userid as xs:string, $offset as xs:double, $limit as xs:double ) {
+   db:open( "titul24", "forms" )/forms/form[ @userid = $userid ] [ ( position() >= $offset + 1 ) and ( position() <=  $offset + $limit ) ]
+};
+
+declare variable $config:form := function( $id ) {
+    $config:forms()/form[ @id = $id ]
 };

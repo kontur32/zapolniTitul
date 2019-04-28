@@ -1,22 +1,45 @@
 module namespace user = "http://dbx.iro37.ru/zapolnititul/api/users/login";
 
-import module namespace Session = "http://basex.org/modules/session";
+import module namespace session = "http://basex.org/modules/session";
+import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../config.xqm";
 
 declare 
   %private
   %rest:GET
-  %rest:path ( "/zapolnititul/api/v1/users/login-check" )
+  %rest:path ( "/zapolnititul/api/v1/users/login" )
   %rest:query-param( "username", "{ $username }", "")
   %rest:query-param( "password", "{ $password }", "")
-function user:login ( $username, $password ){
-  
-    let $response := user:getToken( "http://localhost/subversum",  $username, $password )
+  %rest:query-param( "callbackURL", "{ $callbackURL }", "/zapolnititul")
+function user:login ( $username, $password, $callbackURL ){
+    let $response := user:getToken( $config:param( "JWTEndpoint" ),  $username, $password )
     return
-      ( Session:set( 'token', $response//token/text() ) ,
-        Session:set( 'username', $username ),
-        web:redirect( "http://localhost:8984/zapolnititul/v/forms/upload" )
+      if ( $response//token/text() )
+      then (
+        let $token := $response//token/text()
+        let $userid := user:userIdJWT( $token )
+        return
+          (
+           session:set( 'token', $token ),
+           session:set( 'userid', $userid ),
+           session:set( 'username', normalize-space( $username ) ),
+           web:redirect( $callbackURL )
+          )
+      )
+      else (
+        web:redirect( $callbackURL )
+      ) 
+};
+
+declare 
+  %private
+  %rest:GET
+  %rest:path ( "/zapolnititul/api/v1/users/logout" )
+  %rest:query-param( "callbackURL", "{ $callbackURL }", "")
+function user:logout ( $callbackURL ){
+  ( 
+    session:close( ),
+    web:redirect( $callbackURL )
   )
- 
 };
 
 
@@ -38,7 +61,11 @@ declare function user:getToken( $host, $username, $password )
         $host || "/wp-json/jwt-auth/v1/token"
     )
     return
-      $response[2]
+      if ( $response[1]/@status/data() = "200" )
+      then(
+        $response[2]
+      )
+      else()
 };
 
 declare function user:getData( $host, $token )
@@ -55,4 +82,10 @@ declare function user:getData( $host, $token )
     )
     return
       $response[2]
+};
+
+declare function user:userIdJWT( $token ) {
+  let $t := function( $a ) { json:parse( convert:binary-to-string ( xs:base64Binary( $a ) ) ) }
+  return
+     $t( tokenize( $token, "\." )[2] )/json/data/user/id/text()
 };

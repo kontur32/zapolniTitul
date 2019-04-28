@@ -5,9 +5,13 @@ import module namespace
 
 import module namespace 
   buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "../funct/buildForm.xqm";
+
+import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
   
+(:
 import module namespace 
   htmlZT = "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "../funct/htmlZT.xqm";
+:)
   
 declare
   %rest:GET 
@@ -63,7 +67,7 @@ let $meta := $formData//record[ ID/text() = ( "__ОПИСАНИЕ__", "__ABOUT__
                   "inputForm" : ( $templateLink, $inputForm )
                 }
     let $contentTemplate := serialize( doc("../src/content-tpl.html") )            
-    return htmlZT:fillHtmlTemplate( $contentTemplate, $templateFieldsMap )/child::*
+    return html:fillHtmlTemplate( $contentTemplate, $templateFieldsMap )/child::*
 
 let $siteTemplate := serialize( doc( "../src/main-tpl.html" ) )
 let $sidebar := <img class="img-fluid" src="{ $meta/img/text() }"></img>
@@ -74,6 +78,6 @@ return
     $content 
   )
   else (
-    htmlZT:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
+    html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
   )
 };

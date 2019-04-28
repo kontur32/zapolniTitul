@@ -5,10 +5,11 @@ import module namespace htmlZT =  "http://dbx.iro37.ru/zapolnititul/funct/htmlZT
 
 declare 
   %rest:path ( "/zapolnititul/v/forms/complete/{$id}" )
+  %rest:query-param( "href", "{ $href }", "/zapolnititul/v/forms" )
   %output:method ("xhtml")
-function confirm:main ( $id ) {
+function confirm:main ( $id, $href ) {
   let $form := db:open("titul24", "forms")/forms/form[ @id = $id ]
-  let $href := "/zapolnititul/v/forms?id=" || $id
+  let $href := $href || "?id=" || $id
   let $content :=
     <div>
       <h2>Загрузка шаблона завершена</h2>

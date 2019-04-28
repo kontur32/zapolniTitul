@@ -8,11 +8,6 @@ import module namespace
 
 import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
   
-(:
-import module namespace 
-  htmlZT = "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "../funct/htmlZT.xqm";
-:)
-  
 declare
   %rest:GET 
   %rest:path("/zapolnititul/v/forms")

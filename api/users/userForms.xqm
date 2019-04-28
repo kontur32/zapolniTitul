@@ -20,7 +20,7 @@ function user:formsList(
       element{ "forms" } {
         for $f in $forms
         return 
-          element {"form" } {$f/attribute::* }
+          element { "form" } { $f/@id, $f/@label }
       }
     )
     else()

@@ -36,8 +36,8 @@ function formPost:post(
     let $formData :=
       <form 
         id = "{ $formID }"
-        username = "{session:get( 'username' )}"
-        userid = "{ session:get( 'userid' )}" 
+        userid = "{ session:get( 'userid' )}"
+        username = "{ session:get( 'username' )}" 
         label = "{ $label }"
         timestamp = "{ $timeStamp }" 
         fileNameOriginal = "{ map:keys( $template )[ 1 ] }"

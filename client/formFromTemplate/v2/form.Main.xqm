@@ -4,6 +4,10 @@ import module namespace request = "http://exquery.org/ns/request";
 import module namespace session = "http://basex.org/modules/session";
 import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
 
+import module namespace 
+  buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "../../funct/buildForm.xqm";
+
+
 declare 
   %rest:GET
   %rest:path ( "/zapolnititul/forms/u/{ $page }" )
@@ -23,7 +27,7 @@ function forms:main ( $page, $id, $message ) {
     if( session:get( "userid") )
     then(
       <ul>{ 
-         for $f in fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid") || "/forms")/forms/form
+         for $f in fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form
          return
            <li>{ $f/@id/data() }</li>
        }</ul>
@@ -34,7 +38,17 @@ function forms:main ( $page, $id, $message ) {
      switch ( $page )
        case ( "main" )
          return
-           "Основная"
+           let $formData := 
+            fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $id || "/fields" )//csv
+           return
+              buildForm:buildInputForm ( 
+                $formData, 
+                map{ 
+                  "id" : $id, 
+                  "templatePath" : "", 
+                  "method" : "POST", 
+                  "action" : "/zapolnititul/api/v1/document" }
+                ) 
        case ( "upload" )
          return
            "Загрузка"
@@ -82,3 +96,4 @@ function forms:logoutForm ( $actionURL, $username, $callbackURL ) {
     </form>
   </div>
 };
+

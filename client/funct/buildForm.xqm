@@ -107,7 +107,7 @@ function buildForm:buildInputForm-main (
          return
            <div class="form-group">
              <label>{ $label }</label>
-             <input class="form-control" type="file"  name="{ $field/ID/text() }" value="{ $field/defaultValue/text() }"/>
+             <input class="form-control" type="file"  name="{ $field/ID/text() }" value="{ $field/defaultValue/text() }" accept="image/*"/>
            </div>
        default return ""
  

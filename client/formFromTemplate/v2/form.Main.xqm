@@ -166,11 +166,11 @@ declare function forms:uploadForm( $data ) {
      <form method="POST" action="/zapolnititul/api/v2/forms/post" enctype="multipart/form-data">
         <div class="form-group">
          <label>Укажите название шаблона</label>
-         <input class="form-control" type="text" name="label"/>
+         <input class="form-control" type="text" name="label" required=""/>
        </div>
        <div class="form-group">
          <label>Выберите файл с шаблоном</label>
-         <input class="form-control" type="file" name="template" multiple="multiple"/>
+         <input class="form-control" type="file" name="template" required="" accept=".docx"/>
        </div>
        {
          if ( $data = "yes")

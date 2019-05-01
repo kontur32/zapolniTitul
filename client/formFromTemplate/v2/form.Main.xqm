@@ -7,6 +7,7 @@ import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
 import module namespace 
   buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "../../funct/buildForm.xqm";
 
+import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../../../api/config.xqm";
 
 declare 
   %rest:GET
@@ -37,7 +38,7 @@ function forms:main ( $page, $id, $message ) {
       then ( $userForms[ 1 ]/@id )
       else (
         try {
-          fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms?offset=3&amp;limit=1")//form[1]/@id/data()
+          fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms?offset=3&amp;limit=1" )//form[1]/@id/data()
         }
         catch*{}
       )
@@ -45,26 +46,27 @@ function forms:main ( $page, $id, $message ) {
   let $sidebar := 
     if( session:get( "userid") )
     then(
-      <div>
+      <div class="col">
         <h3>Ваши шаблоны</h3>
-        <div class="form-group form-check-inline">
-        <form method="POST" action="/zapolnititul/api/v2/forms/delete" enctype="multipart/form-data">
-          <input type="hidden" name="redirect" value="/zapolnititul/forms/u/main"/>
-          <button class="btn btn-info" onclick="return confirm('Удалить?');">Удалить…</button> 
-          <div>
-            { 
+       <div class="row">
+           <div>{
              for $f in $userForms
              return
-               <div>
-                   <input type="checkbox" name="id" value="{ $f/@id/data() }" onclick="buttons(this)">
-                     <a href="/zapolnititul/forms/u/form?id={ $f/@id/data() }">
-                     { if( $f/@label/data() !="" ) then ( $f/@label/data() ) else ( "Без имени" ) }
-                     </a>
-                   </input>
-               </div>
-            }
-           </div>
-         </form>
+             <div class="row">
+                <a class="ml-3 px-2" href="{'/zapolnititul/forms/u/upload?id=' || $f/@id/data() }">
+                  <img width="20" src="http://s1.iconbird.com/ico/2013/8/426/w64h64137758297850CloudArrowUp.png" alt="Обновить" />
+                </a>
+                <form method="POST" action="/zapolnititul/api/v2/forms/delete" enctype="multipart/form-data">
+                  <input type="hidden" name="redirect" value="{$config:param('host') || '/zapolnititul/forms/u/form'}"/>
+                  <input type="hidden" name="id" value="{ $f/@id/data() }"/>
+                  <input type="image" width="20" src="http://s1.iconbird.com/ico/2013/10/464/w128h1281380984637delete13.png" alt="Удалить" onclick="return confirm('Удалить?');">
+                    <a href="/zapolnititul/forms/u/form?id={ $f/@id/data() }">
+                      { if( $f/@label/data() !="" ) then ( $f/@label/data() ) else ( "Без имени" ) }
+                    </a>
+                  </input>
+                </form>
+              </div>
+           }</div>
          </div>
        </div>
     )
@@ -104,7 +106,7 @@ function forms:main ( $page, $id, $message ) {
               </div>
        case ( "upload" )
          return
-           forms:uploadForm ( "yes" )
+           forms:uploadForm ( "yes", $id, $config:param( "host" ) || "/zapolnititul/forms/u/complete" )
        case ( "complete" )
          return 
            forms:complete( $formMeta )
@@ -159,7 +161,7 @@ function forms:logoutForm( $actionURL, $username, $callbackURL ) {
   </div>
 };
 
-declare function forms:uploadForm( $data ) {
+declare function forms:uploadForm( $isData, $id, $redirect ) {
   <div>
     <h1>Загрузка шаблона</h1>
     <div class="form-group">
@@ -173,16 +175,17 @@ declare function forms:uploadForm( $data ) {
          <input class="form-control" type="file" name="template" required="" accept=".docx"/>
        </div>
        {
-         if ( $data = "yes")
+         if ( $isData = "yes")
          then (
            <div class="form-group">
              <label>Выберите файл с данными (.xlsx)</label>
-             <input class="form-control" type="file" name="data" multiple="multiple"/>
+             <input class="form-control" type="file" name="data" accept=".xlsx"/>
            </div>
          )
          else ()
        }
-        <input class="form-control" type="hidden" name="redirect" value="/zapolnititul/forms/u/complete"/>
+        <input type="hidden" name="id" value="{ $id }"/>
+        <input type="hidden" name="redirect" value="{ $redirect }"/>
         <p>и нажмите </p>
         <input class="btn btn-info" type="submit" value="Загрузить..."/>
      </form>

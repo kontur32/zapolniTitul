@@ -112,10 +112,10 @@ function forms:main ( $page, $id, $message ) {
     
   let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
   let $nav :=
-    <div class="form-group form-check-inline"> 
-    <form method="GET" action="/zapolnititul/forms/u/upload">
-      <input class="btn btn-info" type="submit" value="Новая форма"/>
-    </form>
+    <div class="form-group"> 
+      <form method="GET" action="/zapolnititul/forms/u/upload">
+        <input class="btn btn-info" type="submit" value="Новая форма"/>
+      </form>
     </div>
   let $templateFieldsMap := map{ "sidebar": $sidebar, "content": $content, "nav": $nav, "nav-login" : $login }
   return 
@@ -133,14 +133,16 @@ declare
   %private
 function forms:loginForm ( $actionURL, $callbackURL, $regURL ) {
   <div class="form-group">
-    <form method="GET" action="{ $actionURL }" class="form-group form-inline my-sm-0">
-      <input type="text" name="username" placeholder="логин"  class="mr-sm-1"/>
-      <input type="password" name="password" placeholder="пароль" class="mr-sm-1"/>
-      <input type="hidden" name="callbackURL" value="{ $callbackURL }"/>
-      <input class="btn btn-info" type="submit" value="Войти"/>
-    </form>
+    <div class="form-inline">
+      <form method="GET" action="{ $actionURL }" class="form-group form-inline my-sm-0">
+        <input type="text" name="username" placeholder="логин"  class="mr-sm-1"/>
+        <input type="password" name="password" placeholder="пароль" class="mr-sm-1"/>
+        <input type="hidden" name="callbackURL" value="{ $callbackURL }"/>
+        <input class="btn btn-info" type="submit" value="Войти"/>
+      </form>
+    </div>
     <div class="my-sm-0">
-      <a href="{ $regURL }">Зарегистрироваться</a>
+        <a class="text-muted" href="{ $regURL }">Зарегистрироваться</a>
     </div>
   </div>
 };
@@ -148,7 +150,7 @@ function forms:loginForm ( $actionURL, $callbackURL, $regURL ) {
 declare 
   %private
 function forms:logoutForm( $actionURL, $username, $callbackURL ) {
-  <div class="form-group form-check-inline">
+  <div class="form-group form-inline text-muted">
     <form method="GET" action="{ $actionURL }">
       { $username }
       <input type="hidden" name="callbackURL" value="{ $callbackURL }"/>

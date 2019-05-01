@@ -11,19 +11,24 @@ declare
   %output:method ("xhtml")
 function zt:start ( ) {
   let $href := "/zapolnititul/v/forms/upload"
+  let $href_u := "/zapolnititul/forms/u/form"
   let $content :=
-  <div>
-    <h1>ЗаполниТитул</h1>
-    <p>Сервис, который экономит время ...</p>
+  <div class="col">
+  <div class="p-3">
     <p>
       Публикуйте шаблоны для удобного заполнения и выгрузки. 
       <a href="/zapolnititul/v/ivgpu?path=iitegn/euf&amp;form=magDiplom">Например, такие...</a>
     </p>
     <p>
-      Чтобы создать форму для заполнения шаблона без регистрации нажмите 
-      <a class="btn btn-info" href="{$href}">здесь</a>
+      Как создать простой шаблон посмотрите 
+      <a class="btn btn-info" href="https://youtu.be/QzxlRRRCLeI">видео</a>
+       или прочитайте <a class="btn btn-info" href="http://portal.titul24.ru/pervij-shablon/">инструкцию</a>
     </p>
-    
+    <p>
+      <a class="btn btn-info" href="{$href_u}">Здесь</a>
+      можно загрузить новую форму 
+    </p>
+  </div>
   </div>
  let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
  let $templateFieldsMap := map{"sidebar": "", "content":$content, "nav": "", "nav-login" : ""}

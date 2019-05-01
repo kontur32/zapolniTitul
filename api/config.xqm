@@ -8,6 +8,10 @@ declare variable $config:forms := function( ) {
    db:open( "titul24", "forms" )/forms
 };
 
+declare variable $config:formsList := function( $offset as xs:double, $limit as xs:double ) {
+   db:open( "titul24", "forms" )/forms/form[ ( position() >= $offset + 1 ) and ( position() <=  $offset + $limit ) ]
+};
+
 declare variable $config:userForms := 
   function( $userid as xs:string, $offset as xs:double, $limit as xs:double ) {
    db:open( "titul24", "forms" )/forms/form[ @userid = $userid ] [ ( position() >= $offset + 1 ) and ( position() <=  $offset + $limit ) ]

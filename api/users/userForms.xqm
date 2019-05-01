@@ -20,7 +20,7 @@ function user:formsList(
       element{ "forms" } {
         for $f in $forms
         return 
-          element { "form" } { $f/@id, $f/@label }
+          element { "form" } { $f/@id, $f/@label, $f/@fileFullPath }
       }
     )
     else()

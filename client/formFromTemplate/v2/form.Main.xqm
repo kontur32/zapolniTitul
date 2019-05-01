@@ -23,48 +23,108 @@ function forms:main ( $page, $id, $message ) {
     else ( 
       forms:loginForm ( "/zapolnititul/api/v1/users/login", "/zapolnititul/forms/u/" || $page , "#" )
     )
+  let $userForms := 
+    try {
+      fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form
+    }
+    catch*{}
+  
+  let $currentFormID := 
+    if ( $id ) 
+    then ( $id ) 
+    else ( 
+      if ( $userForms[ 1 ]/@id )
+      then ( $userForms[ 1 ]/@id )
+      else (
+        try {
+          fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms?offset=3&amp;limit=1")//form[1]/@id/data()
+        }
+        catch*{}
+      )
+    )
   let $sidebar := 
     if( session:get( "userid") )
     then(
-      <ul>{ 
-         for $f in fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form
-         return
-           <li>{ $f/@id/data() }</li>
-       }</ul>
+      <div>
+        <h3>Ваши шаблоны</h3>
+        <div class="form-group form-check-inline">
+        <form method="POST" action="/zapolnititul/api/v2/forms/delete" enctype="multipart/form-data">
+          <input type="hidden" name="redirect" value="/zapolnititul/forms/u/main"/>
+          <button class="btn btn-info" onclick="return confirm('Удалить?');">Удалить…</button> 
+          <div>
+            { 
+             for $f in $userForms
+             return
+               <div>
+                   <input type="checkbox" name="id" value="{ $f/@id/data() }" onclick="buttons(this)">
+                     <a href="/zapolnititul/forms/u/form?id={ $f/@id/data() }">
+                     { if( $f/@label/data() !="" ) then ( $f/@label/data() ) else ( "Без имени" ) }
+                     </a>
+                   </input>
+               </div>
+            }
+           </div>
+         </form>
+         </div>
+       </div>
     )
     else ()
-    
+   let $formMeta := 
+     try {
+       fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/meta" )/form
+     }
+     catch* { }
+            
   let $content := 
      switch ( $page )
-       case ( "main" )
+       case ( "form" )
          return
-           let $formData := 
-            fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $id || "/fields" )//csv
+           let $formData :=
+             try {
+                fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/fields" )//csv
+             }
+             catch* { <csv/> } 
+           let $formLabel := 
+             if ( $formMeta/@label/data() )
+             then ( $formMeta/@label/data() )
+             else ( "Шаблон без названия" )
            return
-              buildForm:buildInputForm ( 
-                $formData, 
-                map{ 
-                  "id" : $id, 
-                  "templatePath" : "", 
-                  "method" : "POST", 
-                  "action" : "/zapolnititul/api/v1/document" }
-                ) 
+             <div>
+               <h3>{ $formLabel }</h3>
+               {
+                buildForm:buildInputForm ( 
+                  $formData, 
+                  map{ 
+                    "id" : $currentFormID, 
+                    "templatePath" : $formMeta/@fileFullPath, 
+                    "method" : "POST", 
+                    "action" : "/zapolnititul/api/v1/document" }
+                  )
+               }
+              </div>
        case ( "upload" )
          return
-           "Загрузка"
+           forms:uploadForm ( "yes" )
        case ( "complete" )
-         return "Загрузка завершена"
+         return 
+           forms:complete( $formMeta )
        default return ""
     
-  let $siteTemplate := serialize( doc( "../../src/main-tpl.html" ) )
-  let $templateFieldsMap := map{ "sidebar": $sidebar, "content": $content, "nav": "", "nav-login" : $login }
+  let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
+  let $nav :=
+    <div class="form-group form-check-inline"> 
+    <form method="GET" action="/zapolnititul/forms/u/upload">
+      <input class="btn btn-info" type="submit" value="Новая форма"/>
+    </form>
+    </div>
+  let $templateFieldsMap := map{ "sidebar": $sidebar, "content": $content, "nav": $nav, "nav-login" : $login }
   return 
-    if( $page = ( "main", "upload", "complete" ) )
+    if( $page = ( "form", "upload", "complete" ) )
     then(
       html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
     )
     else(
-      web:redirect( "http://localhost:8984/zapolnititul/forms/u/main" )
+      web:redirect( "http://localhost:8984/zapolnititul/forms/u/form" )
     )
   
 };
@@ -87,7 +147,7 @@ function forms:loginForm ( $actionURL, $callbackURL, $regURL ) {
 
 declare 
   %private
-function forms:logoutForm ( $actionURL, $username, $callbackURL ) {
+function forms:logoutForm( $actionURL, $username, $callbackURL ) {
   <div class="form-group form-check-inline">
     <form method="GET" action="{ $actionURL }">
       { $username }
@@ -97,3 +157,41 @@ function forms:logoutForm ( $actionURL, $username, $callbackURL ) {
   </div>
 };
 
+declare function forms:uploadForm( $data ) {
+  <div>
+    <h1>Загрузка шаблона</h1>
+    <div class="form-group">
+     <form method="POST" action="/zapolnititul/api/v2/forms/post" enctype="multipart/form-data">
+        <div class="form-group">
+         <label>Укажите название шаблона</label>
+         <input class="form-control" type="text" name="label"/>
+       </div>
+       <div class="form-group">
+         <label>Выберите файл с шаблоном</label>
+         <input class="form-control" type="file" name="template" multiple="multiple"/>
+       </div>
+       {
+         if ( $data = "yes")
+         then (
+           <div class="form-group">
+             <label>Выберите файл с данными (.xlsx)</label>
+             <input class="form-control" type="file" name="data" multiple="multiple"/>
+           </div>
+         )
+         else ()
+       }
+        <input class="form-control" type="hidden" name="redirect" value="/zapolnititul/forms/u/complete"/>
+        <p>и нажмите </p>
+        <input class="btn btn-info" type="submit" value="Загрузить..."/>
+     </form>
+    </div>
+  </div>
+};
+
+declare function forms:complete( $formMeta ) {
+  <div>
+    <h2>Загрузка шаблона завершена</h2>
+    <p>Вы успешно загрузили шаблон <b>{ $formMeta/@label/data() }</b></p>
+    <p>Ссылка на форму шаблона <a href="{ '/zapolnititul/forms/u/form?id=' || $formMeta/@id/data() }">здесь</a></p>
+  </div>
+};

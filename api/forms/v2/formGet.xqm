@@ -15,6 +15,8 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
       switch ( $component )
       case ( "fields" )
         return (  $form/csv,  "application/xml" )
+      case ( "meta" )
+        return ( element { "form" } { $form/@id, $form/@label, $form/@fileFullPath },  "application/xml" )
       case ( "data" )
         return (  $form/data,  "application/xml" )
       case ( "template" )

@@ -22,7 +22,7 @@ function formPost:post(
 ) {
     let $t := $template( map:keys( $template )[ 1 ] )
     let $formRecord := formPost:request( $t, "template", "http://localhost:8984/ooxml/api/v1/docx/fields/record" )
-    let $d := formPost:request( $data( map:keys( $data )[ 1 ] ), "data", "http://localhost:8984/xlsx/api/parse/raw-trci" )   
+    let $d := if( $data instance of map(*) ) then( formPost:request( $data( map:keys( $data )[ 1 ] ), "data", "http://localhost:8984/xlsx/api/parse/raw-trci" ) ) else ( )   
 
     let $timeStamp := string( current-dateTime() )
     let $formID := 
@@ -59,8 +59,7 @@ function formPost:post(
         db:output( 
           (
             file:write-binary( $fileFullName, $t ),
-            $formData,
-            web:redirect( $redirect )
+            web:redirect( web:create-url( $redirect, map{ "id" : $formID } ) )
           )
         )
       )

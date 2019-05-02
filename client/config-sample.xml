@@ -1,0 +1,5 @@
+<config>
+  <param id="host">http://localhost:8984</param>
+  <param id="uploadForm">/zapolnititul/forms/u/upload</param>
+  <param id="deleteAPI">/zapolnititul/api/v2/forms/delete</param>
+</config>

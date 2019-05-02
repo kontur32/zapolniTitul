@@ -7,7 +7,7 @@ import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
 import module namespace 
   buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "../../funct/buildForm.xqm";
 
-import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../../../api/config.xqm";
+import module namespace config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
 
 declare 
   %rest:GET
@@ -52,9 +52,9 @@ function forms:main ( $page, $id, $message ) {
            <div>{
              for $f in $userForms
              let $href_upload := 
-               web:create-url( "/zapolnititul/forms/u/upload", map{ "id" : $f/@id/data() } )
+               web:create-url( $config:param( "uploadForm" ), map{ "id" : $f/@id/data() } )
              let $href_delete := 
-               web:create-url( "/zapolnititul/api/v2/forms/delete", map{ "id" : $f/@id/data(), "redirect" :$config:param( 'host' ) || '/zapolnititul/forms/u/form' } )
+               web:create-url( $config:param( "deleteAPI" ), map{ "id" : $f/@id/data(), "redirect" :$config:param( 'host' ) || '/zapolnititul/forms/u/form' } )
              return
              <div class="row">
                 <a class="ml-3 px-2" href="{ $href_upload }">
@@ -94,6 +94,7 @@ function forms:main ( $page, $id, $message ) {
            return
              <div>
                <h3>{ $formLabel }</h3>
+               <a href="{ $formMeta/@fileFullPath }">Ссылка на шаблон</a>
                {
                 buildForm:buildInputForm ( 
                   $formData, 

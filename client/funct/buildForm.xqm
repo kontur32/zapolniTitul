@@ -21,7 +21,7 @@ declare
   %private
 function buildForm:buildInputForm-main ( 
   $inputFormData as element( csv ), 
-  $id as xs:string, 
+  $id as item()*, 
   $templatePath as xs:string,
   $method as xs:string,
   $action as xs:string 

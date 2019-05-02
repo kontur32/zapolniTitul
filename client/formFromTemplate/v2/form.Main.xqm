@@ -58,10 +58,10 @@ function forms:main ( $page, $id, $message ) {
              return
              <div class="row">
                 <a class="ml-3 px-2" href="{ $href_upload }">
-                  <img width="20" src="http://s1.iconbird.com/ico/2013/8/426/w64h64137758297850CloudArrowUp.png" alt="Обновить" />
+                  <img width="20" src="{ $config:param( 'iconUpload' ) }" alt="Обновить" />
                 </a>
                 <a class="px-2" href="{ $href_delete }" onclick="return confirm('Удалить?');">
-                  <img width="20" src="http://s1.iconbird.com/ico/2013/10/464/w128h1281380984637delete13.png" alt="Удалить" />
+                  <img width="20" src="{ $config:param( 'iconDelete' ) }" alt="Удалить" />
                 </a>
                 <a href="/zapolnititul/forms/u/form?id={ $f/@id/data() }">
                   { if( $f/@label/data() !="" ) then ( $f/@label/data() ) else ( "Без имени" ) }
@@ -185,6 +185,10 @@ declare function forms:uploadForm( $isData, $id, $redirect ) {
          )
          else ()
        }
+        <div class="form-group">
+         <label>Выберите файл с изображением шаблона</label>
+         <input class="form-control" type="file" name="template-image" required="" accept="image/*"/>
+       </div>
         <input type="hidden" name="id" value="{ $id }"/>
         <input type="hidden" name="redirect" value="{ $redirect }"/>
         <p>и нажмите </p>

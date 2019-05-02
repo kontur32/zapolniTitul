@@ -22,7 +22,7 @@ function forms:main ( $page, $id, $message ) {
       forms:logoutForm ( "/zapolnititul/api/v1/users/logout", session:get( "username" ), "/zapolnititul/forms/u/" || $page )
      )
     else ( 
-      forms:loginForm ( "/zapolnititul/api/v1/users/login", "/zapolnititul/forms/u/" || $page , "#" )
+      forms:loginForm ( "/zapolnititul/api/v1/users/login", "/zapolnititul/forms/u/" || $page , "http://portal.titul24.ru/register/" )
     )
   let $userForms := 
     try {
@@ -44,27 +44,28 @@ function forms:main ( $page, $id, $message ) {
       )
     )
   let $sidebar := 
-    if( session:get( "userid") )
+    if( session:get( "userid" ) )
     then(
       <div class="col">
         <h3>Ваши шаблоны</h3>
        <div class="row">
            <div>{
              for $f in $userForms
+             let $href_upload := 
+               web:create-url( "/zapolnititul/forms/u/upload", map{ "id" : $f/@id/data() } )
+             let $href_delete := 
+               web:create-url( "/zapolnititul/api/v2/forms/delete", map{ "id" : $f/@id/data(), "redirect" :$config:param( 'host' ) || '/zapolnititul/forms/u/form' } )
              return
              <div class="row">
-                <a class="ml-3 px-2" href="{'/zapolnititul/forms/u/upload?id=' || $f/@id/data() }">
+                <a class="ml-3 px-2" href="{ $href_upload }">
                   <img width="20" src="http://s1.iconbird.com/ico/2013/8/426/w64h64137758297850CloudArrowUp.png" alt="Обновить" />
                 </a>
-                <form method="POST" action="/zapolnititul/api/v2/forms/delete" enctype="multipart/form-data">
-                  <input type="hidden" name="redirect" value="{$config:param('host') || '/zapolnititul/forms/u/form'}"/>
-                  <input type="hidden" name="id" value="{ $f/@id/data() }"/>
-                  <input type="image" width="20" src="http://s1.iconbird.com/ico/2013/10/464/w128h1281380984637delete13.png" alt="Удалить" onclick="return confirm('Удалить?');">
-                    <a href="/zapolnititul/forms/u/form?id={ $f/@id/data() }">
-                      { if( $f/@label/data() !="" ) then ( $f/@label/data() ) else ( "Без имени" ) }
-                    </a>
-                  </input>
-                </form>
+                <a class="px-2" href="{ $href_delete }" onclick="return confirm('Удалить?');">
+                  <img width="20" src="http://s1.iconbird.com/ico/2013/10/464/w128h1281380984637delete13.png" alt="Удалить" />
+                </a>
+                <a href="/zapolnititul/forms/u/form?id={ $f/@id/data() }">
+                  { if( $f/@label/data() !="" ) then ( $f/@label/data() ) else ( "Без имени" ) }
+                </a>
               </div>
            }</div>
          </div>
@@ -128,7 +129,6 @@ function forms:main ( $page, $id, $message ) {
     else(
       web:redirect( "http://localhost:8984/zapolnititul/forms/u/form" )
     )
-  
 };
 
 declare 

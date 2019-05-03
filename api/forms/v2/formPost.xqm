@@ -24,7 +24,20 @@ function formPost:post(
 ) {
     let $t := $template( map:keys( $template )[ 1 ] )
     let $formRecord := formPost:request( $t, "template", "http://localhost:8984/ooxml/api/v1/docx/fields/record" )
-    let $d := if( $data instance of map(*) ) then( formPost:request( $data( map:keys( $data )[ 1 ] ), "data", "http://localhost:8984/xlsx/api/parse/raw-trci" ) ) else ( )   
+    let $d := 
+      if( $data instance of map(*) ) 
+      then(
+        if ( map:keys( $data )[ 1 ] )
+        then (
+          formPost:request( 
+            $data( map:keys( $data )[ 1 ] ), 
+            "data", 
+            "http://localhost:8984/xlsx/api/parse/raw-trci"
+          )
+        )
+        else( )
+      ) 
+      else ( )   
     let $tpl-img := $template-image( map:keys( $template-image )[ 1 ] )
     
     let $timeStamp := string( current-dateTime() )

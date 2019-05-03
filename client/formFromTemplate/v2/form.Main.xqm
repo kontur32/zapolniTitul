@@ -94,7 +94,35 @@ function forms:main ( $page, $id, $message ) {
            return
              <div>
                <h3>{ $formLabel }</h3>
-               <a href="{ $formMeta/@fileFullPath }">Ссылка на шаблон</a>
+               <div class="row">
+                 <form class="ml-3 form-inline">
+                 <button type="submit" formaction="{ $formMeta/@fileFullPath }" class="btn btn-info mx-3">
+                   Шаблон
+                 </button>
+                  { if ( $formMeta/@dataFullPath/data() )
+                   then (
+                    <button type="submit" formaction="{ $formMeta/@dataFullPath }" class="btn btn-info">
+                       Данные
+                    </button>
+                   )
+                   else ( )
+                  }
+                 { if ( $formMeta/@imageFullPath/data() )
+                   then (
+                     <button type="button" class="btn btn-info mx-3" data-toggle="modal" data-target="#myModal">
+                       Изображение
+                     </button>
+                   )
+                   else ( )
+                 }
+                 </form>
+                
+                { html:fillHtmlTemplate( 
+                   serialize( doc( "src/modal.html" ) ),
+                   map{ "image" : <img width="100%" src="{ $formMeta/@imageFullPath }"/>} ) 
+                }
+               </div>
+               
                {
                 buildForm:buildInputForm ( 
                   $formData, 
@@ -125,7 +153,7 @@ function forms:main ( $page, $id, $message ) {
   return 
     if( $page = ( "form", "upload", "complete" ) )
     then(
-      html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
+      html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )
     )
     else(
       web:redirect( "http://localhost:8984/zapolnititul/forms/u/form" )

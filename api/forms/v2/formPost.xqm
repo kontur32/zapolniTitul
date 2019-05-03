@@ -12,37 +12,54 @@ declare
   %rest:form-param ( "label", "{ $label }", "" )
   %rest:form-param ( "template", "{ $template }" )
   %rest:form-param ( "data", "{ $data }" )
+  %rest:form-param ( "template-image", "{ $template-image }" )
   %rest:form-param ( "redirect", "{ $redirect }", "/" )
 function formPost:post( 
   $id,
   $label, 
   $template, 
-  $data, 
+  $data,
+  $template-image, 
   $redirect
 ) {
     let $t := $template( map:keys( $template )[ 1 ] )
     let $formRecord := formPost:request( $t, "template", "http://localhost:8984/ooxml/api/v1/docx/fields/record" )
     let $d := if( $data instance of map(*) ) then( formPost:request( $data( map:keys( $data )[ 1 ] ), "data", "http://localhost:8984/xlsx/api/parse/raw-trci" ) ) else ( )   
-
+    let $tpl-img := $template-image( map:keys( $template-image )[ 1 ] )
+    
     let $timeStamp := string( current-dateTime() )
     let $formID := 
        if ( $config:form( $id )[ @userid = session:get( 'userid' ) ] )
        then ( $id )
        else ( random:uuid() )
     let $fileNameToSave := $formID || ".docx"
+    let $imageNameToSave := "template-images/" || $formID  || "---" || map:keys( $template-image )[ 1 ]
     let $fileFullName := $config:param( "static" ) || $config:param( "usersTemplatePath" ) || $fileNameToSave
-    let $fileFullPath := $config:param( "httpStatic" ) || $formID     
+    let $imageFullName := $config:param( "static" ) || $config:param( "usersTemplatePath" ) || $imageNameToSave
+    
+    let $fileFullPath := $config:param( "httpStatic" ) || $formID || "/template"
+    
+    let $imageFullPath := $config:param( "httpStatic" ) || $formID || "/template-image"
+    
+    let $dataFullPath := 
+      if ( $d ) 
+      then ( $config:param( "httpStatic" ) || $formID || "/data" ) 
+      else ( )  
     
     let $formData :=
       <form 
         id = "{ $formID }"
-        userid = "{ session:get( 'userid' )}"
-        username = "{ session:get( 'username' )}" 
+        userid = "{ session:get( 'userid' ) }"
+        username = "{ session:get( 'username' ) }" 
         label = "{ $label }"
         timestamp = "{ $timeStamp }" 
         fileNameOriginal = "{ map:keys( $template )[ 1 ] }"
         fileFullName = "{ $fileFullName }"
-        fileFullPath = '{ $fileFullPath }'>
+        fileFullPath = '{ $fileFullPath }'
+        imageNameOriginal = "{ map:keys( $template-image )[ 1 ] }"
+        imageFullName = "{ $imageFullName }"
+        imageFullPath = '{ $imageFullPath }'
+        dataFullPath = "{ $dataFullPath }">
           { $formRecord }
           <data>{ $d }</data>
       </form>
@@ -59,6 +76,7 @@ function formPost:post(
         db:output( 
           (
             file:write-binary( $fileFullName, $t ),
+            file:write-binary( $imageFullName, $tpl-img ),
             web:redirect( web:create-url( $redirect, map{ "id" : $formID } ) )
           )
         )

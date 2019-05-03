@@ -16,7 +16,15 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
       case ( "fields" )
         return (  $form/csv,  "application/xml" )
       case ( "meta" )
-        return ( element { "form" } { $form/@id, $form/@label, $form/@fileFullPath },  "application/xml" )
+        return ( 
+          element { "form" } { 
+            $form/@id, $form/@label, 
+            $form/@fileFullPath, 
+            $form/@imageFullPath,
+            $form/@dataFullPath 
+          },
+          "application/xml" 
+        )
       case ( "data" )
         return (  $form/data,  "application/xml" )
       case ( "template" )
@@ -24,7 +32,12 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
           file:read-binary( $form/@fileFullName/data() ), 
           "application/octet-stream",
           <http:header name="Content-Disposition" value="attachment; filename=titul24.docx" />
-        )
+          )
+      case ( "template-image" )
+        return ( 
+          file:read-binary( $form/@imageFullName/data() ), 
+          "image"
+          )
       default 
         return ( $form/csv,  "application/xml" )
   return 

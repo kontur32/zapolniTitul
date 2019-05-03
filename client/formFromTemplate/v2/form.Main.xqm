@@ -64,7 +64,9 @@ function forms:main ( $page, $id, $message ) {
                   <img width="20" src="{ $config:param( 'iconDelete' ) }" alt="Удалить" />
                 </a>
                 <a href="/zapolnititul/forms/u/form?id={ $f/@id/data() }">
-                  { if( $f/@label/data() !="" ) then ( $f/@label/data() ) else ( "Без имени" ) }
+                  <span class="d-inline-block text-truncate" style="max-width: 200px;">
+                    { if( $f/@label/data() !="" ) then ( $f/@label/data() ) else ( "Без имени" ) }
+                  </span>
                 </a>
               </div>
            }</div>

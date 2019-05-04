@@ -11,7 +11,7 @@ declare
   %output:method ("xhtml")
 function zt:start ( ) {
   let $href := "/zapolnititul/v/forms/upload"
-  let $href_u := "/zapolnititul/forms/u/form"
+  let $href_u := "/zapolnititul/forms/u/form/1"
   let $content :=
   <div class="col">
   <div class="p-3">

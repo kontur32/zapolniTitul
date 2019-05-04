@@ -113,14 +113,10 @@ function buildForm:buildInputForm-main (
  
   return
     <div class="form-group">
-     <form method="{ $method }" action="{ $action }" enctype="multipart/form-data">
+     <form method="{ $method }" action="{ $action }" enctype="multipart/form-data" id="template">
        { 
          $inputFormFields
        }
-        <p>и нажмите </p>
-        <input type="hidden" name="fileName" value="ZapolniTitul.docx"/>
-        <input type="hidden" name="templatePath" value="{ $templatePath }"/>
-        <input class="btn btn-info" type="submit" value="Скачать..."/>
      </form>
     </div>
  };

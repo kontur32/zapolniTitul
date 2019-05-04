@@ -5,7 +5,20 @@ import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
 import module namespace 
   buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "../../funct/buildForm.xqm";
 
-declare function form:form ( $formID as xs:string ) as element( div ) {
+declare function form:form ( $formMeta, $formFields as element() ) as element( div ) {
+   let $formID := $formMeta/@id/data() 
+   return
+        buildForm:buildInputForm ( 
+          $formFields, 
+          map{ 
+            "id" : $formID, 
+            "templatePath" : $formMeta/@fileFullPath, 
+            "method" : "POST", 
+            "action" : "/zapolnititul/api/v1/document" }
+       )
+};
+
+declare function form:meta ( $formID as xs:string ) as element( div ) {
    let $formMeta := 
      try {
        fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $formID || "/meta" )/form
@@ -22,8 +35,6 @@ declare function form:form ( $formID as xs:string ) as element( div ) {
      then ( $formMeta/@label/data() )
      else ( "Шаблон без названия" )
    return
-     <div>
-       <h3>{ $formLabel }</h3>
        <div class="row">
          <form class="ml-3 form-inline">
          <button type="submit" formaction="{ $formMeta/@fileFullPath }" class="btn btn-info mx-3">
@@ -53,15 +64,4 @@ declare function form:form ( $formID as xs:string ) as element( div ) {
           ) 
         }
        </div>
-       {
-        buildForm:buildInputForm ( 
-          $formData, 
-          map{ 
-            "id" : $formID, 
-            "templatePath" : $formMeta/@fileFullPath, 
-            "method" : "POST", 
-            "action" : "/zapolnititul/api/v1/document" }
-          )
-       }
-      </div>
 };

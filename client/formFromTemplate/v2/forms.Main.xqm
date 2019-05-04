@@ -34,11 +34,7 @@ function forms:main ( $page, $id, $message ) {
     else ( 
       forms:loginForm ( "/zapolnititul/api/v1/users/login", "/zapolnititul/forms/u/" , "http://portal.titul24.ru/register/" )
     )
-  let $userForms := 
-    try {
-      fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form
-    }
-    catch*{}
+  
  
   let $currentFormID := 
     if ( session:get( "userid" ) )
@@ -50,23 +46,50 @@ function forms:main ( $page, $id, $message ) {
        fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/meta" )/form
      }
      catch* { }
+  let $formFields := 
+     try {
+       fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/fields" )/csv
+     }
+     catch* { }
   
   let $sidebar := 
     if( session:get( "userid" ) )
     then(
-      <div class="col">
-        <h3>Ваши шаблоны</h3> 
-          {
-            sidebar:userFormsList ( session:get( "userid" ), $config:param )
-          }
-      </div>
+      let $userForms := 
+        try {
+          fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form
+        }
+        catch*{}
+      return
+        <div class="col">
+          <h3>Ваши шаблоны</h3> 
+            {
+              sidebar:userFormsList ( $userForms, $config:param )
+            }
+        </div>
     )
     else ()
     
   let $content := 
      switch ( $page )
        case ( "form" )
-         return form:form ( $currentFormID )
+         return (
+           <div class="container">
+           <h3>{ $formMeta/@label/data() }</h3>
+           { form:meta ( $currentFormID ) }
+           { form:form ( $formMeta, $formFields ) }
+           <div class="form-group">
+              <input form="template" type="hidden" name="fileName" value="ZapolniTitul.docx"></input>
+              <input form="template" type="hidden" name="templatePath" value="{ $formMeta/@fileFullPath/data() }"></input>
+            <button form="template" type="submit" formaction="/zapolnititul/api/v1/document" class="btn btn-success mx-3">
+             Скачать заполненную форму
+            </button>
+            <button form="template" type="submit" formaction="{'/zapolnititul/forms/u/child/' || $currentFormID }" formmethod="GET" class="btn btn-info mx-3">
+              Создать дочернюю форму
+            </button>
+          </div>
+          </div>
+        )
        case ( "upload" )
          return
            forms:uploadForm ( "yes", $id, $config:param( "host" ) || "/zapolnititul/forms/u/complete/" )
@@ -75,7 +98,7 @@ function forms:main ( $page, $id, $message ) {
            forms:complete( $formMeta )
        case ( "child" )
          return 
-           forms:child( $currentFormID )
+           forms:child( $formMeta, $formFields )
        default return ""
     
   let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
@@ -181,6 +204,23 @@ declare function forms:complete( $formMeta ) {
   </div>
 };
 
-declare function forms:child( $formID ) {
-  
+declare function forms:child( $formMeta, $formData ) {
+  let $formID := $formMeta/@id/data()
+  return
+  <div>
+    <div class="form-group">
+       <label class="h4">Укажите название дочернего шаблона</label>
+       <input class="form-control" type="text" name="label" form="template" required=""/>
+     </div>
+    <p class="h4">Заполните необходимые поля</p>
+    {
+     form:form ( $formMeta, $formData )
+    }
+    <div class="form-group">
+      <input type="hidden" name="_t24_id" value="{ $formID }" form="template"/>
+      <button form="template" type="submit" formaction="http://localhost:8984/zapolnititul/api/v1/document/data" formmethod="POST" class="btn btn-success mx-3">
+       Сохранить дочернюю форму
+      </button>
+    </div>
+  </div>
 };

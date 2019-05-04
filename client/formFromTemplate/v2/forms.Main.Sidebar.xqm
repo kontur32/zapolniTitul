@@ -1,13 +1,6 @@
 module namespace sidebar = "http://dbx.iro37.ru/zapolnititul/forms/sidebar";
 
-declare function sidebar:userFormsList ( $userID as xs:integer, $params as item() ) {
-  let $userForms := 
-    try {
-      fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || $userID || "/forms")/forms/form
-    }
-    catch*{
-      "Не удалось получить список форм пользователя"
-    }
+declare function sidebar:userFormsList ( $userForms as element(form)*, $params as item() ) {
   let $result := 
    <div class="row">
            {

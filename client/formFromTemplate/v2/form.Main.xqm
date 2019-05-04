@@ -54,47 +54,11 @@ function forms:main ( $page, $id, $message ) {
       fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form
     }
     catch*{}
-  
-  let $currentFormID := 
-    if ( $id ) 
-    then (
-       let $formMeta := 
-         try {
-           fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $id || "/meta" )/form
-         }
-         catch* { }
-         return 
-           if ( $formMeta )
-           then ( $formMeta/@id/data() )
-           else (
-             let $total := 
-               try {
-                 fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms" )/forms/@total/data()
-               }
-               catch* { }
-              let $id := 
-               try {
-                 fetch:xml( web:create-url( "http://localhost:8984/zapolnititul/api/v2/forms", map {"offset" : $total - 1, "limit" : 1 } ) )/forms/form/@id/data()
-               }
-               catch* { }
-               return $id
-           )
-    ) 
-    else ( 
-      if ( $userForms[ 1 ]/@id )
-      then ( $userForms[ 1 ]/@id )
-      else (
-        try {
-          fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms?offset=3&amp;limit=1" )//form[last()]/@id/data()
-        }
-        catch*{}
-      )
-    )
-    
+ 
   let $currentFormID := 
     if ( session:get( "userid" ) )
     then ( funct:id( $id, session:get( "userid" ) ) )
-    else ( funct:id( $id)  )
+    else ( funct:id( $id )  )
     
   let $sidebar := 
     if( session:get( "userid" ) )
@@ -105,9 +69,9 @@ function forms:main ( $page, $id, $message ) {
            <div>{
              for $f in $userForms
              let $href_upload := 
-               web:create-url( $config:param( "uploadForm" ) || $f/@id/data(), map{ "id2" : $f/@id/data() } )
+                $config:param( "uploadForm" ) || $f/@id/data()
              let $href_delete := 
-               web:create-url( $config:param( "deleteAPI" ), map{ "id" : $f/@id/data(), "redirect" :$config:param( 'host' ) || '/zapolnititul/forms/u/form' } )
+               web:create-url( $config:param( "deleteAPI" ) || $f/@id/data(), map{ "redirect" : $config:param( 'host' ) || '/zapolnititul/forms/u' } )
              return
              <div class="row">
                 <a class="px-2" href="{ $href_upload }">

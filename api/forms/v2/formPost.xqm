@@ -23,6 +23,7 @@ function formPost:post(
   $redirect
 ) {
     let $t := $template( map:keys( $template )[ 1 ] )
+      
     let $formRecord := formPost:request( $t, "template", "http://localhost:8984/ooxml/api/v1/docx/fields/record" )
     let $d := 
       if( $data instance of map(*) ) 
@@ -48,11 +49,19 @@ function formPost:post(
     let $fileNameToSave := $formID || ".docx"
     let $imageNameToSave := "template-images/" || $formID  || "---" || map:keys( $template-image )[ 1 ]
     let $fileFullName := $config:param( "static" ) || $config:param( "usersTemplatePath" ) || $fileNameToSave
-    let $imageFullName := $config:param( "static" ) || $config:param( "usersTemplatePath" ) || $imageNameToSave
+    let $imageFullName := 
+      if ( map:keys( $template-image )[ 1 ] )
+      then (
+        $config:param( "static" ) || $config:param( "usersTemplatePath" ) || $imageNameToSave
+      )
+      else ( ) 
     
     let $fileFullPath := $config:param( "httpStatic" ) || $formID || "/template"
     
-    let $imageFullPath := $config:param( "httpStatic" ) || $formID || "/template-image"
+    let $imageFullPath := 
+      if ( map:keys( $template-image )[ 1 ] ) 
+      then ( $config:param( "httpStatic" ) || $formID || "/template-image" )
+      else ()
     
     let $dataFullPath := 
       if ( $d ) 
@@ -89,8 +98,10 @@ function formPost:post(
         db:output( 
           (
             file:write-binary( $fileFullName, $t ),
-            file:write-binary( $imageFullName, $tpl-img ),
-            web:redirect( web:create-url( $redirect, map{ "id" : $formID } ) )
+            if ( map:keys( $template-image )[ 1 ] )
+            then ( file:write-binary( $imageFullName, $tpl-img ) )
+            else (),
+            web:redirect( web:create-url( $redirect ||  $formID, map{ "id" : $formID } ) )
           )
         )
       )

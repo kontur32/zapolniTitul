@@ -10,8 +10,7 @@ declare
   %rest:path ( "/zapolnititul" )
   %output:method ("xhtml")
 function zt:start ( ) {
-  let $href := "/zapolnititul/v/forms/upload"
-  let $href_u := "/zapolnititul/forms/u/form/1"
+  let $href_upload := "/zapolnititul/forms/u/upload/new"
   let $content :=
   <div class="col">
   <div class="p-3">
@@ -25,7 +24,7 @@ function zt:start ( ) {
        или прочитайте <a class="btn btn-info" href="http://portal.titul24.ru/pervij-shablon/">инструкцию</a>
     </p>
     <p>
-      <a class="btn btn-info" href="{$href_u}">Здесь</a>
+      <a class="btn btn-info" href="{ $href_upload }">Здесь</a>
       можно загрузить новую форму 
     </p>
   </div>

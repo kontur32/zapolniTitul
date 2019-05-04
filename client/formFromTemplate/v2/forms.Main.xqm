@@ -5,10 +5,10 @@ import module namespace session = "http://basex.org/modules/session";
 import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
 
 import module namespace 
-  buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "../../funct/buildForm.xqm";
+  config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
 
 import module namespace 
-  config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
+  buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "../../funct/buildForm.xqm";
 
 import module namespace 
   funct = "http://dbx.iro37.ru/zapolnititul/forms/funct" at "funct/funct.xqm";
@@ -19,27 +19,6 @@ import module namespace
 import module namespace
   sidebar = "http://dbx.iro37.ru/zapolnititul/forms/sidebar" at "forms.Main.Sidebar.xqm";
 
-declare 
-  %rest:GET
-  %rest:path ( "/zapolnititul/forms/u" )
-function forms:user ( ) {
-  let $redirect := 
-    if ( session:get( 'username' ) )
-    then (
-      let $userFormID := 
-        try {
-          fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form[1]/@id/data()
-        }
-        catch*{}
-      return
-      "/zapolnititul/forms/u/form/" || $userFormID
-    )
-    else (
-      "/zapolnititul"
-    )
-  return 
-    web:redirect ( $config:param( "host" ) ||  $redirect )
-};
 
 declare 
   %rest:GET
@@ -65,40 +44,14 @@ function forms:main ( $page, $id, $message ) {
     if ( session:get( "userid" ) )
     then ( funct:id( $id, session:get( "userid" ) ) )
     else ( funct:id( $id )  )
-    
-  let $sidebar := 
-    if( session:get( "userid" ) )
-    then(
-      <div class="col">
-        <h3>Ваши шаблоны</h3>
-       <div class="row">
-           <div>{
-             for $f in $userForms
-             let $href_upload := 
-                $config:param( "uploadForm" ) || $f/@id/data()
-             let $href_delete := 
-               web:create-url( $config:param( "deleteAPI" ) || $f/@id/data(), map{ "redirect" : $config:param( 'host' ) || '/zapolnititul/forms/u' } )
-             return
-             <div class="row">
-                <a class="px-2" href="{ $href_upload }">
-                  <img width="18" src="{ $config:param( 'iconUpload' ) }" alt="Обновить" />
-                </a>
-                <a class="pr-2" href="{ $href_delete }" onclick="return confirm( 'Удалить?' );">
-                  <img width="18" src="{ $config:param( 'iconDelete' ) }" alt="Удалить" />
-                </a>
-                <a href="/zapolnititul/forms/u/form/{ $f/@id/data() }">
-                  <span class="d-inline-block text-truncate" style="max-width: 240px;">
-                    { if( $f/@label/data() !="" ) then ( $f/@label/data() ) else ( "Без имени" ) }
-                  </span>
-                </a>
-              </div>
-           }</div>
-         </div>
-       </div>
-    )
-    else ()
   
- let $sidebar := 
+  let $formMeta := 
+     try {
+       fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/meta" )/form
+     }
+     catch* { }
+  
+  let $sidebar := 
     if( session:get( "userid" ) )
     then(
       <div class="col">
@@ -110,12 +63,6 @@ function forms:main ( $page, $id, $message ) {
     )
     else ()
     
-  let $formMeta := 
-   try {
-     fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/meta" )/form
-   }
-   catch* { }
-            
   let $content := 
      switch ( $page )
        case ( "form" )
@@ -138,6 +85,7 @@ function forms:main ( $page, $id, $message ) {
         <input class="btn btn-info" type="submit" value="Новая форма"/>
       </form>
     </div>
+  
   let $templateFieldsMap := map{ "sidebar": $sidebar, "content": $content, "nav": $nav, "nav-login" : $login }
   return 
     if( $page = ( "form", "upload", "complete", "child" ) )

@@ -5,9 +5,8 @@ import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/conf
 
 declare
   %updating 
-  %rest:path ( "/zapolnititul/api/v2/forms/delete" )
+  %rest:path ( "/zapolnititul/api/v2/forms/delete/{ $id }" )
   %rest:GET
-  %rest:query-param ( "id", "{ $id }", "" )
   %rest:query-param ( "redirect", "{ $redirect }", "/" )
 function formDelete:get( 
   $id,

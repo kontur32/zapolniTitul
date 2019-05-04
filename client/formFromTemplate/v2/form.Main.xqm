@@ -13,6 +13,9 @@ import module namespace
 import module namespace 
   funct = "http://dbx.iro37.ru/zapolnititul/forms/funct" at "funct/funct.xqm";
 
+import module namespace
+  form = "http://dbx.iro37.ru/zapolnititul/forms/form" at "forms.Form.xqm";
+
 declare 
   %rest:GET
   %rest:path ( "/zapolnititul/forms/u" )
@@ -91,16 +94,17 @@ function forms:main ( $page, $id, $message ) {
        </div>
     )
     else ()
-   let $formMeta := 
-     try {
-       fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/meta" )/form
-     }
-     catch* { }
+  let $formMeta := 
+   try {
+     fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/meta" )/form
+   }
+   catch* { }
             
   let $content := 
      switch ( $page )
        case ( "form" )
          return
+         let $a := 
            let $formData :=
              try {
                 fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/fields" )//csv
@@ -153,12 +157,16 @@ function forms:main ( $page, $id, $message ) {
                   )
                }
               </div>
+         return form:form ( $currentFormID )
        case ( "upload" )
          return
            forms:uploadForm ( "yes", $id, $config:param( "host" ) || "/zapolnititul/forms/u/complete/" )
        case ( "complete" )
          return 
            forms:complete( $formMeta )
+       case ( "child" )
+         return 
+           forms:child( $currentFormID )
        default return ""
     
   let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
@@ -170,12 +178,12 @@ function forms:main ( $page, $id, $message ) {
     </div>
   let $templateFieldsMap := map{ "sidebar": $sidebar, "content": $content, "nav": $nav, "nav-login" : $login }
   return 
-    if( $page = ( "form", "upload", "complete" ) )
+    if( $page = ( "form", "upload", "complete", "child" ) )
     then(
       html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )
     )
     else(
-      web:redirect( "http://localhost:8984/zapolnititul/forms/u/form" )
+      web:redirect( "http://localhost:8984/zapolnititul/forms/u/" )
     )
 };
 
@@ -261,4 +269,8 @@ declare function forms:complete( $formMeta ) {
     <p>Вы успешно загрузили шаблон <b>{ $formMeta/@label/data() }</b></p>
     <p>Ссылка на форму шаблона <a href="{ '/zapolnititul/forms/u/form/' || $formMeta/@id/data() }">здесь</a></p>
   </div>
+};
+
+declare function forms:child( $formID ) {
+  
 };

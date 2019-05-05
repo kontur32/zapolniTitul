@@ -80,7 +80,9 @@ function forms:main ( $page, $id, $message ) {
            { form:form ( $formMeta, $formFields ) }
            <div class="form-group">
               <input form="template" type="hidden" name="fileName" value="ZapolniTitul.docx"></input>
-              <input form="template" type="hidden" name="templatePath" value="{ $formMeta/@fileFullPath/data() }"></input>
+              <input form="template" type="hidden" name="templatePath" 
+                value='{"http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/template"}' >
+              </input>
             <button form="template" type="submit" formaction="/zapolnititul/api/v1/document" class="btn btn-success mx-3">
              Скачать заполненную форму
             </button>
@@ -217,8 +219,8 @@ declare function forms:child( $formMeta, $formData ) {
      form:form ( $formMeta, $formData )
     }
     <div class="form-group">
-      <input type="hidden" name="_t24_id" value="{ $formID }" form="template"/>
-      <button form="template" type="submit" formaction="http://localhost:8984/zapolnititul/api/v1/document/data" formmethod="POST" class="btn btn-success mx-3">
+      <input type="hidden" name="_t24_parentID" value="{ $formID }" form="template"/>
+      <button form="template" type="submit" formaction="/zapolnititul/api/v2/forms/post/child" formmethod="POST" class="btn btn-success mx-3">
        Сохранить дочернюю форму
       </button>
     </div>

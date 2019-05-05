@@ -5,14 +5,13 @@ import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
 import module namespace 
   buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "../../funct/buildForm.xqm";
 
-declare function form:form ( $formMeta, $formFields as element() ) as element( div ) {
+declare function form:form ( $formMeta as element(form), $formFields as element(csv) ) as element( div ) {
    let $formID := $formMeta/@id/data() 
    return
         buildForm:buildInputForm ( 
           $formFields, 
           map{ 
             "id" : $formID, 
-            "templatePath" : $formMeta/@fileFullPath, 
             "method" : "POST", 
             "action" : "/zapolnititul/api/v1/document" }
        )
@@ -24,20 +23,17 @@ declare function form:meta ( $formID as xs:string ) as element( div ) {
        fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $formID || "/meta" )/form
      }
      catch* { }
-   
-   let $formData :=
-     try {
-        fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $formID || "/fields" )//csv
-     }
-     catch* { <csv/> } 
+    
    let $formLabel := 
      if ( $formMeta/@label/data() )
      then ( $formMeta/@label/data() )
      else ( "Шаблон без названия" )
+   let $templatePath := 
+     "http://localhost:8984/zapolnititul/api/v2/forms/" || $formID || "/template"
    return
        <div class="row">
          <form class="ml-3 form-inline">
-         <button type="submit" formaction="{ $formMeta/@fileFullPath }" class="btn btn-info mx-3">
+         <button type="submit" formaction="{ $templatePath }" class="btn btn-info mx-3">
            Шаблон
          </button>
           { if ( $formMeta/@dataFullPath/data() )

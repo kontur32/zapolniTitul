@@ -10,7 +10,7 @@ declare function sidebar:userFormsList ( $userForms as element(form)*, $params a
              let $href_delete := 
                web:create-url( $params( "deleteAPI" ) || $f/@id/data(), map{ "redirect" : $params( 'host' ) || '/zapolnititul/forms/u' } )
              return
-             <div class="row">
+             <p class="row">
                 <a class="px-2" href="{ $href_upload }">
                   <img width="18" src="{ $params( 'iconUpload' ) }" alt="Обновить" />
                 </a>
@@ -22,7 +22,7 @@ declare function sidebar:userFormsList ( $userForms as element(form)*, $params a
                     { if( $f/@label/data() !="" ) then ( $f/@label/data() ) else ( "Без имени" ) }
                   </span>
                 </a>
-              </div>
+              </p>
            }
          </div>
   return

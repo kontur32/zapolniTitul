@@ -10,7 +10,6 @@ function buildForm:buildInputForm (
   buildForm:buildInputForm-main ( 
     $inputFormData, 
     $param?id, 
-    $param?templatePath,
     $param?method,
     $param?action
   )
@@ -22,7 +21,7 @@ declare
 function buildForm:buildInputForm-main ( 
   $inputFormData as element( csv ), 
   $id as item()*, 
-  $templatePath as xs:string,
+ 
   $method as xs:string,
   $action as xs:string 
 ){  

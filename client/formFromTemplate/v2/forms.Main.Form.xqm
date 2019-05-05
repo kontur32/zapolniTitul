@@ -5,7 +5,10 @@ import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
 import module namespace 
   buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "../../funct/buildForm.xqm";
 
-declare function form:form ( $formMeta as element(form), $formFields as element(csv) ) as element( div ) {
+declare function form:form ( 
+  $formMeta as element( form ), 
+  $formFields as element( csv ) 
+) as element( div ) {
    let $formID := $formMeta/@id/data() 
    return
         buildForm:buildInputForm ( 

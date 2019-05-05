@@ -12,7 +12,7 @@ declare
   %rest:path ( "/zapolnititul/api/v2/forms/post/child" )
   %rest:POST
   %rest:form-param ( "_t24_parentID", "{ $parentID }", "" )
-  %rest:form-param ( "label", "{ $label }", "" )
+  %rest:form-param ( "_t24_label", "{ $label }", "" )
   %rest:form-param ( "redirect", "{ $redirect }", "/" )
   %output:method("xml")
 function formPost:post( 
@@ -23,7 +23,7 @@ function formPost:post(
   let $paramsText :=
     for $param in request:parameter-names()
     let $paramValue := normalize-space ( request:parameter( $param ) )
-    where not ( $paramValue instance of map(*) )
+    where not ( $paramValue instance of map(*) ) and not ( contains( $param, "_t24_" ) )
     return
       if ( $paramValue != "")
       then(

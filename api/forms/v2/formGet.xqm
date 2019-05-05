@@ -18,7 +18,7 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
           let $fields := 
             if( $form/@parentid )
             then ( 
-              fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/"|| $form/@parentid/data() || "/fields")
+              getForm:fields( $id )
             )
             else ( $form/csv )
           return 
@@ -29,11 +29,7 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
             $form/@id, $form/@label,
             $form/@parentid, 
             $form/@fileFullPath,
-            if ( $form/@parentid ) 
-            then(
-              fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $form/@parentid/data() ||"/meta" )/form/@fileFullName
-            )
-            else ($form/@fileFullName), 
+            $form/@fileFullName,
             $form/@imageFullPath,
             $form/@dataFullPath 
           },
@@ -108,4 +104,31 @@ declare function getForm:parent( $formID, $data ){
   )
   return
       $response[2]
+};
+
+declare function getForm:fields( $id ) {
+  let $parentid := fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/"|| $id ||"/meta")/form/@parentid/data()
+  let $r := fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $parentid || "/fields")
+  let $p := fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/"|| $id ||"/prefilled")/prefilled/table/row[ @id = "fields" ]
+  return
+    <csv>
+    {
+      for $i in $r/csv/record
+      return
+       if( $p//cell/@id = $i/ID )
+       then ( 
+         ( 
+           if ( $i/defaultValue )
+           then (
+             $i update replace node ./defaultValue with ( <defaultValue>{ $p//cell[ @id = $i/ID ]/text() }</defaultValue>, <disabled>disabled</disabled> )
+           ) 
+           else (
+             $i update insert node ( <defaultValue>{$p//cell[ @id = $i/ID ]/text()}</defaultValue>, <disabled>disabled</disabled>) into .
+           )
+           
+         )
+       )
+       else ( $i )
+    }
+    </csv>
 };

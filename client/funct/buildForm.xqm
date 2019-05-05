@@ -41,14 +41,26 @@ function buildForm:buildInputForm-main (
        case ( "hidden" )
          return 
            <div class="form-group">
-             <input class="form-control" type="hidden"  name="{ $field/ID/text() }" value="{ $field/defaultValue/text() }"/>
+             <input class="form-control" type="hidden"  name="{ $field/ID/text() }" value="{ $field/defaultValue/text() }" />
            </div>
+
        case ( "text" )
          return
-           <div class="form-group">
-             <label>{ $label }</label>
-             <input class="form-control" type="text"  name="{ $field/ID/text() }" value="{ $field/defaultValue/text() }"/>
-           </div>
+           element { "div" } {
+              attribute {"class"} { "form-group"},
+              element { "label" } { $label },
+              element { "input" } {
+                attribute { "class" } { "form-control" },
+                attribute { "type" } { "text" },
+                attribute { "name" } { $field/ID/text() },
+                attribute { "value" } { $field/defaultValue/text() },
+                if ( $field/disabled ) 
+                then (
+                   attribute { "disabled" } { "disabled" }
+                ) else ()
+              }
+            } 
+           
        case  ( "textarea" ) 
          return
            <div class="form-group">

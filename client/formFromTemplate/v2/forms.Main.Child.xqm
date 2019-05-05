@@ -11,7 +11,7 @@ declare function child:main ( $formMeta, $formData ) {
   <div>
     <div class="form-group">
        <label class="h4">Укажите название дочернего шаблона</label>
-       <input class="form-control" type="text" name="label" form="template" required=""/>
+       <input class="form-control" type="text" name="_t24_label" form="template" required=""/>
      </div>
     <p class="h4">Заполните необходимые поля</p>
     {

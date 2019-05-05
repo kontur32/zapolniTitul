@@ -14,12 +14,26 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
     let $result := 
       switch ( $component )
       case ( "fields" )
-        return (  $form/csv,  "application/xml" )
+        return 
+          let $fields := 
+            if( $form/@parentid )
+            then ( 
+              fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/"|| $form/@parentid/data() || "/fields")
+            )
+            else ( $form/csv )
+          return 
+            (   $fields,  "application/xml" )
       case ( "meta" )
         return ( 
           element { "form" } { 
-            $form/@id, $form/@label, 
-            $form/@fileFullPath, 
+            $form/@id, $form/@label,
+            $form/@parentid, 
+            $form/@fileFullPath,
+            if ( $form/@parentid ) 
+            then(
+              fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $form/@parentid/data() ||"/meta" )/form/@fileFullName
+            )
+            else ($form/@fileFullName), 
             $form/@imageFullPath,
             $form/@dataFullPath 
           },
@@ -27,9 +41,15 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
         )
       case ( "data" )
         return (  $form/data,  "application/xml" )
+      case ( "prefilled" )
+        return (  $form/prefilled,  "application/xml" )
       case ( "template" )
-        return ( 
-          file:read-binary( $form/@fileFullName/data() ), 
+        return (
+          if ( $form/@parentid )
+          then ( getForm:parent( $form/@parentid/data(), $form/prefilled/table ) )
+          else (
+            file:read-binary( $form/@fileFullName/data() )
+          ), 
           "application/octet-stream",
           <http:header name="Content-Disposition" value="attachment; filename=titul24.docx" />
           )
@@ -59,4 +79,33 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
       </rest:response>,
      "Форма не найдена"
    )
+};
+
+declare function getForm:parent( $formID, $data ){
+    
+    let $template := 
+      string(
+       fetch:binary( "http://localhost:8984/zapolnititul/api/v2/forms/" || $formID ||"/template")
+      )
+    let $request :=
+    <http:request method='post'>
+      <http:multipart media-type = "multipart/form-data" >
+          <http:header name="Content-Disposition" value= 'form-data; name="template";'/>
+          <http:body media-type = "application/octet-stream" >
+            { $template }
+          </http:body>
+          <http:header name="Content-Disposition" value= 'form-data; name="data";'/>
+          <http:body media-type = "application/xml">
+            { $data }
+          </http:body>
+      </http:multipart> 
+    </http:request>
+
+  let $response := 
+    http:send-request(
+      $request,
+      'http://localhost:8984/api/v1/ooxml/docx/template/complete'
+  )
+  return
+      $response[2]
 };

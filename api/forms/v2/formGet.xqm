@@ -114,16 +114,17 @@ declare function getForm:fields( $id ) {
     <csv>
     {
       for $i in $r/csv/record
+      let $disabled := if ( not ( $i/disabled ) ) then( <disabled>disabled</disabled> ) else ()
       return
        if( $p//cell/@id = $i/ID )
        then ( 
          ( 
            if ( $i/defaultValue )
            then (
-             $i update replace node ./defaultValue with ( <defaultValue>{ $p//cell[ @id = $i/ID ]/text() }</defaultValue>, <disabled>disabled</disabled> )
+             $i update replace node ./defaultValue with ( <defaultValue>{ $p//cell[ @id = $i/ID ]/text() }</defaultValue>, $disabled )
            ) 
            else (
-             $i update insert node ( <defaultValue>{$p//cell[ @id = $i/ID ]/text()}</defaultValue>, <disabled>disabled</disabled>) into .
+             $i update insert node ( <defaultValue>{$p//cell[ @id = $i/ID ]/text()}</defaultValue>, $disabled) into .
            )
            
          )

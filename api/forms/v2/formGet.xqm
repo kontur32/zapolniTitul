@@ -22,27 +22,39 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
             )
             else ( $form/csv )
           return 
-            (   $fields,  "application/xml" )
+            ( $fields,  "application/xml" )
       case ( "meta" )
         return ( 
           element { "form" } { 
-            $form/@id, $form/@label,
+            $form/@id, 
+            $form/@label,
             $form/@parentid, 
             $form/@fileFullPath,
             $form/@fileFullName,
-            $form/@imageFullPath,
-            $form/@dataFullPath 
+            
+            if ( $form/@parentid and not( $form/@dataFullPath ) )
+            then (
+              $config:apiResult( $form/@parentid, "meta")/form/@dataFullPath
+            )
+            else ( $form/@dataFullPath ),
+            
+            if ( $form/@parentid and not( $form/@imageFullPath ) )
+            then (
+              $config:apiResult( $form/@parentid, "meta")/form/@imageFullPath
+            )
+            else ( $form/@imageFullPath )
           },
           "application/xml" 
         )
       case ( "data" )
-        return (  $form/data,  "application/xml" )
+        return ( getForm:data( $form ),  "application/xml" )
+        
       case ( "prefilled" )
         return (  $form/prefilled,  "application/xml" )
       case ( "template" )
         return (
           if ( $form/@parentid )
-          then ( getForm:parent( $form/@parentid/data(), $form/prefilled/table ) )
+          then ( getForm:parentTemplate( $form/@parentid/data(), $form/prefilled/table ) )
           else (
             file:read-binary( $form/@fileFullName/data() )
           ), 
@@ -77,7 +89,7 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
    )
 };
 
-declare function getForm:parent( $formID, $data ){
+declare function getForm:parentTemplate( $formID, $data ){
     
     let $template := 
       string(
@@ -132,4 +144,21 @@ declare function getForm:fields( $id ) {
        else ( $i )
     }
     </csv>
+};
+
+declare function getForm:data( $form as element( form ) ) as element( data ) {
+  if ( $form/@parentid )
+  then (
+    try {
+      fetch:xml( 
+        $config:apiEndpoint( $form/@parentid, "data" )
+      )/data
+    }
+    catch* {
+      <error>Не удалось получить данные</error>
+    }
+  )
+  else (
+    $form/data
+  )  
 };

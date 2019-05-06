@@ -9,11 +9,11 @@ declare
   %rest:GET
 function formData:get( $id as xs:string, $field ) {
   let $data := 
-    for $r in $config:forms()//forms/form[ @id = $id ]/data/table/row
+    for $r in $config:form( $id )/data/table/row
     return 
-      <row>{ $r/cell[ @label = $field ] }</row>  
+      <record>{ $r/cell[ @label = $field ] }</record> 
   return
     (
-      <data>{$data}</data>
+      <csv>{$data}</csv>
     )
 };

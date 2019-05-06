@@ -27,7 +27,7 @@ function buildForm:buildInputForm-main (
 ){  
   let $inputFormFields :=
      for $field in $inputFormData/record
-     where not ( $field/enable/text() = "false" )
+     where not ( $field/enable/text() = "false" ) 
        let $inputType := 
          if ( not( empty( $field/inputType/text() ) ) )
          then ( $field/inputType/text() )
@@ -74,7 +74,7 @@ function buildForm:buildInputForm-main (
                <select class="form-control" name="{ $field/ID/text() }">
                  {
                   let $itemsQueryURL :=
-                    if ( $inputFormData/csv/record[ ID="__ОПИСАНИЕ__" ]/itemsSourceURL/text()="true" and not ( $field/itemsSourceURL ) ) 
+                    if ( $inputFormData/csv/record[ ID = "__ОПИСАНИЕ__" ]/itemsSourceURL/text() = "true" and not ( $field/itemsSourceURL ) ) 
                     then (
                       "http://localhost:8984/zapolnititul/api/v1/forms/data/" 
                       || $id 
@@ -84,7 +84,7 @@ function buildForm:buildInputForm-main (
                     else ( $field/itemsSourceURL/text() )
                   
                   let $csvHeader := 
-                    if ( $inputFormData/csv/record[ID="__ОПИСАНИЕ__"]/itemsSourceURL/text()="true" and not ($field/itemsSourceURL) ) 
+                    if ( $inputFormData/csv/record[ ID = "__ОПИСАНИЕ__" ]/itemsSourceURL/text() = "true" and not ( $field/itemsSourceURL ) ) 
                     then ( false() )
                     else ( true() )
                     
@@ -103,10 +103,18 @@ function buildForm:buildInputForm-main (
                            map { 'header': $csvHeader }
                        )/csv/record/child::*[ 1 or name()="label" ][ 1 ]
                      }
-                     catch* { <label>(!) Ошибка: Данные для списка пустые или недлежащего формата</label> }
+                     catch* { 
+                       try {
+                          fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/"|| $id|| "/data")/data/table/row/cell[ @label = $field/ID/text() ]
+                       }
+                       catch*{
+                         <label>(!) Ошибка: Данные для списка пустые или недлежащего формата</label>
+                       }
+                      }
+                  
                    for $item in $items
                    return 
-                     <option value="{ $item }">
+                     <option value="{ $item/text() }">
                        {
                          $item/text()
                        }

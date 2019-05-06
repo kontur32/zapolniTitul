@@ -4,7 +4,10 @@ import module namespace
   form = "http://dbx.iro37.ru/zapolnititul/forms/form" at "forms.Main.Form.xqm";
 import module namespace
   upload = "http://dbx.iro37.ru/zapolnititul/forms/upload" at "forms.Main.Upload.xqm";
-  
+import module namespace 
+  config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
+
+ 
 declare function child:main ( $formMeta, $formData ) {
   let $formID := $formMeta/@id/data()
   return
@@ -23,7 +26,8 @@ declare function child:main ( $formMeta, $formData ) {
      
     <div class="form-group">
       <input type="hidden" name="_t24_parentID" value="{ $formID }" form="template"/>
-      <button form="template" type="submit" formaction="/zapolnititul/api/v2/forms/post/child" formmethod="POST" class="btn btn-success mx-3">
+      <input type="hidden" name="redirect" value="{ $config:param( 'host' ) || '/zapolnititul/forms/u/form/' }" form="template"/>
+      <button form="template" type="submit" formaction="{ $config:param( 'host' )|| '/zapolnititul/api/v2/forms/post/child'}" formmethod="POST" class="btn btn-success mx-3">
        Сохранить дочернюю форму
       </button>
     </div>

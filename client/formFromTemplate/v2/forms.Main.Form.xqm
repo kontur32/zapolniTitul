@@ -3,6 +3,9 @@ module namespace form = "http://dbx.iro37.ru/zapolnititul/forms/form";
 import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
 
 import module namespace 
+  config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
+  
+import module namespace 
   buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "../../funct/buildForm.xqm";
 
 declare function form:form ( 
@@ -36,7 +39,7 @@ declare function form:meta ( $formID as xs:string ) as element( div ) {
    return
        <div class="row">
          <form class="ml-3 form-inline">
-         <button type="submit" formaction="{ $templatePath }" class="btn btn-info mx-3">
+         <button type="submit" formaction="{ $config:apiurl( $formID, 'template') }" class="btn btn-info mx-3">
            Шаблон
          </button>
           { if ( $formMeta/@dataFullPath/data() )

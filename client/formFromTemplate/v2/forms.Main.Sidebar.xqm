@@ -1,6 +1,6 @@
 module namespace sidebar = "http://dbx.iro37.ru/zapolnititul/forms/sidebar";
 
-declare function sidebar:userFormsList ( $userForms as element(form)*, $params as item() ) {
+declare function sidebar:userFormsList ( $userForms as element( form )*, $params as item() ) {
   let $result := 
    <div class="row">
            {
@@ -8,7 +8,7 @@ declare function sidebar:userFormsList ( $userForms as element(form)*, $params a
              let $href_upload := 
                 $params( "uploadForm" ) || $f/@id/data()
              let $href_delete := 
-               web:create-url( $params( "deleteAPI" ) || $f/@id/data(), map{ "redirect" : $params( 'host' ) || '/zapolnititul/forms/u' } )
+               web:create-url( $params( "host") || $params( "deleteAPI" ) || $f/@id/data(), map{ "redirect" : '/zapolnititul/forms/u' } )
              return
              <p class="row">
                 <a class="px-2" href="{ $href_upload }">

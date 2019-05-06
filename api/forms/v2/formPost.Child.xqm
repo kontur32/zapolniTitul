@@ -22,7 +22,7 @@ function formPost:post(
 ) {
   let $paramsText :=
     for $param in request:parameter-names()
-    let $paramValue := normalize-space ( request:parameter( $param ) )
+    let $paramValue := request:parameter( $param )
     where not ( $paramValue instance of map(*) ) and not ( contains( $param, "_t24_" ) )
     return
       if ( $paramValue != "")
@@ -56,7 +56,7 @@ function formPost:post(
       </form>
   return (
     insert node $formData into $config:forms(), 
-    db:output( web:redirect( "http://localhost:8984/zapolnititul/forms/u/form/" || $formID ) )
+    db:output( web:redirect( $redirect || $formID ) )
     )
 };
 

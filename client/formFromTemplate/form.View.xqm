@@ -47,14 +47,26 @@ let $meta := $formData//record[ ID/text() = ( "__ОПИСАНИЕ__", "__ABOUT__
 
  let $content := 
     let $inputForm :=  
-      buildForm:buildInputForm ( 
+    <div>
+      { buildForm:buildInputForm ( 
         $formData, 
         map{ 
           "id" : $formData/parent::*/@id/data(), 
           "templatePath" : $tplPath, 
           "method" : "POST", 
-          "action" : "/zapolnititul/api/v1/document" }
-        )
+          "action" : "/zapolnititul/api/v1/document"
+        }
+        ) }
+         <div class="form-group">
+              <input form="template" type="hidden" name="fileName" value="ZapolniTitul.docx"></input>
+              <input form="template" type="hidden" name="templatePath" 
+                value='{ $tplPath }' >
+              </input>
+            <button form="template" type="submit" formaction="/zapolnititul/api/v1/document" class="btn btn-success mx-3">
+             Скачать заполненную форму
+            </button>
+          </div>
+     </div>
     let $templateLink := <a href="{ $tplPath }" download="{$downloadName}">Ссылка на шаблон</a>
     let $templateFieldsMap := map{ 
                   "OrgLabel": $meta/org/text(), 

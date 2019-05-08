@@ -48,15 +48,29 @@ function zt:form ( $org as xs:string, $path as xs:string , $formID as xs:string 
 
   let $content := 
     let $inputFormParam := csv:parse( fetch:text( $data/formURL/text() ), map { 'header': true() } )/csv
-    let $inputForm := buildForm:buildInputForm (  
-      $inputFormParam, 
-       map{ 
-          "id" : "id", 
-          "templatePath" :  $data/formTemplate/text(), 
-          "method" : "POST", 
-          "action" : "/zapolnititul/api/v1/document" }
+    let $inputForm := 
+      <div>
+        {
+        buildForm:buildInputForm (  
+          $inputFormParam, 
+           map{ 
+              "id" : "id", 
+              "templatePath" :  $data/formTemplate/text(), 
+              "method" : "POST", 
+              "action" : "/zapolnititul/api/v1/document"
+            }
         )
-      
+        }
+        <div class="form-group">
+              <input form="template" type="hidden" name="fileName" value="ZapolniTitul.docx"></input>
+              <input form="template" type="hidden" name="templatePath" 
+                value='{ $data/formTemplate/text() }' >
+              </input>
+            <button form="template" type="submit" formaction="/zapolnititul/api/v1/document" class="btn btn-success mx-3">
+             Скачать заполненную форму
+            </button>
+       </div>
+     </div> 
     let $templateFieldsMap := map{ 
                   "OrgLabel": $data/formTitle/text(), 
                   "Title": $data/formLabel/text(),

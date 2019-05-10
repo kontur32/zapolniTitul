@@ -6,7 +6,7 @@ import module namespace
   config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
   
 import module namespace 
-  buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "../../funct/buildForm.xqm";
+  buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "funct/buildForm.xqm";
 
 declare function form:form ( 
   $formMeta as element( form ), 
@@ -23,13 +23,8 @@ declare function form:form (
        )
 };
 
-declare function form:meta ( $formID as xs:string ) as element( div ) {
-   let $formMeta := 
-     try {
-       fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $formID || "/meta" )/form
-     }
-     catch* { }
-    
+declare function form:metaButtons ( $formID as xs:string, $getFormByAPI ) as element( div ) {
+   let $formMeta := $getFormByAPI( $formID, "meta")/form
    let $formLabel := 
      if ( $formMeta/@label/data() )
      then ( $formMeta/@label/data() )

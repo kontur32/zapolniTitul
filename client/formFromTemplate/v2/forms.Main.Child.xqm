@@ -21,12 +21,12 @@ declare function child:main ( $formMeta, $formData ) {
      form:form ( $formMeta, $formData )
     }
      <div class="form-group">
-       { upload:additionalFormParam () }
+       { upload:additionalFormParam ( "template" ) }
      </div>
      
     <div class="form-group">
       <input type="hidden" name="_t24_parentID" value="{ $formID }" form="template"/>
-      <input type="hidden" name="redirect" value="{ $config:param( 'host' ) || '/zapolnititul/forms/u/form/' }" form="template"/>
+      <input type="hidden" name="_t24_redirect" value="{ $config:param( 'host' ) || '/zapolnititul/forms/u/form/' }" form="template"/>
       <button form="template" type="submit" formaction="{ $config:param( 'host' )|| '/zapolnititul/api/v2/forms/post/child'}" formmethod="POST" class="btn btn-success mx-3">
        Сохранить дочернюю форму
       </button>

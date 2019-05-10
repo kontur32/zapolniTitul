@@ -8,10 +8,10 @@ import module namespace
   config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
 
 import module namespace 
-  buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "../../funct/buildForm.xqm";
+  buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "funct/buildForm.xqm";
 
 import module namespace 
-  funct = "http://dbx.iro37.ru/zapolnititul/forms/funct" at "funct/funct.xqm";
+  getFormID = "http://dbx.iro37.ru/zapolnititul/forms/getFormID" at "funct/getFormID.xqm";
 
 import module namespace
   form = "http://dbx.iro37.ru/zapolnititul/forms/form" at "forms.Main.Form.xqm";
@@ -47,8 +47,8 @@ function forms:main ( $page, $id, $message ) {
  
   let $currentFormID := 
     if ( session:get( "userid" ) )
-    then ( funct:id( $id, session:get( "userid" ) ) )
-    else ( funct:id( $id )  )
+    then ( getFormID:id( $id, session:get( "userid" ) ) )
+    else ( getFormID:id( $id )  )
   
   let $formMeta := 
      try {
@@ -85,7 +85,7 @@ function forms:main ( $page, $id, $message ) {
          return (
            <div class="container">
            <h3>{ $formMeta/@label/data() }</h3>
-           { form:meta ( $currentFormID ) }
+           { form:metaButtons ( $currentFormID, $config:getFormByAPI ) }
            { form:form ( $formMeta, $formFields ) }
            <div class="form-group">
               <input form="template" type="hidden" name="fileName" value="ZapolniTitul.docx"></input>

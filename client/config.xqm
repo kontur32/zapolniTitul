@@ -5,5 +5,14 @@ declare variable $config:param := function( $param ) {
 };
 
 declare variable $config:apiurl := function( $object, $method ) {
-   $config:param( "host" ) || "/zapolnititul/api/v2/forms/" || $object || "/" || $method
+   $config:param( "host" ) || $config:param( "currentAPIEndpoint" ) || $object || "/" || $method
+};
+
+declare variable $config:getFormByAPI := function( $object, $method ) {
+  let $path := $config:apiurl ( $object, $method )
+  return
+     try {
+       fetch:xml( $path )
+     }
+     catch* { <error>Не удалось получить данные "{ $method }" для формы { $object } </error> }
 };

@@ -41,7 +41,7 @@ declare
 function dataSave:main( $redirect ){
     let $paramNames := 
       for $name in  request:parameter-names()
-      where not ( matches( substring( $name, 1, 5 ), "_t24_" ) )
+      where not ( starts-with( $name, "_t24_" ) )
       return $name
     let $aboutType := 
       if( request:parameter( '_t24_type' ) ) then (  request:parameter( '_t24_type' ) ) else ( "student" )

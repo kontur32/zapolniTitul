@@ -51,12 +51,12 @@ function forms:main ( $page, $id, $message ) {
     else ( 
       forms:loginForm ( "/zapolnititul/api/v1/users/login", "/zapolnititul/forms/u/" , "http://portal.titul24.ru/register/" )
     )
-  
- 
+
   let $currentFormID := 
-    if ( session:get( "userid" ) )
-    then ( getFormID:id( $id, session:get( "userid" ) ) )
-    else ( getFormID:id( $id )  )
+      if ( session:get( "userid" ) )
+      then ( getFormID:id( $id, session:get( "userid" ) ) )
+      else ( getFormID:id( $id ) )
+
   
   let $formMeta := $config:getFormByAPI( $currentFormID,  "meta")/form
      
@@ -100,14 +100,16 @@ function forms:main ( $page, $id, $message ) {
   let $content := 
      switch ( $page )
        case ( "form" )
-         return (
+         return
+         if ( $currentFormID )
+         then (
            <div class="container">
            <h3>{ $formMeta/@label/data() }</h3>
            { form:header ( $currentFormID, $config:getFormByAPI ) }
            { form:body ( $formMeta, $formFields ) }
            {
              let $meta := (
-               [ "fileName", "ZapolniTitul.docx"],
+               [ "fileName", "ZapolniTitul.docx" ],
                [ "templatePath", $config:apiurl( $currentFormID, "template" ) ],
                [ "templateID", $currentFormID ],
                [ "redirect", "/zapolnititul/forms/u/form/" || $currentFormID ],
@@ -141,6 +143,7 @@ function forms:main ( $page, $id, $message ) {
            }
           </div>
         )
+        else ( <div>Нет ни одной формы</div>)
        case ( "upload" )
          return
            upload:main( "yes", $id, $config:param( "host" ) || "/zapolnititul/forms/u/complete/" )

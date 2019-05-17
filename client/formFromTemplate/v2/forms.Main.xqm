@@ -171,7 +171,19 @@ function forms:main ( $page, $id, $message ) {
            iframe:main( $currentFormID,  $config:getFormByAPI,  $config:apiurl, $config:param )
        default return ""
   
-  let $nav := nav:main( $page, $currentFormID )
+  let $nav := 
+    let $items:= 
+        (
+           if ( session:get( "userid") )
+           then(
+             ["form", '/zapolnititul/forms/u/' || 'form' || '/' || $currentFormID,  "Мои формы" ],
+             ["data", '/zapolnititul/forms/u/' || 'data' || '/' || $currentFormID, "Мои данные" ]
+           )
+           else (),
+          ["upload", '/zapolnititul/forms/u/' || 'upload' || '/' || 'new', "Новая форма" ]
+        )
+    return
+      nav:main( $page, $items )
       
   let $templateFieldsMap := map{ "sidebar": $sidebar, "content": $content, "nav": $nav, "nav-login" : $login }
   

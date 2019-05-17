@@ -4,15 +4,8 @@ declare
   %public
 function nav:main(
   $page as xs:string,
-  $currentFormID as xs:string
+  $items as item()*
 ) as element() {
-  let $items:= 
-        (
-          ["form", '/zapolnititul/forms/u/' || 'form' || '/' || $currentFormID,  "Мои формы" ],
-          ["data", '/zapolnititul/forms/u/' || 'data' || '/' || $currentFormID, "Мои данные" ],
-          ["upload", '/zapolnititul/forms/u/' || 'upload' || '/' || 'new', "Новая форма" ]
-        )
-        return
         <div>
             <ul class="nav nav-pills">
               {

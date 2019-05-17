@@ -1,8 +1,8 @@
 <config>
   <param id="host">http://localhost:8984</param>
   <param id="currentAPIEndpoint">/zapolnititul/api/v2/forms/</param>
-  <param id="uploadForm">/zapolnititul/forms/u/upload</param>
-  <param id="deleteAPI">/zapolnititul/api/v2/forms/delete</param>
+  <param id="uploadForm">/zapolnititul/forms/u/upload/</param>
+  <param id="deleteAPI">/zapolnititul/api/v2/forms/delete/</param>
   <param id="iconUpload">http://s1.iconbird.com/ico/2013/8/426/w64h64137758297850CloudArrowUp.png</param>
   <param id="iconDelete">http://s1.iconbird.com/ico/2013/10/464/w128h1281380984637delete13.png</param>
 </config>

@@ -24,11 +24,11 @@ function dataSave:update( $data ){
     ( if ( $nodeToReplace )
     then (
       replace node $nodeToReplace with $d,
-      db:output(<replace></replace>)
+      db:output( <replace></replace> )
     )
     else (
       insert node  $d into $db,
-      db:output(<insert></insert>)
+      db:output( <insert></insert> )
     )
   )
 };
@@ -48,7 +48,11 @@ function dataSave:main( $redirect ){
     let $modelURL := 
        web:create-url( "http://localhost:8984/trac/api/Model/ood", map{ "id" : $aboutType } )
     let $data :=
-    <table aboutType="{ $aboutType }" templateID="{ request:parameter( '_t24_templateID' ) }" userID="{ session:get('userid') }" modelURL="{web:encode-url( $modelURL )}">
+    <table 
+      aboutType="{ $aboutType }" 
+      templateID="{ request:parameter( '_t24_templateID' ) }" 
+      userID="{ session:get('userid') }" 
+      modelURL="{ web:encode-url( $modelURL ) }">
       <row>
       {
         for $param in $paramNames
@@ -86,7 +90,7 @@ function dataSave:main( $redirect ){
   let $response := 
     http:send-request(
       $request,
-      'http://localhost:8984/trac/api/v2/trci/bind/meta'
+      'http://localhost:8984/xlsx/api/v1/trci/bind/meta'
   )[2]
   let $dbUpdate := 
      http:send-request(
@@ -102,6 +106,6 @@ function dataSave:main( $redirect ){
         )[2]
   return
     db:output(
-      web:redirect( request:parameter( '_t24_saveRedirect' ) ) 
+     web:redirect( request:parameter( '_t24_saveRedirect' ) )
     )
 };

@@ -8,9 +8,9 @@ function nav:main(
 ) as element() {
   let $items:= 
         (
-          ["form", "Мои формы" ],
-          ["data", "Мои данные" ],
-          ["upload", "Новая форма" ]
+          ["form", '/zapolnititul/forms/u/' || 'form' || '/' || $currentFormID,  "Мои формы" ],
+          ["data", '/zapolnititul/forms/u/' || 'data' || '/' || $currentFormID, "Мои данные" ],
+          ["upload", '/zapolnititul/forms/u/' || 'upload' || '/' || 'new', "Новая форма" ]
         )
         return
         <div>
@@ -18,10 +18,9 @@ function nav:main(
               {
                 for $item in $items
                 let $class := if ( $page = $item?1 ) then( "nav-link active" ) else ( "nav-link" )
-                let $href := '/zapolnititul/forms/u/' || $item?1 || '/' || $currentFormID 
                 return 
                   <li class="nav-item">
-                    <a class="{ $class }" href="{ $href }">{ $item?2 }</a>
+                    <a class="{ $class }" href="{ $item?2 }">{ $item?3 }</a>
                   </li>
               }
             </ul>

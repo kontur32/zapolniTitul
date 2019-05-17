@@ -56,7 +56,9 @@ declare function getFormID:id( $id as xs:string ) as xs:string* {
          }
          catch* { }
       return
-        $id
+        if( $id )
+        then ( $id )
+        else ( "" )
    )
 };
 
@@ -64,9 +66,15 @@ declare function getFormID:id( $id as xs:string ) as xs:string* {
  : Возвращает количество зарегистрированных форм
  : @return строку
  :)
-declare %private function getFormID:total() as xs:integer {
+declare
+  %private
+function getFormID:total() as xs:integer {
   try {
-   fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms" )/forms/@total/data()
+   let $totalFormCount := fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms" )/forms/@total/data()
+   return
+     if( $totalFormCount )
+     then( $totalFormCount )
+     else ( 1 )
   }
-  catch* { }
+  catch* { 1 }
 };

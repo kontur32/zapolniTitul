@@ -58,8 +58,8 @@ let $meta := $formData//record[ ID/text() = ( "__ОПИСАНИЕ__", "__ABOUT__
         }
         ) }
          <div class="form-group">
-              <input form="template" type="hidden" name="fileName" value="ZapolniTitul.docx"></input>
-              <input form="template" type="hidden" name="templatePath" 
+              <input form="template" type="hidden" name="_t24_fileName" value="ZapolniTitul.docx"></input>
+              <input form="template" type="hidden" name="_t24_templatePath" 
                 value='{ $tplPath }' >
               </input>
             <button form="template" type="submit" formaction="/zapolnititul/api/v1/document" class="btn btn-success mx-3">

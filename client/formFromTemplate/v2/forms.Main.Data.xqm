@@ -19,7 +19,15 @@ function data:main( $data ){
            return
              <tr>
                <td class="px-3">
-               { $model[ @id = $i/@id ]/cell[ @id = "label" ]/text() }
+               {
+                 if (  $model/@id = $i/@id )
+                 then(
+                   $model[ @id = $i/@id ]/cell[ @id = "label" ]/text() 
+                 )
+                 else (
+                   $i/@id/data()
+                 )
+               } 
                </td>
                <td>:</td>
                <td class="font-italic text-left px-3">{ $i/text()}</td>

@@ -32,3 +32,22 @@ declare function sidebar:userFormsList ( $userForms as element( form )*, $params
   return
     $result         
 };
+
+declare function sidebar:userDataList ( $userData as element( table )* ) {
+  let $result := 
+   <div class="container">
+     <ul>
+       {
+         for $d in $userData
+         let $formID := $d/@templateID/data()
+         let $formLabel := fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $formID || "/meta")/form/@label/data()
+         return
+           <li>
+             <a href="{ $formID }">{ $formLabel }</a>
+           </li>
+       }
+     </ul>
+   </div>
+  return
+    $result
+};

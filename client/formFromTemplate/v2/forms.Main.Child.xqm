@@ -18,15 +18,15 @@ declare function child:main ( $formMeta, $formData ) {
      </div>
     <p class="h4">Заполните необходимые поля</p>
     {
-     form:form ( $formMeta, $formData )
+     form:body ( $formMeta, $formData )
     }
      <div class="form-group">
        { upload:additionalFormParam ( "template" ) }
      </div>
      
     <div class="form-group">
-      <input type="hidden" name="_t24_parentID" value="{ $formID }" form="template"/>
-      <input type="hidden" name="_t24_redirect" value="{ $config:param( 'host' ) || '/zapolnititul/forms/u/form/' }" form="template"/>
+      <input form="template" type="hidden" name="_t24_parentID" value="{ $formID }"/>
+      <input form="template" type="hidden" name="_t24_redirect" value="{ $config:param( 'host' ) || '/zapolnititul/forms/u/form/' }" />
       <button form="template" type="submit" formaction="{ $config:param( 'host' )|| '/zapolnititul/api/v2/forms/post/child'}" formmethod="POST" class="btn btn-success mx-3">
        Сохранить дочернюю форму
       </button>

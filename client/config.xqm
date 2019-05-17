@@ -16,3 +16,12 @@ declare variable $config:getFormByAPI := function( $object, $method ) {
      }
      catch* { <error>Не удалось получить данные "{ $method }" для формы { $object } </error> }
 };
+
+declare variable $config:fetchUserData := function ( $userID, $cookie ){
+  http:send-request(
+    <http:request method='get'
+       href='{ "http://localhost:8984/zapolnititul/api/v2/user/" || $userID ||"/data" }'>
+      <http:header name="Cookie" value="{ 'JSESSIONID=' || $cookie }" />
+    </http:request>
+   )[2]
+};

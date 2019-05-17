@@ -24,7 +24,13 @@ function formPost:post(
 ) {
     let $t := $template( map:keys( $template )[ 1 ] )
       
-    let $formRecord := formPost:request( $t, "template", "http://localhost:8984/ooxml/api/v1/docx/fields/record" )
+    let $formRecord := 
+      formPost:request( 
+        $t, 
+        "template", 
+        "http://localhost:8984/ooxml/api/v1/docx/fields/record"
+      )
+      
     let $d := 
       if( $data instance of map(*) ) 
       then(
@@ -108,7 +114,7 @@ function formPost:post(
  };
  
 declare 
-  %private
+  %public
 function formPost:request ( $data, $name, $host ) {
   let $request := 
   <http:request method='POST'>

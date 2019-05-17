@@ -5,8 +5,8 @@ import module namespace request = "http://exquery.org/ns/request";
 declare 
   %rest:path ( "/zapolnititul/api/v1/document" )
   %rest:method ( "POST" )
-  %rest:form-param ( "fileName", "{ $fileName }", "ZapolniTitul.docx" )
-  %rest:form-param ( "templatePath", "{ $templatePath }" )
+  %rest:form-param ( "_t24_fileName", "{ $fileName }", "ZapolniTitul.docx" )
+  %rest:form-param ( "_t24_templatePath", "{ $templatePath }" )
 function restDocx:document-POST ( $fileName  as xs:string, $templatePath as xs:string ) {
   let $template := 
     try {

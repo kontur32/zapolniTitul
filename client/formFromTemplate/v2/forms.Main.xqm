@@ -17,6 +17,9 @@ import module namespace
   form = "http://dbx.iro37.ru/zapolnititul/forms/form" at "forms.Main.Form.xqm";
 
 import module namespace
+  data = "http://dbx.iro37.ru/zapolnititul/forms/data" at "forms.Main.Data.xqm";
+
+import module namespace
   child = "http://dbx.iro37.ru/zapolnititul/forms/child" at "forms.Main.Child.xqm";
   
 import module namespace
@@ -24,10 +27,15 @@ import module namespace
   
 import module namespace
   complete = "http://dbx.iro37.ru/zapolnititul/forms/complete" at "forms.Main.Complete.xqm";
+
+import module namespace
+  iframe = "http://dbx.iro37.ru/zapolnititul/forms/iframe" at "forms.Main.Iframe.xqm";
+
+import module namespace
+  nav = "http://dbx.iro37.ru/zapolnititul/forms/nav" at "forms.Main.Nav.xqm";
   
 import module namespace
   sidebar = "http://dbx.iro37.ru/zapolnititul/forms/sidebar" at "forms.Main.Sidebar.xqm";
-
 
 declare 
   %rest:GET
@@ -50,20 +58,16 @@ function forms:main ( $page, $id, $message ) {
     then ( getFormID:id( $id, session:get( "userid" ) ) )
     else ( getFormID:id( $id )  )
   
-  let $formMeta := 
-     try {
-       fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/meta" )/form
-     }
-     catch* { }
-  let $formFields := 
-     try {
-       fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/fields" )/csv
-     }
-     catch* { }
+  let $formMeta := $config:getFormByAPI( $currentFormID,  "meta")/form
+     
+  let $formFields := $config:getFormByAPI( $currentFormID,  "fields")/csv
   
   let $sidebar := 
     if( session:get( "userid" ) )
     then(
+       switch ( $page )
+       case ( "form" )
+         return (
       let $userForms := 
         try {
           fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form
@@ -76,6 +80,20 @@ function forms:main ( $page, $id, $message ) {
               sidebar:userFormsList ( $userForms, $config:param )
             }
         </div>
+      )
+      case ( "data" )
+         return 
+           <div>
+             {
+               let $data := $config:fetchUserData(
+                   session:get( "userid"),
+                   request:cookie('JSESSIONID')
+                 )
+               return  
+                 sidebar:userDataList ( $data/data/table )
+             }
+           </div>
+      default return ""
     )
     else ()
     
@@ -85,20 +103,42 @@ function forms:main ( $page, $id, $message ) {
          return (
            <div class="container">
            <h3>{ $formMeta/@label/data() }</h3>
-           { form:metaButtons ( $currentFormID, $config:getFormByAPI ) }
-           { form:form ( $formMeta, $formFields ) }
-           <div class="form-group">
-              <input form="template" type="hidden" name="fileName" value="ZapolniTitul.docx"></input>
-              <input form="template" type="hidden" name="templatePath" 
-                value='{"http://localhost:8984/zapolnititul/api/v2/forms/" || $currentFormID || "/template"}' >
-              </input>
-            <button form="template" type="submit" formaction="/zapolnititul/api/v1/document" class="btn btn-success mx-3">
-             Скачать заполненную форму
-            </button>
-            <button form="template" type="submit" formaction="{'/zapolnititul/forms/u/child/' || $currentFormID }" formmethod="GET" class="btn btn-info mx-3">
-              Создать дочернюю форму
-            </button>
-          </div>
+           { form:header ( $currentFormID, $config:getFormByAPI ) }
+           { form:body ( $formMeta, $formFields ) }
+           {
+             let $meta := (
+               [ "fileName", "ZapolniTitul.docx"],
+               [ "templatePath", $config:apiurl( $currentFormID, "template" ) ],
+               [ "templateID", $currentFormID ],
+               [ "redirect", "/zapolnititul/forms/u/form/" || $currentFormID ],
+               [ "saveRedirect", "/zapolnititul/forms/u/data/" || $currentFormID ]
+             )
+             let $buttons := (
+               map{
+                 "method" : "POST",
+                 "action" : "/zapolnititul/api/v1/document",
+                 "class" : "btn btn-success mr-3",
+                 "label" : "Скачать заполненную форму"},
+                map{
+                 "method" : "GET",
+                 "action" : '/zapolnititul/forms/u/child/' || $currentFormID,
+                 "class" : "btn btn-info mr-3",
+                 "label" : " Создать дочернюю форму"},
+                map{
+                 "method" : "POST",
+                 "action" : "/zapolnititul/api/v2/data/save",
+                 "class" : "btn btn-info mr-3",
+                 "label" : "Сохранить данные"}
+               
+             )
+             return
+              form:footer(
+                "template" , 
+                $meta ,
+                "_t24_",
+                $buttons
+              )
+           }
           </div>
         )
        case ( "upload" )
@@ -110,24 +150,40 @@ function forms:main ( $page, $id, $message ) {
        case ( "child" )
          return 
            child:main( $formMeta, $formFields )
+       case ( "data" )
+         return 
+           <div>
+             <h3 class="my-3"> Данные формы: { $formMeta/@label/data() }</h3>
+                 <div class="row">{
+                    let $userData := 
+                      $config:fetchUserData(
+                          session:get( "userid"), request:cookie('JSESSIONID')
+                      )/data/table[ @templateID = $currentFormID ]
+                     return
+                        data:main( $userData )
+                 }</div>
+           </div>
+       case ( "iframe" )
+         return
+           iframe:main( $currentFormID,  $config:getFormByAPI,  $config:apiurl, $config:param )
        default return ""
-    
-  let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
-  let $nav :=
-    <div class="form-group"> 
-      <form method="GET" action="/zapolnititul/forms/u/upload/new">
-        <input class="btn btn-info" type="submit" value="Новая форма"/>
-      </form>
-    </div>
   
+  let $nav := nav:main( $page, $currentFormID )
+      
   let $templateFieldsMap := map{ "sidebar": $sidebar, "content": $content, "nav": $nav, "nav-login" : $login }
+  
+  let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
   return 
-    if( $page = ( "form", "upload", "complete", "child" ) )
+    if( $page = ( "form", "upload", "complete", "child", "data" ) )
     then(
       html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )
     )
     else(
-      web:redirect( "http://localhost:8984/zapolnititul/forms/u/" )
+      if ( $page = "iframe" )
+      then ( $content  )
+      else (
+        web:redirect( "http://localhost:8984/zapolnititul/forms/u/" )
+      )
     )
 };
 

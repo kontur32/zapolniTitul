@@ -29,8 +29,18 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
             $form/@id, 
             $form/@label,
             $form/@parentid, 
-            $form/@fileFullPath,
+            
+            if ( $form/@parentid and not( $form/@fileFullPath ) )
+            then (
+              $config:apiResult( $form/@parentid, "meta")/form/@fileFullPath
+            )
+            else ( $form/@fileFullPath ),
             $form/@fileFullName,
+            if ( $form/@parentid and not( $form/@fileNameOriginal ) )
+            then (
+              $config:apiResult( $form/@parentid, "meta")/form/@fileNameOriginal
+            )
+            else ( $form/@fileNameOriginal ),
             
             if ( $form/@parentid and not( $form/@dataFullPath ) )
             then (
@@ -42,7 +52,13 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
             then (
               $config:apiResult( $form/@parentid, "meta")/form/@imageFullPath
             )
-            else ( $form/@imageFullPath )
+            else ( $form/@imageFullPath ),
+            
+            if ( $form/@parentid and not( $form/@modeURL ) )
+            then (
+              $config:apiResult( $form/@parentid, "meta")/form/@modelURL
+            )
+            else ( $form/@modelURL )
           },
           "application/xml" 
         )
@@ -81,7 +97,7 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
    )
    else (
      <rest:response>
-        <http:response status="404">
+        <http:response status="200">
           <http:header name="Content-type" value="text/plain"/>
         </http:response>
       </rest:response>,
@@ -90,7 +106,6 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
 };
 
 declare function getForm:parentTemplate( $formID, $data ){
-    
     let $template := 
       string(
        fetch:binary( "http://localhost:8984/zapolnititul/api/v2/forms/" || $formID ||"/template")
@@ -138,7 +153,6 @@ declare function getForm:fields( $id ) {
            else (
              $i update insert node ( <defaultValue>{$p//cell[ @id = $i/ID ]/text()}</defaultValue>, $disabled) into .
            )
-           
          )
        )
        else ( $i )
@@ -147,7 +161,7 @@ declare function getForm:fields( $id ) {
 };
 
 declare function getForm:data( $form as element( form ) ) as element( data ) {
-  if ( $form/@parentid )
+  if ( $form/@parentid and not ( $form/data ) )
   then (
     try {
       fetch:xml( 

@@ -8,7 +8,7 @@ import module namespace
 import module namespace 
   buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "funct/buildForm.xqm";
 
-declare function form:form ( 
+declare function form:body ( 
   $formMeta as element( form ), 
   $formFields as element( csv ) 
 ) as element( div ) {
@@ -23,7 +23,7 @@ declare function form:form (
        )
 };
 
-declare function form:metaButtons ( $formID as xs:string, $getFormByAPI ) as element( div ) {
+declare function form:header ( $formID as xs:string, $getFormByAPI ) as element( div ) {
    let $formMeta := $getFormByAPI( $formID, "meta")/form
    let $formLabel := 
      if ( $formMeta/@label/data() )
@@ -33,27 +33,30 @@ declare function form:metaButtons ( $formID as xs:string, $getFormByAPI ) as ele
      "http://localhost:8984/zapolnititul/api/v2/forms/" || $formID || "/template"
    return
        <div class="row">
-         <form class="ml-3 form-inline">
-         <button type="submit" formaction="{ $config:apiurl( $formID, 'template') }" class="btn btn-info mx-3">
-           Шаблон
-         </button>
-          { if ( $formMeta/@dataFullPath/data() )
-           then (
-            <button type="submit" formaction="{ $formMeta/@dataFullPath }" class="btn btn-info">
-               Данные
-            </button>
-           )
-           else ( )
-          }
-         { if ( $formMeta/@imageFullPath/data() )
-           then (
-             <button type="button" class="btn btn-info mx-3" data-toggle="modal" data-target="#myModal">
-               Изображение
-             </button>
-           )
-           else ( )
-         }
-         </form>
+         <ul class="nav">
+           <li class="nav-item">
+              <a class="nav-link" href="{ $config:apiurl( $formID, 'template') }">Шаблон</a>
+           </li>
+           <li class="nav-item">
+              { if ( $formMeta/@dataFullPath/data() )
+               then (
+                <a class="nav-link" href="{ $formMeta/@dataFullPath }">Данные</a>
+               )
+               else ( )
+              }
+           </li>
+           <li class="nav-item">
+              {
+               if ( $formMeta/@imageFullPath/data() )
+               then (
+                 <a class="nav-link" href="#" data-toggle="modal" data-target="#myModal">
+                   Изображение
+                 </a>
+               )
+               else ( )
+             }
+           </li>
+         </ul>
         { 
           html:fillHtmlTemplate( 
             serialize( doc( "src/modal.html" ) ),
@@ -61,4 +64,33 @@ declare function form:metaButtons ( $formID as xs:string, $getFormByAPI ) as ele
           ) 
         }
        </div>
+};
+
+declare 
+  %public
+function form:footer(
+    $formID as xs:string, 
+    $meta as item()*,
+    $metaPrefix as xs:string,
+    $buttons as item()*
+  ) as element(div) {
+  <div class="form-group">
+    {
+      for $i in $meta
+      return
+        <input form="{ $formID }" type="hidden" name="{ '_t24_' || $i?1 }" value="{ $i?2 }"/> 
+    }
+    {
+      for $b in $buttons
+      return
+        <button 
+          form="{ $formID }" 
+          type="submit" 
+          formmethod="{ $b?method }"
+          formaction="{ $b?action }"
+          class="{ $b?class }">
+             { $b?label }
+         </button>
+    }
+  </div>
 };

@@ -6,7 +6,6 @@ function buildForm:buildInputForm (
   $inputFormData as element( csv ), 
   $param as item()
 ){  
-
   buildForm:buildInputForm-main ( 
     $inputFormData, 
     $param?id, 
@@ -17,11 +16,10 @@ function buildForm:buildInputForm (
 
 
 declare 
-
+  %private
 function buildForm:buildInputForm-main ( 
   $inputFormData as element( csv ), 
   $id as item()*, 
- 
   $method as xs:string,
   $action as xs:string 
 ){  

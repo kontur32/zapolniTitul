@@ -29,9 +29,6 @@ import module namespace
   complete = "http://dbx.iro37.ru/zapolnititul/forms/complete" at "forms.Main.Complete.xqm";
 
 import module namespace
-  iframe = "http://dbx.iro37.ru/zapolnititul/forms/iframe" at "forms.Main.Iframe.xqm";
-
-import module namespace
   nav = "http://dbx.iro37.ru/zapolnititul/forms/nav" at "forms.Main.Nav.xqm";
   
 import module namespace
@@ -168,7 +165,27 @@ function forms:main ( $page, $id, $message ) {
            </div>
        case ( "iframe" )
          return
-           iframe:main( $currentFormID,  $config:getFormByAPI,  $config:apiurl, $config:param )
+            <div class="container-fluid">
+              {
+                form:body ( $formMeta, $formFields )
+              }
+              {
+               let $meta := (
+                 [ "fileName", "ZapolniTitul.docx" ],
+                 [ "templatePath", $config:apiurl( $currentFormID, "template" ) ],
+                 [ "redirect", "" ]
+               )
+               let $buttons := (
+                 map{
+                   "method" : "POST",
+                   "action" : "/zapolnititul/api/v1/document",
+                   "class" : "btn btn-success mr-3",
+                   "label" : "Скачать заполненную форму"}
+               )
+               return
+                form:footer( "template", $meta, "_t24_", $buttons )
+            }
+            </div>
        default return ""
   
   let $nav := 
@@ -185,17 +202,23 @@ function forms:main ( $page, $id, $message ) {
     return
       nav:main( $page, $items )
       
-  let $templateFieldsMap := map{ "sidebar": $sidebar, "content": $content, "nav": $nav, "nav-login" : $login }
   
-  let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
   return 
     if( $page = ( "form", "upload", "complete", "child", "data" ) )
     then(
-      html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )
+      let $templateFieldsMap := map{ "sidebar": $sidebar, "content": $content, "nav": $nav, "nav-login" : $login }
+      let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
+      return
+        html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )
     )
     else(
       if ( $page = "iframe" )
-      then ( $content  )
+      then (
+        let $siteTemplate := serialize( doc( "src/iframe-tpl.html" ) )
+        let $templateFieldsMap := map{ "sidebar": "", "content": $content, "nav": "", "nav-login" : "" }
+        return
+          html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )
+      )
       else (
         web:redirect( "http://localhost:8984/zapolnititul/forms/u/" )
       )

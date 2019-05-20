@@ -16,9 +16,14 @@ function dataDelete:delete( $id, $inst ){
       and @updated = $inst
     ]
   return
-    if ( $nodeToDelete )
-    then (
-      delete node $nodeToDelete
+    (
+      if ( $nodeToDelete )
+      then (
+        delete node $nodeToDelete
+      )
+      else ( ),
+      db:output(
+        web:redirect( "/zapolnititul/forms/u/data/" || $id )
+      )
     )
-    else ( )
 };

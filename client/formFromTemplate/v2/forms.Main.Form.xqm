@@ -78,7 +78,7 @@ function form:footer(
     {
       for $i in $meta
       return
-        <input form="{ $formID }" type="hidden" name="{ '_t24_' || $i?1 }" value="{ $i?2 }"/> 
+        <input form="{ $formID }" type="hidden" name="{ $metaPrefix || $i?1 }" value="{ $i?2 }"/> 
     }
     {
       for $b in $buttons

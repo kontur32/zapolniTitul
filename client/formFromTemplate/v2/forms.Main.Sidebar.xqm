@@ -12,9 +12,6 @@ declare function sidebar:userFormsList ( $userForms as element( form )*, $params
              return
              <div class="row">
                <div class="col">
-                <a href="{ $href_upload }">
-                  <img width="18" src="{ $params( 'iconUpload' ) }" alt="Обновить" />
-                </a>
                
                 <a class="px-1" href="{ $href_delete }" onclick="return confirm( 'Удалить?' );">
                   <img width="18" src="{ $params( 'iconDelete' ) }" alt="Удалить" />
@@ -40,7 +37,10 @@ declare function sidebar:userDataList ( $userData as element( table )* ) {
        {
          for $d in $userData
          let $formID := $d/@templateID/data()
-         let $formLabel := fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $formID || "/meta")/form/@label/data()
+         let $formLabel := 
+           try{
+             fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $formID || "/meta")/form/@label/data()}
+           catch*{ "Форма не найдена" }
          return
            <li>
              <a href="{ $formID }">{ $formLabel }</a>

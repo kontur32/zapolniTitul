@@ -3,9 +3,9 @@ module namespace data = "http://dbx.iro37.ru/zapolnititul/forms/data";
 
 declare 
   %public
-function data:main( $data ){
+function data:main( $currentDataSet ){
 <div class="container">{
-     if ( $data )
+     if ( $currentDataSet )
      then (
        <table class="table-striped">
          <tr >
@@ -14,8 +14,8 @@ function data:main( $data ){
            <th class="text-center">Значение</th>
           </tr>
          {
-           let $model := fetch:xml( web:decode-url( $data/@modelURL/data() ) )/table/row
-           for $i in $data/row/cell
+           let $model := fetch:xml( web:decode-url( $currentDataSet/@modelURL/data() ) )/table/row
+           for $i in $currentDataSet/row/cell
            return
              <tr>
                <td class="px-3">

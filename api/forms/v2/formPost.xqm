@@ -6,21 +6,20 @@ import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/conf
 declare
   %updating
   %private 
-  %rest:path ( "/zapolnititul/api/v2/forms/post" )
+  %rest:path ( "/zapolnititul/api/v2/forms/post/{ $id }" )
   %rest:POST
-  %rest:form-param ( "id", "{ $id }", "" )
   %rest:form-param ( "label", "{ $label }", "" )
   %rest:form-param ( "template", "{ $template }" )
   %rest:form-param ( "data", "{ $data }" )
   %rest:form-param ( "template-image", "{ $template-image }" )
   %rest:form-param ( "redirect", "{ $redirect }", "/" )
 function formPost:post( 
-  $id,
-  $label, 
-  $template, 
-  $data,
-  $template-image, 
-  $redirect
+  $id as xs:string,
+  $label as xs:string, 
+  $template as map(*), 
+  $data as item()*,
+  $template-image as item()*, 
+  $redirect as xs:string
 ) {
     let $t := $template( map:keys( $template )[ 1 ] )
       
@@ -94,7 +93,7 @@ function formPost:post(
       
     return
       (
-        if ( $config:form( $formID ) )
+        if ( $config:form( $formID ) and not( $id = "create" ) )
         then (
           replace node $config:form( $formID ) with $formData
         )

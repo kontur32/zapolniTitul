@@ -21,7 +21,7 @@ function dataSave:update( $data ){
       and @userID = $d/@userID
     ]
   return
-    ( if ( $nodeToReplace )
+    ( if ( $nodeToReplace and false() )
     then (
       replace node $nodeToReplace with $d,
       db:output( <replace></replace> )

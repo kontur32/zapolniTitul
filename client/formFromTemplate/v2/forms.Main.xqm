@@ -229,29 +229,6 @@ function forms:main ( $page, $id, $datainst, $message ) {
                </div>
              </div>
           </div>
-       case ( "iframe" )
-         return
-            <div class="container-fluid">
-              {
-                form:body ( $formMeta, $formFields )
-              }
-              {
-               let $meta := (
-                 [ "fileName", "ZapolniTitul.docx" ],
-                 [ "templatePath", $config:apiurl( $currentFormID, "template" ) ],
-                 [ "redirect", "" ]
-               )
-               let $buttons := (
-                 map{
-                   "method" : "POST",
-                   "action" : "/zapolnititul/api/v1/document",
-                   "class" : "btn btn-success mr-3",
-                   "label" : "Скачать заполненную форму"}
-               )
-               return
-                form:footer( "template", $meta, "_t24_", $buttons )
-            }
-            </div>
        default return ""
   
   let $nav := 
@@ -269,7 +246,6 @@ function forms:main ( $page, $id, $datainst, $message ) {
     return
       nav:main( $page, $items )
       
-  
   return 
     if( $page = ( "form", "upload", "complete", "child", "data" ) )
     then(
@@ -279,16 +255,7 @@ function forms:main ( $page, $id, $datainst, $message ) {
         html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )
     )
     else(
-      if ( $page = "iframe" )
-      then (
-        let $siteTemplate := serialize( doc( "src/iframe-tpl.html" ) )
-        let $templateFieldsMap := map{ "sidebar": "", "content": $content, "nav": "", "nav-login" : "" }
-        return
-          html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )
-      )
-      else (
         web:redirect( "http://localhost:8984/zapolnititul/forms/u/" )
-      )
     )
 };
 

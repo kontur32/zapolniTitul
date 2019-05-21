@@ -32,8 +32,8 @@ function zt:start ( ) {
       )
       else(
         <div>
-          <p>Чтобы загрузить шаблон без регистрации, Вам <a class="btn btn-info" href="/zapolnititul/v/forms/upload">сюда</a>.</p>
-          <p>Для управления шаблонами и данными введите Ваш логин и пароль. Если Вы ещё не зарегистрированы, то Вам <a class="btn btn-info" href="http://portal.titul24.ru/register/">сюда</a>.</p>
+          <p>Чтобы загрузить шаблон без регистрации, Вам <a class="btn btn-info" href="/zapolnititul/forms/a/upload">сюда</a></p>
+          <p>Для управления шаблонами и данными введите Ваш логин и пароль. Если Вы ещё не зарегистрированы, то Вам <a class="btn btn-info" href="http://portal.titul24.ru/register/">сюда</a></p>
         </div>
       )
     }

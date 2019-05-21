@@ -4,9 +4,10 @@ import module namespace Session = "http://basex.org/modules/session";
 import module namespace htmlZT =  "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "../funct/htmlZT.xqm";
 
 declare 
-  %rest:path ( "/zapolnititul/v/forms/upload" )
-  %rest:query-param( "data", "{ $data }", "no")
-  %output:method ("xhtml")
+  %rest:path ( "/zapolnititul/forms/a/upload" )
+  %rest:GET
+  %rest:query-param( "data", "{ $data }", "no" )
+  %output:method ( "xhtml" )
 function upload:main ( $data  ) {
   let $content :=
   <div>

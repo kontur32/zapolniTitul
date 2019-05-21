@@ -13,15 +13,15 @@ import module namespace
   
 declare 
   %rest:GET
-  %rest:path ( "/zapolnititul/forms/a/form/{ $currentFormID }" )
+  %rest:path ( "/zapolnititul/forms/a/{ $page }/{ $currentFormID }" )
   %output:method ("xhtml")
-function forms:main ( $currentFormID ) {
+function forms:main ( $page, $currentFormID ) {
   
   let $formMeta := $config:getFormByAPI( $currentFormID,  "meta")/form
      
   let $formFields := $config:getFormByAPI( $currentFormID,  "fields")/csv
   
-  let $tpl := serialize( $template:get( "main" ) )
+  let $tpl := serialize( $template:get( $page ) )
   
   let $imgPath := 
     if( $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/img )

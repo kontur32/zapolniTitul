@@ -5,7 +5,8 @@ declare %private variable $template:SourcePath := "../src/";
 declare variable $template:get := function( $templateID as xs:string ){
   let $templateData := 
     <templates>
-      <template id="main" path="main-tpl.html" />
+      <template id="form" path="main-tpl.html" />
+      <template id="iframe" path="iframe-tpl.html" />
     </templates>
     
   return 

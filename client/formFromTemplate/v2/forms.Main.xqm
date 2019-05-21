@@ -317,9 +317,15 @@ declare
 function forms:logoutForm( $actionURL, $username, $callbackURL ) {
   <div class="form-group form-inline text-muted">
     <form method="GET" action="{ $actionURL }">
-      { $username }
+      <a href="/zapolnititul/forms/u">{ $username }</a>
       <input type="hidden" name="callbackURL" value="{ $callbackURL }"/>
       <input class="btn btn-info ml-sm-1" type="submit" value="Выйти"/>
     </form>
   </div>
+};
+
+declare %perm:check('/zapolnititul/forms/u') function forms:check-admin() {
+  let $user := session:get('userid')
+  where not( $user )
+  return web:redirect('/zapolnititul')
 };

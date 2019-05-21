@@ -28,10 +28,13 @@ function zt:start ( ) {
     {
       if ( session:get( 'username' ) )
       then(
-        <p>Чтобы создать свой первый шаблон, Вам <a class="btn btn-info" href="/zapolnititul/forms/u/upload/new">сюда</a></p>
+        <p>Чтобы создать свой первый шаблон, перейдите в <a class="btn btn-info" href="/zapolnititul/forms/u/form/new">в личный кабинет</a></p>
       )
       else(
-        <p>Чтобы создать свой первый шаблон зарегистрийтесь <a class="btn btn-info" href="http://portal.titul24.ru/register/">здесь</a> войдите в свой личный кабинет.</p>
+        <div>
+          <p>Чтобы загрузить шаблон без регистрации, Вам <a class="btn btn-info" href="/zapolnititul/v/forms/upload">сюда</a>.</p>
+          <p>Для управления шаблонами и данными введите Ваш логин и пароль. Если Вы ещё не зарегистрированы, то Вам <a class="btn btn-info" href="http://portal.titul24.ru/register/">сюда</a>.</p>
+        </div>
       )
     }
   </div>

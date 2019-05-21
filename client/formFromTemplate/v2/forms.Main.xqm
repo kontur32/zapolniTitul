@@ -204,7 +204,7 @@ function forms:main ( $page, $id, $datainst, $message ) {
                  for $i in $userData[ @templateID = $currentFormID ]
                  return 
                    <div>
-                     <a class="px-1" href="{ $config:param( 'host' ) || '/zapolnititul/api/v2/data/delete/' || $currentFormID || '/' || $datainst }" onclick="return confirm( 'Удалить?' );">
+                     <a class="px-1" href="{ $config:param( 'host' ) || '/zapolnititul/api/v2/data/delete/' || $currentFormID || '/' || $i/@updated/data() }" onclick="return confirm( 'Удалить?' );">
                         <img width="18" src="{ $config:param( 'iconDelete' ) }" alt="Удалить" />
                      </a>
                      <a href="{ '?datainst=' || web:encode-url( $i/@updated/data() ) }" >

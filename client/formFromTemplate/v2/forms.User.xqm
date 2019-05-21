@@ -18,7 +18,7 @@ function user:main ( ) {
         }
         catch*{}
       return
-      "/zapolnititul/forms/u/form/" || $userFormID
+      "/zapolnititul/forms/u/form/" || ( if ( $userFormID ) then ( $userFormID ) else( "new" ) )
     )
     else (
       "/zapolnititul"

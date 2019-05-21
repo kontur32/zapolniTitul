@@ -49,9 +49,13 @@ function forms:main ( $page, $id, $datainst, $message ) {
     else ( 
       forms:loginForm ( "/zapolnititul/api/v1/users/login", "/zapolnititul/forms/u/" , "http://portal.titul24.ru/register/" )
     )
-
+  let $userForms := 
+        try {
+          fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form
+        }
+        catch*{}
   let $currentFormID := 
-      if ( session:get( "userid" ) )
+      if ( session:get( "userid" ) and  $userForms )
       then ( getFormID:id( $id, session:get( "userid" ) ) )
       else ( getFormID:id( $id ) )
 
@@ -66,12 +70,6 @@ function forms:main ( $page, $id, $datainst, $message ) {
        switch ( $page )
        case ( "form" )
          return (
-      let $userForms := 
-        try {
-          fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form
-        }
-        catch*{}
-      return
         <div class="col">
           <h3>Мои шаблоны</h3> 
             {

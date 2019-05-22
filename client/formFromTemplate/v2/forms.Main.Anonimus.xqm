@@ -35,7 +35,6 @@ function forms:main ( $page, $currentFormID ) {
     </div>
   let $content := 
     <div class="container-fluid">
-      <div class="h3"> { $formMeta/@label/data() } </div>
       <div><a href="{ $formMeta/@fileFullPath/data() }">Шаблон формы</a></div>
       <div>Заполните поля формы и нажмите</div>
       {

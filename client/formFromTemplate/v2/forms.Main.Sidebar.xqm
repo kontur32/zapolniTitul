@@ -31,19 +31,19 @@ declare function sidebar:userFormsList ( $userForms as element( form )*, $params
 };
 
 declare function sidebar:userDataList ( $userData as element( table )* ) {
+  let $forms := distinct-values( $userData/@templateID/data() )
   let $result := 
    <div class="container">
      <ul>
        {
-         for $d in $userData
-         let $formID := $d/@templateID/data()
+         for $d in $forms
          let $formLabel := 
            try{
-             fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $formID || "/meta")/form/@label/data()}
+             fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $d || "/meta")/form/@label/data()}
            catch*{ "Форма не найдена" }
          return
            <li>
-             <a href="{ $formID }">{ $formLabel }</a>
+             <a href="{ $d }">{ $formLabel }</a>
            </li>
        }
      </ul>

@@ -36,25 +36,38 @@ function forms:main ( $page, $currentFormID ) {
   let $content := 
     <div class="container-fluid">
       <div class="h3"> { $formMeta/@label/data() } </div>
+      <div><a href="{ $formMeta/@fileFullPath/data() }">Шаблон формы</a></div>
+      <div>Заполните поля формы и нажмите</div>
+      {
+        let $buttons := (
+           map{
+             "method" : "POST",
+             "action" : "/zapolnititul/api/v1/document",
+             "class" : "btn btn-success btn-block",
+             "label" : "Скачать заполненный шаблон"}
+         )
+         return
+          form:footer( "template", (), "_t24_", $buttons )
+      }
       { form:body ( $formMeta, $formFields ) }
-               {
-                 let $meta := (
-                   [ "fileName", "ZapolniTitul.docx" ],
-                   [ "templatePath", $config:apiurl( $currentFormID, "template" ) ],
-                   [ "templateID", $currentFormID ],
-                   [ "redirect", "/zapolnititul/forms/a/form/" || $currentFormID ]
-                 )
-                 let $buttons := (
-                   map{
-                     "method" : "POST",
-                     "action" : "/zapolnititul/api/v1/document",
-                     "class" : "btn btn-success btn-block",
-                     "label" : "Скачать заполненный шаблон"}
-                   
-                 )
-                 return
-                  form:footer( "template", $meta, "_t24_", $buttons )
-               }
+       {
+         let $meta := (
+           [ "fileName", "ZapolniTitul.docx" ],
+           [ "templatePath", $config:apiurl( $currentFormID, "template" ) ],
+           [ "templateID", $currentFormID ],
+           [ "redirect", "/zapolnititul/forms/a/form/" || $currentFormID ]
+         )
+         let $buttons := (
+           map{
+             "method" : "POST",
+             "action" : "/zapolnititul/api/v1/document",
+             "class" : "btn btn-success btn-block",
+             "label" : "Скачать заполненный шаблон"}
+           
+         )
+         return
+          form:footer( "template", $meta, "_t24_", $buttons )
+       }
     </div>
     
   let $map := map{ "sidebar": $sidebar, "content": $content, "nav": "", "nav-login" : "" }

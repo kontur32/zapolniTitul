@@ -3,6 +3,12 @@ module namespace data = "http://dbx.iro37.ru/zapolnititul/forms/data";
 import module namespace 
   config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
 
+import module namespace 
+  buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "funct/buildForm.xqm";
+
+import module namespace
+  form = "http://dbx.iro37.ru/zapolnititul/forms/form" at "forms.Main.Form.xqm";
+  
 declare 
   %public
 function data:main( $formMeta, $userData, $currentDataInst ){
@@ -37,8 +43,15 @@ function data:main( $formMeta, $userData, $currentDataInst ){
               and web:encode-url( @updated/data() ) = web:encode-url( $currentDataInst )
             ]
            return
-              data:currentInst( $currentDataSet )
+              ( 
+                data:currentInst( $currentDataSet )
+              )
        }
+       <div>
+       {
+         
+       }
+       </div>
        </div>
      </div>
   </div>
@@ -77,6 +90,73 @@ function data:currentInst( $currentDataSet ){
                <td class="font-italic text-left px-3">{ $i/text()}</td>
               </tr>
        }</table> 
+     )
+     else(
+       <div>
+         <p>Сохраненных данных нет</p>
+       </div>
+     )
+ }</div>
+};
+
+declare 
+  %public
+function data:currentInstForm( $currentDataSet ){
+<div class="container">{
+     if ( $currentDataSet )
+     then (
+       let $formFields := 
+       <csv>
+         {
+           let $model := fetch:xml( web:decode-url( $currentDataSet/@modelURL/data() ) )/table/row
+           for $i in $currentDataSet/row/cell
+           return
+             <record>
+               <ID>
+               {
+                 if (  $model/@id = $i/@id )
+                 then(
+                   $model[ @id = $i/@id ]/cell[ @id = "label" ]/text() 
+                 )
+                 else (
+                   $i/@id/data()
+                 )
+               } 
+               </ID>
+               <defaultValue>{ $i/text() }</defaultValue>
+              </record>
+       }</csv> 
+       return
+         <div>
+           <div>{
+             buildForm:buildInputForm ( 
+              $formFields, 
+              map{ 
+                "method" : "POST", 
+                "action" : "/zapolnititul/api/v1/document" }
+             )
+           }</div>
+           <div>
+               {
+                 let $meta := (
+                   [ "type", $currentDataSet/@aboutType/data() ],
+                   [ "templateID", $currentDataSet/@templateID/data() ],
+                   [ "action", "update" ],
+                   [ "saveRedirect", "/zapolnititul/forms/u/data/" || $currentDataSet/@templateID/data() ]
+                 )
+                 let $buttons := (
+                    map{
+                     "method" : "POST",
+                     "action" : "/zapolnititul/api/v2/data/save",
+                     "class" : "btn btn-info btn-block",
+                     "label" : "Сохранить изменения"}
+                   
+                 )
+                 return
+                  form:footer( "template", $meta, "_t24_", $buttons )
+               }
+           </div>
+         </div> 
      )
      else(
        <div>

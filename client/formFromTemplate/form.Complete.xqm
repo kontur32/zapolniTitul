@@ -4,12 +4,12 @@ import module namespace Session = "http://basex.org/modules/session";
 import module namespace htmlZT =  "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "../funct/htmlZT.xqm";
 
 declare 
-  %rest:path ( "/zapolnititul/v/forms/complete/{$id}" )
-  %rest:query-param( "href", "{ $href }", "/zapolnititul/v/forms" )
+  %rest:path ( "/zapolnititul/forms/a/complete/{$id}" )
+  %rest:query-param( "href", "{ $href }", "/zapolnititul/forms/a/form/" )
   %output:method ("xhtml")
 function confirm:main ( $id, $href ) {
   let $form := db:open("titul24", "forms")/forms/form[ @id = $id ]
-  let $href := $href || "?id=" || $id
+  let $href := $href || $id
   let $content :=
     <div>
       <h2>Загрузка шаблона завершена</h2>

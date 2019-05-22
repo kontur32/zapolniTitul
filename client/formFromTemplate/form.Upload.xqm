@@ -32,7 +32,7 @@ function upload:main ( $data  ) {
          )
          else ()
        }
-        <input class="form-control" type="hidden" name="redirect" value="/zapolnititul/v/forms/complete/"/>
+        <input class="form-control" type="hidden" name="redirect" value="/zapolnititul/forms/a/complete/"/>
         <p>и нажмите </p>
         <input class="btn btn-info" type="submit" value="Загрузить..."/>
      </form>

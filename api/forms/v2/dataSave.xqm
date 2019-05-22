@@ -7,12 +7,35 @@ import module namespace session = "http://basex.org/modules/session";
   !!! Это костыль: в фукнции dataSave:main( $redirect ) 
   не удается открыть базу db:open()
 :)
+
 declare
   %updating
   %rest:path ( "/zapolnititul/api/v2/data/update" )
   %rest:POST
   %rest:form-param ( "data", "{ $data }" )
 function dataSave:update( $data ){
+  let $d := parse-xml( $data )/table
+  let $db := db:open("titul24", "data" )/data
+  let $nodeToReplace := 
+    $db/table[
+      @templateID = $d/@templateID and
+      @userID = $d/@userID 
+    ][last()]
+  return
+    ( if ( $nodeToReplace )
+    then (
+      db:output( $nodeToReplace )
+    )
+    else (  db:output( <no></no> ) )
+     )
+};
+
+declare
+  %updating
+  %rest:path ( "/zapolnititul/api/v2/data/add" )
+  %rest:POST
+  %rest:form-param ( "data", "{ $data }" )
+function dataSave:add( $data ){
   let $d := parse-xml( $data )/table
   let $db := db:open("titul24", "data" )/data
   let $nodeToReplace := 
@@ -37,8 +60,9 @@ declare
   %updating
   %rest:path ( "/zapolnititul/api/v2/data/save" )
   %rest:POST
+  %rest:form-param ( "_t24_action", "{ $action }", "add" )
   %rest:form-param ( "_t24_redirect", "{ $redirect }", "/" )
-function dataSave:main( $redirect ){
+function dataSave:main( $action, $redirect ){
     let $paramNames := 
       for $name in  request:parameter-names()
       where not ( starts-with( $name, "_t24_" ) )
@@ -102,8 +126,14 @@ function dataSave:main( $redirect ){
                   </http:body>
               </http:multipart> 
             </http:request>,
-            "http://localhost:8984/zapolnititul/api/v2/data/update" 
-        )[2]
+            if( $action = "update")
+            then(
+               "http://localhost:8984/zapolnititul/api/v2/data/update" 
+            )
+            else(
+               "http://localhost:8984/zapolnititul/api/v2/data/add" 
+            )
+        )
   return
     db:output(
      web:redirect( request:parameter( '_t24_saveRedirect' ) )

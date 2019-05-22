@@ -21,8 +21,6 @@ function forms:main ( $page, $currentFormID ) {
      
   let $formFields := $config:getFormByAPI( $currentFormID,  "fields")/csv
   
-  let $tpl := serialize( $template:get( $page ) )
-  
   let $imgPath := 
     if( $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/img )
     then ( $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/img/text() )
@@ -60,6 +58,8 @@ function forms:main ( $page, $currentFormID ) {
     </div>
     
   let $map := map{ "sidebar": $sidebar, "content": $content, "nav": "", "nav-login" : "" }
+  let $tpl := serialize( $template:get( $page ) )
+   
   return
     html:fillHtmlTemplate( $tpl, $map )
 };

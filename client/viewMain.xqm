@@ -2,6 +2,12 @@ module namespace zt = "http://dbx.iro37.ru/zapolnititul/";
 
 import module namespace session = "http://basex.org/modules/session";
 
+import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
+
+import module namespace 
+  template = "http://dbx.iro37.ru/zapolnititul/forms/u/template" 
+  at "formFromTemplate/v2/conf/forms.Template.xqm";
+
 import module namespace buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "funct/buildForm.xqm";
 import module namespace formData = "http://dbx.iro37.ru/zapolnititul/formData" at "funct/formData.xqm";
 import module namespace htmlZT = "http://dbx.iro37.ru/zapolnititul/funct/htmlZT" at "funct/htmlZT.xqm";
@@ -42,13 +48,18 @@ function zt:start ( ) {
   let $nav-login := 
     if ( session:get( 'username' ) )
     then ( 
-      zt:logoutForm ( "/zapolnititul/api/v1/users/logout", session:get( "username" ), "/zapolnititul/forms/u/" )
+      html:fillHtmlTemplate(
+         serialize( $template:get( "logout" ) ), 
+         map{ "username" : session:get( "username" ) }
+       )
      )
     else ( 
-    zt:loginForm ( "/zapolnititul/api/v1/users/login", "/zapolnititul/forms/u/" , "http://portal.titul24.ru/register/" )
+      html:fillHtmlTemplate(
+           serialize( $template:get( "login" ) ), 
+           map{}
+         )
     )
- 
- 
+
  let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
  let $templateFieldsMap := map{"sidebar": "", "content":$content, "nav": "", "nav-login" : $nav-login}
     return htmlZT:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
@@ -102,34 +113,4 @@ function zt:form ( $org as xs:string, $path as xs:string , $formID as xs:string 
   let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
   let $templateFieldsMap := map{"sidebar": $sidebar, "content":$content, "nav": "", "nav-login" : ""}
     return htmlZT:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )/child::*
-};
-
-declare 
-  %private
-function zt:loginForm ( $actionURL, $callbackURL, $regURL ) {
-  <div class="form-group">
-    <div class="form-inline">
-      <form method="GET" action="{ $actionURL }" class="form-group form-inline my-sm-0">
-        <input type="text" name="username" placeholder="логин"  class="mr-sm-1"/>
-        <input type="password" name="password" placeholder="пароль" class="mr-sm-1"/>
-        <input type="hidden" name="callbackURL" value="{ $callbackURL }"/>
-        <input class="btn btn-info" type="submit" value="Войти"/>
-      </form>
-    </div>
-    <div class="my-sm-0">
-        <a class="text-muted" href="{ $regURL }">Зарегистрироваться</a>
-    </div>
-  </div>
-};
-
-declare 
-  %private
-function zt:logoutForm( $actionURL, $username, $callbackURL ) {
-  <div class="form-group form-inline text-muted">
-    <form method="GET" action="{ $actionURL }">
-      <a href="/zapolnititul/forms/u">{ $username }</a>
-      <input type="hidden" name="callbackURL" value="{ $callbackURL }"/>
-      <input class="btn btn-info ml-sm-1" type="submit" value="Выйти"/>
-    </form>
-  </div>
 };

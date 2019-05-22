@@ -1,9 +1,53 @@
 module namespace data = "http://dbx.iro37.ru/zapolnititul/forms/data";
 
+import module namespace 
+  config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
 
 declare 
   %public
-function data:main( $currentDataSet ){
+function data:main( $formMeta, $userData, $currentDataInst ){
+   <div class="row">
+     <div class="col-md-6 border-right">
+       <h3>Экземпляры:</h3>
+       <p>{ $formMeta/@label/data() }</p>
+       <div>
+       {
+         for $i in $userData[ @templateID = $formMeta/@id/data() ]
+         return 
+           <div>
+             <a class="px-1" href="{ $config:param( 'host' ) || '/zapolnititul/api/v2/data/delete/' ||$formMeta/@id/data() || '/' || $i/@updated/data() }" onclick="return confirm( 'Удалить?' );">
+                <img width="18" src="{ $config:param( 'iconDelete' ) }" alt="Удалить" />
+             </a>
+             <a href="{ '?datainst=' || web:encode-url( $i/@updated/data() ) }" >
+               { $i/@updated/data() }
+             </a>
+           </div>
+           
+       }
+       </div>
+     </div>  
+     <div class="col-md-6 border-right">
+       <h3 class="my-3"> Экземлпяр:</h3>
+       <p>{ $currentDataInst }</p>
+       <div class="row">
+       {
+          let $currentDataSet  := 
+            $userData[
+              @templateID = $formMeta/@id/data() 
+              and web:encode-url( @updated/data() ) = web:encode-url( $currentDataInst )
+            ]
+           return
+              data:currentInst( $currentDataSet )
+       }
+       </div>
+     </div>
+  </div>
+};
+
+
+declare 
+  %public
+function data:currentInst( $currentDataSet ){
 <div class="container">{
      if ( $currentDataSet )
      then (

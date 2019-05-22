@@ -6,10 +6,10 @@ import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
 
 import module namespace 
   config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
-
+  
 import module namespace 
-  buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "funct/buildForm.xqm";
-
+  template = "http://dbx.iro37.ru/zapolnititul/forms/u/template" at "conf/forms.Template.xqm";
+  
 import module namespace 
   getFormID = "http://dbx.iro37.ru/zapolnititul/forms/getFormID" at "funct/getFormID.xqm";
 
@@ -42,24 +42,22 @@ declare
   %output:method ("xhtml")
 function forms:main ( $page, $id, $datainst, $message ) {
   let $login := 
-    if ( session:get( 'username' ) )
-    then ( 
-      forms:logoutForm ( "/zapolnititul/api/v1/users/logout", session:get( "username" ), "/zapolnititul/forms/u/" )
-     )
-    else ( 
-      forms:loginForm ( "/zapolnititul/api/v1/users/login", "/zapolnititul/forms/u/" , "http://portal.titul24.ru/register/" )
-    )
+       html:fillHtmlTemplate(
+         serialize( $template:get( "logout" ) ), 
+         map{ "username" : session:get( "username" ) }
+       )
+ 
   let $userForms := 
         try {
           fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form
         }
         catch*{}
+        
   let $currentFormID := 
-      if ( session:get( "userid" ) and  $userForms )
-      then ( getFormID:id( $id, session:get( "userid" ) ) )
-      else ( getFormID:id( $id ) )
+    if (  $config:getFormByAPI( $id,  "meta")/form ) 
+    then( $id )
+    else ()
 
-  
   let $formMeta := $config:getFormByAPI( $currentFormID,  "meta")/form
      
   let $formFields := $config:getFormByAPI( $currentFormID,  "fields")/csv
@@ -81,13 +79,13 @@ function forms:main ( $page, $id, $datainst, $message ) {
          return 
            <div>
              <h3>Мои формы</h3>
-             {
+             { 
                let $data := $config:fetchUserData(
                    session:get( "userid"),
                    request:cookie('JSESSIONID')
                  )
-               return  
-                 sidebar:userDataList ( $data/data/table )
+            return 
+               sidebar:userDataList( $data/data/table )
              }
            </div>
       default return ""
@@ -100,86 +98,9 @@ function forms:main ( $page, $id, $datainst, $message ) {
          return
          if ( $currentFormID )
          then (
-           <div class="row">
-             <div class="col-md-6 border-right">
-               <h3>{ $formMeta/@label/data() }</h3>
-               { form:header ( $currentFormID, $config:getFormByAPI ) }
-               { form:body ( $formMeta, $formFields ) }
-               {
-                 let $meta := (
-                   [ "fileName", "ZapolniTitul.docx" ],
-                   [ "templatePath", $config:apiurl( $currentFormID, "template" ) ],
-                   [ "templateID", $currentFormID ],
-                   [ "redirect", "/zapolnititul/forms/u/form/" || $currentFormID ],
-                   [ "saveRedirect", "/zapolnititul/forms/u/data/" || $currentFormID ]
-                 )
-                 let $buttons := (
-                   map{
-                     "method" : "POST",
-                     "action" : "/zapolnititul/api/v1/document",
-                     "class" : "btn btn-success btn-block",
-                     "label" : "Скачать заполненный шаблон"},
-                    map{
-                     "method" : "POST",
-                     "action" : "/zapolnititul/api/v2/data/save",
-                     "class" : "btn btn-info btn-block",
-                     "label" : "Сохранить введенные данные"}
-                   
-                 )
-                 return
-                  form:footer( "template", $meta, "_t24_", $buttons )
-               }
-             </div>
-             <div class="col-md-6">
-               <h3>Загрузить шаблон</h3>
-               {
-                 upload:main( "yes", $id, $config:param( "host" ) || "/zapolnititul/forms/u/complete/" )
-               }
-               {
-                 let $meta := (
-                   [ "redirect", "/zapolnititul/forms/u/form/" || $currentFormID ]
-                 )
-                 let $buttons := (
-                   map{
-                     "method" : "POST",
-                     "action" : "/zapolnititul/api/v2/forms/post/" || $currentFormID,
-                     "class" : "btn btn-success btn-block",
-                     "label" : "Обновить форму"},
-                    map{
-                     "method" : "POST",
-                     "action" : "/zapolnititul/api/v2/forms/post/create",
-                     "class" : "btn btn-info btn-block",
-                     "label" : "Создать новую форму"},
-                   map{
-                     "method" : "GET",
-                     "action" : '/zapolnititul/forms/u/child/' || $currentFormID,
-                     "class" : "btn btn-info btn-block",
-                     "label" : "Создать дочернюю форму"}   
-                 )
-                 return
-                  form:footer( "upload", $meta, "", $buttons )
-               }
-             </div>
-          </div>
+          form:main ( $id, $formMeta, $formFields )
         )
-        else ( <div>Нет ни одной формы</div>)
-       case ( "upload" )
-         return
-             let $meta := (
-                   [ "redirect", "/zapolnititul/forms/u/form/" || $currentFormID ]
-                 )
-             let $buttons := (
-                    map{
-                     "method" : "POST",
-                     "action" : "/zapolnititul/api/v2/forms/post/create",
-                     "class" : "btn btn-info btn-block",
-                     "label" : "Создать новую форму"}
-                 )
-                 return
-                 (
-                   upload:main( "yes", $id, $config:param( "host" ) || "/zapolnititul/forms/u/complete/" ),
-                   form:footer( "upload", $meta, "", $buttons )
-                  )
+        else ( <div>Запрошенная форма не найдена формы</div>)
        case ( "complete" )
          return 
            complete:main( $formMeta )
@@ -189,108 +110,31 @@ function forms:main ( $page, $id, $datainst, $message ) {
        case ( "data" )
          return
            let $userData := 
-                    $config:fetchUserData(
-                        session:get( "userid"), request:cookie('JSESSIONID')
-                    )/data/table
+                $config:fetchUserData(
+                    session:get( "userid" ), request:cookie('JSESSIONID')
+                )/data/table
             return 
-           <div class="row">
-             <div class="col-md-6 border-right">
-               <h3>Экземпляры:</h3>
-               <p>{ $formMeta/@label/data() }</p>
-               <div>
-               {
-                 for $i in $userData[ @templateID = $currentFormID ]
-                 return 
-                   <div>
-                     <a class="px-1" href="{ $config:param( 'host' ) || '/zapolnititul/api/v2/data/delete/' || $currentFormID || '/' || $i/@updated/data() }" onclick="return confirm( 'Удалить?' );">
-                        <img width="18" src="{ $config:param( 'iconDelete' ) }" alt="Удалить" />
-                     </a>
-                     <a href="{ '?datainst=' || web:encode-url( $i/@updated/data() ) }" >
-                       { $i/@updated/data() }
-                     </a>
-                   </div>
-                   
-               }
-               </div>
-             </div>  
-             <div class="col-md-6 border-right">
-               <h3 class="my-3"> Экземлпяр:</h3>
-               <p>{ $datainst }</p>
-               <div class="row">
-               {
-                  let $currentDataSet  := 
-                    $userData[
-                      @templateID = $currentFormID 
-                      and web:encode-url( @updated/data() ) = web:encode-url( $datainst )
-                    ]
-                   return
-                      data:main( $currentDataSet )
-               }
-               </div>
-             </div>
-          </div>
+              data:main( $formMeta, $userData, $datainst )
        default return ""
   
   let $nav := 
     let $items:= 
-        (
-           if ( session:get( "userid") )
-           then(
+           (
              ["form", '/zapolnititul/forms/u/' || 'form' || '/' || $currentFormID,  "Мои шаблоны" ],
              ["data", '/zapolnititul/forms/u/' || 'data' || '/' || $currentFormID, "Мои данные" ]
            )
-           else (
-             ["upload", '/zapolnititul/forms/u/' || 'upload' || '/' || 'new', "Новая форма" ]
-           )
-        )
     return
       nav:main( $page, $items )
       
   return 
-    if( $page = ( "form", "upload", "complete", "child", "data" ) )
+    if( $template:get( $page )  )
     then(
       let $templateFieldsMap := map{ "sidebar": $sidebar, "content": $content, "nav": $nav, "nav-login" : $login }
-      let $siteTemplate := serialize( doc( "src/main-tpl.html" ) )
+      let $siteTemplate := serialize( $template:get( $page ) )
       return
         html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )
     )
     else(
         web:redirect( "http://localhost:8984/zapolnititul/forms/u/" )
     )
-};
-
-declare 
-  %private
-function forms:loginForm ( $actionURL, $callbackURL, $regURL ) {
-  <div class="form-group">
-    <div class="form-inline">
-      <form method="GET" action="{ $actionURL }" class="form-group form-inline my-sm-0">
-        <input type="text" name="username" placeholder="логин"  class="mr-sm-1"/>
-        <input type="password" name="password" placeholder="пароль" class="mr-sm-1"/>
-        <input type="hidden" name="callbackURL" value="{ $callbackURL }"/>
-        <input class="btn btn-info" type="submit" value="Войти"/>
-      </form>
-    </div>
-    <div class="my-sm-0">
-        <a class="text-muted" href="{ $regURL }">Зарегистрироваться</a>
-    </div>
-  </div>
-};
-
-declare 
-  %private
-function forms:logoutForm( $actionURL, $username, $callbackURL ) {
-  <div class="form-group form-inline text-muted">
-    <form method="GET" action="{ $actionURL }">
-      <a href="/zapolnititul/forms/u">{ $username }</a>
-      <input type="hidden" name="callbackURL" value="{ $callbackURL }"/>
-      <input class="btn btn-info ml-sm-1" type="submit" value="Выйти"/>
-    </form>
-  </div>
-};
-
-declare %perm:check('/zapolnititul/forms/u') function forms:check-admin() {
-  let $user := session:get('userid')
-  where not( $user )
-  return web:redirect('/zapolnititul')
 };

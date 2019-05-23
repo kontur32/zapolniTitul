@@ -52,6 +52,7 @@ function buildForm:buildInputForm-main (
                 attribute { "type" } { "text" },
                 attribute { "name" } { $field/ID/text() },
                 attribute { "value" } { $field/defaultValue/text() },
+                attribute { "placeholder" } { $field/placeholder/text() },
                 if ( $field/disabled ) 
                 then (
                    attribute { "disabled" } { "disabled" }

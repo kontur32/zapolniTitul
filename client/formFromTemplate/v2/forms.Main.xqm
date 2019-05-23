@@ -38,9 +38,10 @@ declare
   %rest:GET
   %rest:path ( "/zapolnititul/forms/u/{ $page }/{$id}" )
   %rest:query-param( "datainst", "{ $datainst }", "")
+  %rest:query-param( "dataver", "{ $dataver }", "")
   %rest:query-param( "message", "{ $message }", "")
   %output:method ("xhtml")
-function forms:main ( $page, $id, $datainst, $message ) {
+function forms:main ( $page, $id, $datainst, $dataver, $message ) {
   let $login := 
        html:fillHtmlTemplate(
          serialize( $template:get( "logout" ) ), 
@@ -100,7 +101,28 @@ function forms:main ( $page, $id, $datainst, $message ) {
          then (
           form:main ( $id, $formMeta, $formFields )
         )
-        else ( <div>Запрошенная форма не найдена формы</div>)
+        else (
+          <div class="col-md-6">
+               <h3>Загрузить новый шаблон</h3>
+               {
+                 upload:main( "yes", $id, $config:param( "host" ) || "/zapolnititul/forms/u/complete/" )
+               }
+               {
+                 let $meta := (
+                   [ "redirect", "/zapolnititul/forms/u/form/"]
+                 )
+                 let $buttons := (
+                    map{
+                     "method" : "POST",
+                     "action" : "/zapolnititul/api/v2/forms/post/create",
+                     "class" : "btn btn-info btn-block",
+                     "label" : "Создать новую форму"}
+                 )
+                 return
+                  form:footer( "upload", $meta, "", $buttons )
+               }
+             </div>
+        )
        case ( "complete" )
          return 
            complete:main( $formMeta )
@@ -114,7 +136,7 @@ function forms:main ( $page, $id, $datainst, $message ) {
                     session:get( "userid" ), request:cookie('JSESSIONID')
                 )/data/table
             return 
-              data:main( $formMeta, $userData, $datainst )
+              data:main( $formMeta, $userData, $datainst, $dataver )
        default return ""
   
   let $nav := 

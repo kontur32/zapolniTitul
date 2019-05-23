@@ -11,40 +11,59 @@ import module namespace
   
 declare 
   %public
-function data:main( $formMeta, $userData, $currentDataInst ){
+function data:main( $formMeta, $userData, $currentDataInst, $currentDataVer ){
    <div class="row">
      <div class="col-md-6 border-right">
-       <h3>Экземпляры:</h3>
-       <p>{ $formMeta/@label/data() }</p>
-       <div>
+       <h3>Экземпляры формы:</h3>
+       <h4>{ '"' || $formMeta/@label/data() || '"'}</h4>
+       <dl>
        {
-         for $i in $userData[ @templateID = $formMeta/@id/data() ]
-         return 
+         let $data := $userData[ @templateID = $formMeta/@id/data() ]
+         let $instList := distinct-values( $data/@id/data() )
+         for $v in $instList
+         return
            <div>
-             <a class="px-1" href="{ $config:param( 'host' ) || '/zapolnititul/api/v2/data/delete/' ||$formMeta/@id/data() || '/' || $i/@updated/data() }" onclick="return confirm( 'Удалить?' );">
-                <img width="18" src="{ $config:param( 'iconDelete' ) }" alt="Удалить" />
-             </a>
-             <a href="{ '?datainst=' || web:encode-url( $i/@updated/data() ) }" >
-               { $i/@updated/data() }
-             </a>
-           </div>
-           
+             <dt>Экземпляр: {$v}</dt>
+             <div class="ml-2">
+             {
+               for $i in $data[ @id = $v ]
+               count $c
+               return 
+                 <dd>
+                   <a class="px-1" href="{ $config:param( 'host' ) || '/zapolnititul/api/v2/data/delete/' ||$formMeta/@id/data() || '/' || $i/@updated/data() }" onclick="return confirm( 'Удалить?' );">
+                      <img width="18" src="{ $config:param( 'iconDelete' ) }" alt="Удалить" />
+                   </a>
+                   <a href="{
+                     web:create-url( '',
+                       map{
+                         'dataver' : web:encode-url( $i/@updated/data() ),
+                         'datainst' : $i/@id/data()
+                       }
+                     )
+                     }" >
+                     Версия: { $c }
+                   </a>
+                 </dd>
+                   }</div>
+                 </div>
        }
-       </div>
+       </dl>
      </div>  
-     <div class="col-md-6 border-right">
-       <h3 class="my-3"> Экземлпяр:</h3>
-       <p>{ $currentDataInst }</p>
+     <div class="col-md-6">
+       <div class="my-1">Версия от: { substring-before( web:decode-url( $currentDataVer ),"+" )}</div>
+       <div></div>
+       <div>Экземпляра: { $currentDataInst }</div>
        <div class="row">
        {
           let $currentDataSet  := 
             $userData[
-              @templateID = $formMeta/@id/data() 
-              and web:encode-url( @updated/data() ) = web:encode-url( $currentDataInst )
+              @templateID = $formMeta/@id/data() and
+              @id = $currentDataInst and
+              web:encode-url( @updated/data() ) =  $currentDataVer 
             ]
            return
               ( 
-                data:currentInst( $currentDataSet )
+                data:currentInstForm( $currentDataSet )
               )
        }
        <div>
@@ -55,48 +74,6 @@ function data:main( $formMeta, $userData, $currentDataInst ){
        </div>
      </div>
   </div>
-};
-
-
-declare 
-  %public
-function data:currentInst( $currentDataSet ){
-<div class="container">{
-     if ( $currentDataSet )
-     then (
-       <table class="table-striped">
-         <tr >
-           <th class="text-center">Свойство</th>
-           <th></th>
-           <th class="text-center">Значение</th>
-          </tr>
-         {
-           let $model := fetch:xml( web:decode-url( $currentDataSet/@modelURL/data() ) )/table/row
-           for $i in $currentDataSet/row/cell
-           return
-             <tr>
-               <td class="px-3">
-               {
-                 if (  $model/@id = $i/@id )
-                 then(
-                   $model[ @id = $i/@id ]/cell[ @id = "label" ]/text() 
-                 )
-                 else (
-                   $i/@id/data()
-                 )
-               } 
-               </td>
-               <td>:</td>
-               <td class="font-italic text-left px-3">{ $i/text()}</td>
-              </tr>
-       }</table> 
-     )
-     else(
-       <div>
-         <p>Сохраненных данных нет</p>
-       </div>
-     )
- }</div>
 };
 
 declare 
@@ -133,7 +110,8 @@ function data:currentInstForm( $currentDataSet ){
               $formFields, 
               map{ 
                 "method" : "POST", 
-                "action" : "/zapolnititul/api/v1/document" }
+                "action" : "/zapolnititul/api/v1/document"
+              }
              )
            }</div>
            <div>
@@ -141,15 +119,23 @@ function data:currentInstForm( $currentDataSet ){
                  let $meta := (
                    [ "type", $currentDataSet/@aboutType/data() ],
                    [ "templateID", $currentDataSet/@templateID/data() ],
+                   [ "id",  $currentDataSet/@id/data() ],
+                   [ "inst",  $currentDataSet/@updated/data() ],
                    [ "action", "update" ],
-                   [ "saveRedirect", "/zapolnititul/forms/u/data/" || $currentDataSet/@templateID/data() ]
+                   [ "saveRedirect", 
+                     web:create-url(
+                       "/zapolnititul/forms/u/data/" || 
+                       $currentDataSet/@templateID/data(),
+                       map{ "datainst" : $currentDataSet/@updated/data() }
+                     )
+                   ]
                  )
                  let $buttons := (
                     map{
                      "method" : "POST",
                      "action" : "/zapolnititul/api/v2/data/save",
                      "class" : "btn btn-info btn-block",
-                     "label" : "Сохранить изменения"}
+                     "label" : "Сохранить новую версию"}
                    
                  )
                  return
@@ -157,6 +143,47 @@ function data:currentInstForm( $currentDataSet ){
                }
            </div>
          </div> 
+     )
+     else(
+       <div>
+         <p>Сохраненных данных нет</p>
+       </div>
+     )
+ }</div>
+};
+
+declare 
+  %public
+function data:currentInst( $currentDataSet ){
+<div class="container">{
+     if ( $currentDataSet )
+     then (
+       <table class="table-striped">
+         <tr >
+           <th class="text-center">Свойство</th>
+           <th></th>
+           <th class="text-center">Значение</th>
+          </tr>
+         {
+           let $model := fetch:xml( web:decode-url( $currentDataSet/@modelURL/data() ) )/table/row
+           for $i in $currentDataSet/row/cell
+           return
+             <tr>
+               <td class="px-3">
+               {
+                 if (  $model/@id = $i/@id )
+                 then(
+                   $model[ @id = $i/@id ]/cell[ @id = "label" ]/text() 
+                 )
+                 else (
+                   $i/@id/data()
+                 )
+               } 
+               </td>
+               <td>:</td>
+               <td class="font-italic text-left px-3">{ $i/text()}</td>
+              </tr>
+       }</table> 
      )
      else(
        <div>

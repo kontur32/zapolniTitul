@@ -36,6 +36,7 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
             )
             else ( $form/@fileFullPath ),
             $form/@fileFullName,
+            
             if ( $form/@parentid and not( $form/@fileNameOriginal ) )
             then (
               $config:apiResult( $form/@parentid, "meta")/form/@fileNameOriginal

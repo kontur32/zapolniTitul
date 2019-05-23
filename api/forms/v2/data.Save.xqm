@@ -8,34 +8,13 @@ import module namespace session = "http://basex.org/modules/session";
   не удается открыть базу db:open()
 :)
 
+
 declare
   %updating
   %rest:path ( "/zapolnititul/api/v2/data/update" )
   %rest:POST
   %rest:form-param ( "data", "{ $data }" )
 function dataSave:update( $data ){
-  let $d := parse-xml( $data )/table
-  let $db := db:open("titul24", "data" )/data
-  let $nodeToReplace := 
-    $db/table[
-      @templateID = $d/@templateID and
-      @userID = $d/@userID 
-    ][last()]
-  return
-    ( if ( $nodeToReplace )
-    then (
-      db:output( $nodeToReplace )
-    )
-    else (  db:output( <no></no> ) )
-     )
-};
-
-declare
-  %updating
-  %rest:path ( "/zapolnititul/api/v2/data/add" )
-  %rest:POST
-  %rest:form-param ( "data", "{ $data }" )
-function dataSave:add( $data ){
   let $d := parse-xml( $data )/table
   let $db := db:open("titul24", "data" )/data
   let $nodeToReplace := 
@@ -60,19 +39,26 @@ declare
   %updating
   %rest:path ( "/zapolnititul/api/v2/data/save" )
   %rest:POST
+  %rest:form-param ( "_t24_id", "{ $id }", "" )
+  %rest:form-param ( "_t24_inst", "{ $inst }", "" )
   %rest:form-param ( "_t24_action", "{ $action }", "add" )
   %rest:form-param ( "_t24_redirect", "{ $redirect }", "/" )
-function dataSave:main( $action, $redirect ){
+function dataSave:main( $id, $inst, $action, $redirect ){
     let $paramNames := 
-      for $name in  request:parameter-names()
+      for $name in  distinct-values( request:parameter-names() )
       where not ( starts-with( $name, "_t24_" ) )
       return $name
     let $aboutType := 
       if( request:parameter( '_t24_type' ) ) then (  request:parameter( '_t24_type' ) ) else ( "student" )
     let $modelURL := 
        web:create-url( "http://localhost:8984/trac/api/Model/ood", map{ "id" : $aboutType } )
+    let $currentID := 
+      if ( $action = "add" )
+      then ( random:uuid() )
+      else ( $id )
     let $data :=
-    <table 
+    <table
+      id="{ $currentID }"
       aboutType="{ $aboutType }" 
       templateID="{ request:parameter( '_t24_templateID' ) }" 
       userID="{ session:get('userid') }" 
@@ -80,7 +66,7 @@ function dataSave:main( $action, $redirect ){
       <row>
       {
         for $param in $paramNames
-        let $paramValue := request:parameter( $param )
+        let $paramValue := request:parameter( $param )[1] (: если одинаковые параметры, то берет значение только первого :)
         where not ( $paramValue instance of map(*)  ) and $paramValue
         return
             <cell label="{ $param }">{ $paramValue }</cell>
@@ -124,15 +110,13 @@ function dataSave:main( $action, $redirect ){
                   <http:body media-type = "application/xml" >
                     { $response }
                   </http:body>
+                  <http:header name="Content-Disposition" value= 'form-data; name="inst";'/>
+                  <http:body media-type = "text" >
+                    { $inst }
+                  </http:body>
               </http:multipart> 
             </http:request>,
-            if( $action = "update")
-            then(
                "http://localhost:8984/zapolnititul/api/v2/data/update" 
-            )
-            else(
-               "http://localhost:8984/zapolnititul/api/v2/data/add" 
-            )
         )
   return
     db:output(

@@ -23,7 +23,7 @@ function data:main( $formMeta, $userData, $currentDataInst, $currentDataVer ){
          for $v in $instList
          return
            <div>
-             <dt>Экземпляр: {$v}</dt>
+             <dt>Экземпляр: {  data:instanceLabel( $data[@id=$v][last()] ) }</dt>
              <div class="ml-2">
              {
                for $i in $data[ @id = $v ]
@@ -41,7 +41,7 @@ function data:main( $formMeta, $userData, $currentDataInst, $currentDataVer ){
                        }
                      )
                      }" >
-                     Версия: { $c }
+                     Версия { $c } : { data:instanceLabel( $i )}
                    </a>
                  </dd>
                    }</div>
@@ -50,28 +50,30 @@ function data:main( $formMeta, $userData, $currentDataInst, $currentDataVer ){
        </dl>
      </div>  
      <div class="col-md-6">
-       <div class="my-1">Версия от: { substring-before( web:decode-url( $currentDataVer ),"+" )}</div>
-       <div></div>
-       <div>Экземпляра: { $currentDataInst }</div>
-       <div class="row">
-       {
-          let $currentDataSet  := 
+     {
+       let $currentDataSet  := 
             $userData[
               @templateID = $formMeta/@id/data() and
               @id = $currentDataInst and
               web:encode-url( @updated/data() ) =  $currentDataVer 
             ]
+       let $lastDataSet := 
+         $userData[
+              @templateID = $formMeta/@id/data() and
+              @id = $currentDataInst  
+            ][ last() ]
            return
-              ( 
-                data:currentInstForm( $currentDataSet )
-              )
-       }
-       <div>
-       {
-         
-       }
-       </div>
-       </div>
+           <div>
+             <div class="font-weight-bold my-1">{  data:instanceLabel( $currentDataSet ) }</div>
+             <div>Версия от: { replace( substring-before( web:decode-url( $currentDataVer ),"." ), "T", " ") } </div>
+             <div>Экземпляра: {  data:instanceLabel( $lastDataSet ) }</div>
+             <div class="row">
+             {
+               data:currentInstForm( $currentDataSet )
+             }
+             </div>
+           </div>
+        }
      </div>
   </div>
 };
@@ -154,7 +156,7 @@ function data:currentInstForm( $currentDataSet ){
 
 declare 
   %public
-function data:currentInst( $currentDataSet ){
+function data:currentInstView( $currentDataSet ){
 <div class="container">{
      if ( $currentDataSet )
      then (
@@ -191,4 +193,23 @@ function data:currentInst( $currentDataSet ){
        </div>
      )
  }</div>
+};
+
+declare function data:instanceLabel( $VersionData )
+{
+let $f := fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $VersionData/@templateID ||  "/fields")/csv/record[ID="__ОПИСАНИЕ__"]/labelOfInstance/text()
+
+let $fieldsNameList := tokenize($f, "--") => for-each( normalize-space( ? ) )
+
+let $modelFields := fetch:xml( web:decode-url( $VersionData/@modelURL/data() ) )/table/row
+
+let $fieldsIDList := 
+  for $i in $fieldsNameList
+   return
+     $modelFields[cell[@id="label"]=$i]/@id/data()
+
+return 
+   string-join( 
+     for $i in $fieldsIDList return $VersionData/row/cell[@id=$i]/text(), " "
+   )
 };

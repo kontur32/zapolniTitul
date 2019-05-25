@@ -123,9 +123,6 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
                }
              </div>
         )
-       case ( "complete" )
-         return 
-           complete:main( $formMeta )
        case ( "child" )
          return 
            child:main( $formMeta, $formFields )

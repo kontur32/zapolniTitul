@@ -29,10 +29,12 @@ function
            )
          return
          <div class="row">
-           <div class="col text-truncate">
+           <div class="col-md-10 text-truncate">
             <a class="{ $itemClass }" href="/zapolnititul/forms/u/form/{ $formID }" data-toggle="tooltip" data-placement="top" title="{ $formLabel }">
               { $formLabel } 
             </a>
+            </div>
+            <div class="col-md">
             <a class="float-right" href="{ $href_delete }" onclick="return confirm( 'Удалить?' );">
               <i class="fa fa-trash-alt"/>
             </a>

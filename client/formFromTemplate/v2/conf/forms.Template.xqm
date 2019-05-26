@@ -5,8 +5,8 @@ declare %private variable $template:SourcePath := "../src/";
 declare %private variable  
    $template:data := 
     <templates>
-      <template id="form" path="main-tpl.html" />
-      <template id="data" path="main-tpl.html" />
+      <template id="form" path="main-tpl2.html" />
+      <template id="data" path="main-tpl2.html" />
       <template id="complete" path="main-tpl.html" />
       <template id="child" path="main-tpl.html" />
       <template id="iframe" path="iframe-tpl.html" />

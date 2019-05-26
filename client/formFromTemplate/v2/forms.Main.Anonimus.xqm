@@ -30,11 +30,11 @@ function forms:main ( $page, $currentFormID ) {
       else()
     )
   let $sidebar := 
-    <div class="container-fluid">
+    <div class="col-md-3">
       <img class="img-fluid my-3" src="{ $imgPath }"/>
     </div>
   let $content := 
-    <div class="container-fluid">
+    <div class="col-md-9">
       <div><a href="{ $formMeta/@fileFullPath/data() }">Шаблон формы</a></div>
       <div>Заполните поля формы и нажмите</div>
       {
@@ -69,7 +69,7 @@ function forms:main ( $page, $currentFormID ) {
        }
     </div>
     
-  let $map := map{ "sidebar": $sidebar, "content": $content, "nav": "", "nav-login" : "" }
+  let $map := map{ "sidebar": $sidebar, "content": ($sidebar, $content), "nav": "", "nav-login" : "" }
   let $tpl := serialize( $template:get( $page ) )
    
   return

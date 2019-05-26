@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>TRaC</title>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+       
+    </head>
+    <body>
+      <div class="container-fluid" id="main">
+      
+        <nav class="navbar bg-dark navbar-dark">
+          <div class="container-fluid">
+            
+            <div class="col navbar-head">
+              <a href="/zapolnititul/">
+                <h1 class="navbar-brand">{ ЗаполниТитул }</h1>
+              </a> 
+            </div>
+            
+            <div class="col">{{nav}}</div>
+            
+            <div class="col">{{nav-login}}</div>
+            
+          </div>
+        </nav>
+        
+        <div class="container-fluid" id="content">
+          <div class="row" >      
+              {{content}}
+          </div>
+        </div>
+
+        <div class="footer" id="footer">
+          <div class="container-fluid bg-dark p-3">
+            <div class="text-muted">
+              <div>(tm) ЗаполниТитул - поможет экономить время, (tm) TRaC before ask</div>
+              <div>
+                <span>(c) </span>
+                <a href="http://iro37.ru/xqwiki/Artel"> artel</a>
+                <span>, (c) artmotor.</span> <span>Powered by </span>
+                <span class="badge badge-primary">
+                  <a target="_blank" href="http://iro37.ru/xqwiki/TRaC" style="color : white">TRaC</a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+       </div>
+      
+      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous"/>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+      <script>
+        $(document).ready(function(){
+          $('[data-toggle="tooltip"]').tooltip(); 
+        });
+      </script>
+    </body>
+</html>

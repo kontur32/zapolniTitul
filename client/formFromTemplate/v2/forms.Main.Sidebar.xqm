@@ -1,53 +1,68 @@
 module namespace sidebar = "http://dbx.iro37.ru/zapolnititul/forms/sidebar";
 
-declare function sidebar:userFormsList ( $userForms as element( form )*, $params as item() ) {
-  let $result := 
-   <div class="container">
-           {
-             for $f in $userForms
-             let $href_upload := 
-                $params( "uploadForm" ) || $f/@id/data()
-             let $href_delete := 
-               web:create-url( $params( "host") || $params( "deleteAPI" ) || $f/@id/data(), map{ "redirect" : '/zapolnititul/forms/u' } )
-             return
-             <div class="row">
-               <div class="col">
-               
-                <a class="px-1" href="{ $href_delete }" onclick="return confirm( 'Удалить?' );">
-                  <img width="18" src="{ $params( 'iconDelete' ) }" alt="Удалить" />
-                </a>
-               
-                <a href="/zapolnititul/forms/u/form/{ $f/@id/data() }" data-toggle="tooltip" data-placement="top" title="{ $f/@label/data() }">
-                  <span class="d-inline-block text-truncate" style="max-width: 180px;">
-                    { if( $f/@label/data() !="" ) then ( $f/@label/data() ) else ( "Без имени" ) }
-                  </span>
-                </a>
-               </div>
-              </div>
-           }
-         </div>
-  return
-    $result         
+declare 
+  %public
+function
+  sidebar:userFormsList(
+    $currentFormID as xs:string,
+    $userForms as element( form )*,
+    $params as item()
+  )
+{
+  <div class="container">
+       {
+         for $f in $userForms
+         let $formID := $f/@id/data()
+         let $formLabel :=
+           if( $f/@label/data() != "" )
+           then ( $f/@label/data() )
+           else ( "Без имени" )
+         let $itemClass := 
+           if ( $formID = $currentFormID ) 
+              then( "font-weight-bold" )
+              else( "" )
+         let $href_upload := $params( "uploadForm" ) || $formID
+         let $href_delete := 
+           web:create-url(
+             $params( "host") || $params( "deleteAPI" ) || $formID,
+             map{ "redirect" : '/zapolnititul/forms/u' }
+           )
+         return
+         <div class="row">
+           <div class="col text-truncate">
+            <a class="{ $itemClass }" href="/zapolnititul/forms/u/form/{ $formID }" data-toggle="tooltip" data-placement="top" title="{ $formLabel }">
+              { $formLabel } 
+            </a>
+            <a class="float-right" href="{ $href_delete }" onclick="return confirm( 'Удалить?' );">
+              <i class="fa fa-trash-alt"/>
+            </a>
+           </div>
+          </div>
+       }
+  </div>    
 };
 
-declare function sidebar:userDataList ( $userData as element( table )* ) {
-  let $forms := distinct-values( $userData/@templateID/data() )
-  let $result := 
+declare function sidebar:userDataList ( $currentFormID, $userData as element( table )* ) {
+  let $formsID := distinct-values( $userData/@templateID/data() )
+  return
    <div class="container">
-     <ul>
        {
-         for $d in $forms
+         for $d in $formsID
+         let $itemClass := 
+           if ( $d = $currentFormID ) 
+              then( "font-weight-bold" )
+              else( "" )
          let $formLabel := 
            try{
-             fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $d || "/meta")/form/@label/data()}
+             fetch:xml(
+               "http://localhost:8984/zapolnititul/api/v2/forms/" || $d || "/meta"
+             )/form/@label/data()}
            catch*{ "Форма не найдена" }
          return
-           <li>
-             <a href="{ $d }">{ $formLabel }</a>
-           </li>
+           <div class="row text-truncate">
+             <i class="fa fa-check mr-1"/>
+             <a class="{ $itemClass }" href="{ $d }">{ $formLabel }</a>
+           </div>
        }
-     </ul>
    </div>
-  return
-    $result
 };

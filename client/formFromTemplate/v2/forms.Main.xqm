@@ -10,9 +10,6 @@ import module namespace
 import module namespace 
   template = "http://dbx.iro37.ru/zapolnititul/forms/u/template" at "conf/forms.Template.xqm";
   
-import module namespace 
-  getFormID = "http://dbx.iro37.ru/zapolnititul/forms/getFormID" at "funct/getFormID.xqm";
-
 import module namespace
   form = "http://dbx.iro37.ru/zapolnititul/forms/form" at "forms.Main.Form.xqm";
 
@@ -59,26 +56,24 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
     then( $id )
     else ()
 
-  let $formMeta := $config:getFormByAPI( $currentFormID,  "meta")/form
-     
-  let $formFields := $config:getFormByAPI( $currentFormID,  "fields")/csv
+  let $formMeta := $config:getFormByAPI( $currentFormID,  "meta" )/form
+   
+  let $formFields := $config:getFormByAPI( $currentFormID,  "fields" )/csv
   
   let $sidebar := 
-    if( session:get( "userid" ) )
-    then(
        switch ( $page )
        case ( "form" )
          return (
-        <div class="col">
+        <div class="col-md-3 border-right">
           <h3>Мои шаблоны</h3> 
             {
-              sidebar:userFormsList ( $userForms, $config:param )
+              sidebar:userFormsList ( $currentFormID, $userForms, $config:param )
             }
         </div>
       )
       case ( "data" )
          return 
-           <div>
+           <div class="col-md-3 border-right">
              <h3>Мои формы</h3>
              { 
                let $data := $config:fetchUserData(
@@ -86,12 +81,10 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
                    request:cookie('JSESSIONID')
                  )
             return 
-               sidebar:userDataList( $data/data/table )
+               sidebar:userDataList( $currentFormID, $data/data/table )
              }
            </div>
       default return ""
-    )
-    else ()
     
   let $content := 
      switch ( $page )
@@ -102,7 +95,7 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
           form:main ( $id, $formMeta, $formFields )
         )
         else (
-          <div class="col-md-6">
+          <div class="col-md">
                <h3>Загрузить новый шаблон</h3>
                {
                  upload:main( "yes", $id, $config:param( "host" ) || "/zapolnititul/forms/u/complete/" )
@@ -132,8 +125,25 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
                 $config:fetchUserData(
                     session:get( "userid" ), request:cookie('JSESSIONID')
                 )/data/table
+            
+            let $currentUserData := 
+              $userData[ @templateID = $formMeta/@id ]
+              [ @updated = web:decode-url($dataver) ]
+            
+            let $currentVerID := 
+              if( $currentUserData )
+              then ( $dataver )
+              else (
+               web:encode-url( 
+                 $userData[ @templateID = $formMeta/@id ][ last() ]/@updated/data()
+               )
+              )
+            let $currentInstID := 
+              $userData[ @templateID = $formMeta/@id ]
+              [ @updated = web:decode-url( $currentVerID ) ]/@id/data()
+              
             return 
-              data:main( $formMeta, $userData, $datainst, $dataver )
+              data:main( $formMeta, $userData, $currentInstID, $currentVerID )
        default return ""
   
   let $nav := 
@@ -148,7 +158,7 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
   return 
     if( $template:get( $page )  )
     then(
-      let $templateFieldsMap := map{ "sidebar": $sidebar, "content": $content, "nav": $nav, "nav-login" : $login }
+      let $templateFieldsMap := map{ "content": ( $sidebar, $content), "nav": $nav, "nav-login" : $login }
       let $siteTemplate := serialize( $template:get( $page ) )
       return
         html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )

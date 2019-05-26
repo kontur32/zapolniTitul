@@ -147,10 +147,14 @@ let $fieldsNameList := tokenize($f, "--") => for-each( normalize-space( ? ) )
 let $modelFields := fetch:xml( web:decode-url( $VersionData/@modelURL/data() ) )/table/row
 
 let $fieldsIDList := 
+ if( $modelFields and ( $VersionData/@aboutType != "none" ) )
+ then(
   for $i in $fieldsNameList
    return
      $modelFields[cell[@id="label"]=$i]/@id/data()
-
+  )
+  else( $fieldsNameList )
+  
 return 
    string-join( 
      for $i in $fieldsIDList return $VersionData/row/cell[@id=$i]/text(), " "

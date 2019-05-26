@@ -30,6 +30,7 @@ function form:main (
            [ "fileName", "ZapolniTitul.docx" ],
            [ "templatePath", $config:apiurl( $currentFormID, "template" ) ],
            [ "templateID", $formMeta/@id/data() ],
+           [ "type", $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/type/text() ],
            [ "redirect", "/zapolnititul/forms/u/form/" || $currentFormID ],
            [ "saveRedirect", "/zapolnititul/forms/u/data/" || $currentFormID ]
          )
@@ -136,11 +137,22 @@ function
                else ( )
              }
            </li>
-           <li class="nav-item">{
+           <li class="nav-item">
+             {
              <a class="nav-link" href="/zapolnititul/forms/a/form/{ $formID } " target="blank">
                Cсылка на форму
              </a>
-           }</li>
+             }
+             </li>
+             <li class="nav-item">
+             <div class="d-inline">
+               <button class="js-textareacopybtn btn btn-info" style="vertical-align:top;">
+               Копировать ссылку
+               </button>
+               <textarea style="width:0px; height:0px;" class="js-copytextarea" disable="yes">{ $config:param('host')}/zapolnititul/forms/a/form/{ $formID }</textarea>
+             </div>
+           </li>
+           <script src="/static/titul24/copy-paste.js"></script>
          </ul>
         { 
           html:fillHtmlTemplate( 

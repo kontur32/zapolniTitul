@@ -49,7 +49,7 @@ function dataSave:main( $id, $inst, $action, $redirect ){
       where not ( starts-with( $name, "_t24_" ) )
       return $name
     let $aboutType := 
-      if( request:parameter( '_t24_type' ) ) then (  request:parameter( '_t24_type' ) ) else ( "student" )
+      if( request:parameter( '_t24_type' ) ) then (  request:parameter( '_t24_type' ) ) else ( "none" )
     let $modelURL := 
        web:create-url( "http://localhost:8984/trac/api/Model/ood", map{ "id" : $aboutType } )
     let $currentID := 

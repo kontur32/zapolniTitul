@@ -20,6 +20,10 @@
     <value>defaultValue</value>
   </record>
   <record>
+    <label>строк</label>
+    <value>rows</value>
+  </record>
+  <record>
     <label>тип</label>
     <value>inputType</value>
   </record>

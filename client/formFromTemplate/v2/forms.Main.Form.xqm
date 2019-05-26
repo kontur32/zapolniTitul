@@ -57,7 +57,7 @@ function form:main (
        }
        {
          let $meta := (
-           [ "redirect", "/zapolnititul/forms/u/form/" || $currentFormID ]
+           [ "redirect", "/zapolnititul/forms/u/form/" ]
          )
          let $buttons := (
            map{
@@ -101,9 +101,10 @@ declare
 function 
   form:header(
     $formID as xs:string, 
-    $getFormByAPI ) as element( div )
+    $getFormByAPI
+  ) as element( div )
 {
-   let $formMeta := $getFormByAPI( $formID, "meta")/form
+   let $formMeta := $getFormByAPI( $formID, "meta" )/form
    let $formLabel := 
      if ( $formMeta/@label/data() )
      then ( $formMeta/@label/data() )
@@ -114,7 +115,7 @@ function
        <div class="row">
          <ul class="nav">
            <li class="nav-item">
-              <a class="nav-link" href="{ $config:apiurl( $formID, 'template') }">Шаблон</a>
+              <a class="nav-link" href="{ $config:apiurl( $formID, 'template' ) }">Шаблон</a>
            </li>
            <li class="nav-item">
               { if ( $formMeta/@dataFullPath/data() )
@@ -135,6 +136,11 @@ function
                else ( )
              }
            </li>
+           <li class="nav-item">{
+             <a class="nav-link" href="/zapolnititul/forms/a/form/{ $formID } " target="blank">
+               Cсылка на форму
+             </a>
+           }</li>
          </ul>
         { 
           html:fillHtmlTemplate( 

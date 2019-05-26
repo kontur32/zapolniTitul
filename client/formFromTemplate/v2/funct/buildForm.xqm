@@ -62,9 +62,14 @@ function buildForm:buildInputForm-main (
            
        case  ( "textarea" ) 
          return
+           let $rows := 
+             if ( $field/rows/text() )
+             then ( $field/rows/text() )
+             else ( 2 )
+           return
            <div class="form-group">
              <label>{ $label }</label>
-             <textarea class="form-control" name="{ $field/ID/text() }">{ $field/defaultValue/text() }</textarea>
+             <textarea class="form-control" name="{ $field/ID/text() }" rows="{ $rows }">{ $field/defaultValue/text() }</textarea>
            </div>
        case ( "select" )
          return

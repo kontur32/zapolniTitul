@@ -128,7 +128,7 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
             
             let $currentUserData := 
               $userData[ @templateID = $formMeta/@id ]
-              [ @updated = web:decode-url($dataver) ]
+              [ @updated = web:decode-url( $dataver ) ]
             
             let $currentVerID := 
               if( $currentUserData )

@@ -17,7 +17,9 @@ function data:main( $formMeta, $userData, $currentDataInst, $currentDataVer ){
      </div>,  
      <div class="col-md">
        {
-         data:currentVersionForm( $formMeta/@id, $currentDataInst, $currentDataVer, $userData )
+         let $formID := $formMeta/@id/data()
+          return
+         data:currentVersionForm( $formID, $currentDataInst, $currentDataVer, $userData )
        }
      </div>
   )

@@ -62,7 +62,6 @@ declare function sidebar:userDataList ( $currentFormID, $userData as element( ta
            catch*{ "Форма не найдена" }
          return
            <div class="row text-truncate">
-             <i class="fa fa-check mr-1"/>
              <a class="{ $itemClass }" href="{ $d }">{ $formLabel }</a>
            </div>
        }

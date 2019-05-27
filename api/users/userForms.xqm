@@ -7,7 +7,7 @@ declare
   %rest:GET
   %rest:path( "/zapolnititul/api/v2/users/{ $userid }/forms" )
   %rest:query-param( "offset", "{ $offset }", "0" )
-  %rest:query-param( "limit", "{ $limit }", "10" )
+  %rest:query-param( "limit", "{ $limit }", "20" )
 function user:formsList( 
   $userid as xs:string, 
   $offset as xs:double, 

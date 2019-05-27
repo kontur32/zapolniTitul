@@ -24,7 +24,7 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
       <div class="col-md-3">Третья</div>
     </div>
   let $templateFieldsMap := map{ "content": $content, "nav": "", "nav-login" : "" }
-  let $siteTemplate := serialize( doc("src\main-tpl-footer.html") )
+  let $siteTemplate := serialize( doc("src/main-tpl-footer.html") )
   return
     html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )
 };

@@ -48,7 +48,7 @@ function forms:main ( $page, $currentFormID ) {
          return
           form:footer( "template", (), "_t24_", $buttons )
       }
-      { form:body ( $formMeta, $formFields ) }
+      { form:body ( $currentFormID, $formFields ) }
        {
          let $meta := (
            [ "fileName", "ZapolniTitul.docx" ],

@@ -23,6 +23,8 @@ declare
   %rest:path ( "/zapolnititul/api/v2/user/{ $id }/data/public" )
   %rest:query-param( "type", "{ $type }", "" )
   %rest:query-param( "field", "{ $fieldName }", "" )
+  %output:method("csv")
+  %output:csv("header=yes")
 function getUserData:public( $id as xs:string, $type, $fieldName ) {
   let $data := $config:userData( $id )
   let $result := 
@@ -30,13 +32,5 @@ function getUserData:public( $id as xs:string, $type, $fieldName ) {
     return 
       <record><label>{ $i }</label></record>
   return 
-  serialize(
-    <csv>
-      { $result }
-    </csv>,
-    map {
-      'method': 'csv',
-      'csv': map { 'header': 'yes', 'separator': ';' }
-    }
-)
+  <csv>{$result}</csv>
 };

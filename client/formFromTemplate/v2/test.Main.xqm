@@ -18,13 +18,13 @@ declare
   %output:method ("xhtml")
 function forms:main ( $page, $id, $datainst, $dataver, $message ) {
   let $content := 
-    <div class="row">
-      <div class="col-6 border-right">Первая</div>
-      <div class="col-3 border-right">Вторая</div>
-      <div class="col-3">Третья</div>
+    <div class="row mt-5">
+      <div class="col-md-6 border-right">Первая</div>
+      <div class="col-md-3 border-right">Вторая</div>
+      <div class="col-md-3">Третья</div>
     </div>
   let $templateFieldsMap := map{ "content": $content, "nav": "", "nav-login" : "" }
-  let $siteTemplate := serialize( doc("C:\Program Files\BaseX\webapp\zapolniTitul\client\formFromTemplate\v2\src\main-tpl-footer.html") )
+  let $siteTemplate := serialize( doc("src\main-tpl-footer.html") )
   return
     html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )
 };

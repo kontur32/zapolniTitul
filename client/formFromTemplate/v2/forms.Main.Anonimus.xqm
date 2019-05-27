@@ -35,6 +35,7 @@ function forms:main ( $page, $currentFormID ) {
     </div>
   let $content := 
     <div class="col-md-9">
+      <h3>{ $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/name/text() }</h3>
       <div><a href="{ $formMeta/@fileFullPath/data() }">Шаблон формы</a></div>
       <div>Заполните поля формы и нажмите</div>
       {

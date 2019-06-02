@@ -31,11 +31,40 @@ declare
   %output:method("csv")
   %output:csv("header=yes")
 function getUserData:public( $id as xs:string, $type, $fieldName ) {
-  let $data := $config:userData( $id )
+  let $data := $config:userData( $id )[ row[ @type = $type ] ]
   let $result := 
-    for $i in  $data/row[ @type = $type ]/cell[ @id = $fieldName ]/text()
+    for $i in  distinct-values( $data/@id/data() )
     return 
-      <record><label>{ $i }</label></record>
+       $data[ @id = $i ][last()]
   return 
-  <csv>{$result}</csv>
+      <csv>{
+        for $r in $result
+        return 
+          <record>
+            <label>{ $r/row/cell[ @id = $fieldName ]/text() }</label>
+          </record>
+      }</csv>
+      
+};
+
+(:
+  метод для публикации модели данных
+:)
+declare
+  %private
+  %rest:GET
+  %rest:path ( "/zapolnititul/api/v2/user/{ $userID }/models/{ $modelID }" )
+  %output:method("xml")
+function getUserData:model( $userID as xs:string,  $modelID as xs:string ) {
+  let $data := $config:userData( $userID )[ @templateID = $modelID ]
+  let $result := 
+    for $i in  distinct-values( $data/@id/data() )
+    return 
+       $data[ @id = $i ][last()]
+  return 
+      <table>{
+        for $r in $result
+        return 
+          $r/row
+      }</table>    
 };

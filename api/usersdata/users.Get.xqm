@@ -17,6 +17,25 @@ function getUserData:get( $id as xs:string ) {
   
 };
 
+
+declare
+  %private
+  %rest:GET
+  %rest:path ( "/zapolnititul/api/v2/user/{ $userID }/data/templates/{ $templateID }" )
+function getUserData:templateData( $userID as xs:string, $templateID as xs:string ) {
+  let $data := $config:templateData( $templateID )
+  let $formOwner := 
+    try {
+      $config:apiResult( $templateID, "meta" )/form/@userid
+    }
+    catch*{}
+  return 
+    if ( session:get( "userid" ) = $userID and $formOwner = $userID )
+    then( <data>{ $data }</data> )
+    else ( <error>Пользователь не опознан</error>)
+  
+};
+
 (:
   метод для публикации публично доступных данных
   !!! - требуется подключение механизма проверки статуса публичности
@@ -43,8 +62,7 @@ function getUserData:public( $id as xs:string, $type, $fieldName ) {
           <record>
             <label>{ $r/row/cell[ @id = $fieldName ]/text() }</label>
           </record>
-      }</csv>
-      
+      }</csv>    
 };
 
 (:

@@ -28,7 +28,8 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
           element { "form" } { 
             $form/@id, 
             $form/@label,
-            $form/@parentid, 
+            $form/@parentid,
+            $form/@userid, 
             
             if ( $form/@parentid and not( $form/@fileFullPath ) )
             then (

@@ -16,6 +16,10 @@ declare variable $config:userData := function( $id ) {
     db:open( "titul24", "data")/data/table[ @userID = $id ]
 };
 
+declare variable $config:templateData := function( $id ) {
+    db:open( "titul24", "data")/data/table[ @templateID = $id ]
+};
+
 declare variable $config:formsList := function( $offset as xs:double, $limit as xs:double ) {
    db:open( "titul24", "forms" )/forms/form[ ( position() >= $offset + 1 ) and ( position() <=  $offset + $limit ) ]
 };

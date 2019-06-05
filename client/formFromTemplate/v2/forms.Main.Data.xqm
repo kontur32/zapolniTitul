@@ -1,5 +1,7 @@
 module namespace data = "http://dbx.iro37.ru/zapolnititul/forms/data";
 
+import module namespace session = "http://basex.org/modules/session";
+
 import module namespace 
   config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
 
@@ -13,6 +15,8 @@ function data:main( $formMeta, $userData, $currentDataInst, $currentDataVer ){
      <div class="col-md-4 border-right">
        <h3>Экземпляры формы:</h3>
        <h4>{ '"' || $formMeta/@label/data() || '"'}</h4>
+       <div>{<a href='{ "/zapolnititul/api/v2/user/" || session:get( "userid" ) || "/models/" || $formMeta/@id }'>Ссылка на модель</a> }</div>
+       <div>{<a href='{ "/zapolnititul/api/v2/user/" || session:get( "userid" ) || "/data/templates/" || $formMeta/@id }'>Ссылка на данные</a> }</div>
        <div>{ data:listOfInstance( $formMeta/@id, $userData ) }</div>
      </div>,  
      <div class="col-md">

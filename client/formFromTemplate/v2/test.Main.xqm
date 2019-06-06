@@ -6,7 +6,7 @@ import module namespace
   config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
 
 import module namespace 
-  template = "http://dbx.iro37.ru/zapolnititul/forms/u/template" at "conf/forms.Template.xqm";
+  template = "http://dbx.iro37.ru/zapolnititul/forms/u/template" at "conf/conf.Template.xqm";
 
 
 declare 

@@ -1,12 +1,14 @@
 module namespace forms = "http://dbx.iro37.ru/zapolnititul/forms/main";
 
+import module namespace session = "http://basex.org/modules/session";
+
 import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
 
 import module namespace 
   config = "http://dbx.iro37.ru/zapolnititul/forms/u/config" at "../../config.xqm";
 
 import module namespace 
-  template = "http://dbx.iro37.ru/zapolnititul/forms/u/template" at "conf/forms.Template.xqm";
+  template = "http://dbx.iro37.ru/zapolnititul/forms/u/template" at "conf/conf.Template.xqm";
 
 import module namespace
   form = "http://dbx.iro37.ru/zapolnititul/forms/form" at "forms.Main.Form.xqm";
@@ -39,15 +41,29 @@ function forms:main ( $page, $currentFormID ) {
       <div><a href="{ $formMeta/@fileFullPath/data() }">Шаблон формы</a></div>
       <div>Заполните поля формы и нажмите</div>
       {
+        
+         let $meta := (
+           [ "type", $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/type/text() ],
+           [ "saveRedirect", "/zapolnititul/forms/u/data/" || $currentFormID ]
+         )
         let $buttons := (
            map{
              "method" : "POST",
              "action" : "/zapolnititul/api/v1/document",
              "class" : "btn btn-success btn-block",
-             "label" : "Скачать заполненный шаблон"}
+             "label" : "Скачать заполненный шаблон"},
+             if( session:get( "userid" ) )
+             then(
+                map{
+                 "method" : "POST",
+                 "action" : "/zapolnititul/api/v2/data/save",
+                 "class" : "btn btn-info btn-block",
+                 "label" : "Сохранить введенные данные"}
+             )
+             else()
          )
          return
-          form:footer( "template", (), "_t24_", $buttons )
+          form:footer( "template", $meta, "_t24_", $buttons )
       }
       { form:body ( $currentFormID, $formFields ) }
        {
@@ -62,7 +78,16 @@ function forms:main ( $page, $currentFormID ) {
              "method" : "POST",
              "action" : "/zapolnititul/api/v1/document",
              "class" : "btn btn-success btn-block",
-             "label" : "Скачать заполненный шаблон"}
+             "label" : "Скачать заполненный шаблон"},
+           if( session:get( "userid" ) )
+             then(
+                map{
+                 "method" : "POST",
+                 "action" : "/zapolnititul/api/v2/data/save",
+                 "class" : "btn btn-info btn-block",
+                 "label" : "Сохранить введенные данные"}
+             )
+             else()
            
          )
          return

@@ -6,7 +6,7 @@ import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
 
 import module namespace 
   template = "http://dbx.iro37.ru/zapolnititul/forms/u/template" 
-  at "formFromTemplate/v2/conf/forms.Template.xqm";
+  at "formFromTemplate/v2/conf/conf.Template.xqm";
 
 import module namespace buildForm = "http://dbx.iro37.ru/zapolnititul/buildForm" at "funct/buildForm.xqm";
 import module namespace formData = "http://dbx.iro37.ru/zapolnititul/formData" at "funct/formData.xqm";

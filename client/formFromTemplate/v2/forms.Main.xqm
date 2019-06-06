@@ -42,7 +42,10 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
   let $login := 
        html:fillHtmlTemplate(
          serialize( $template:get( "logout" ) ), 
-         map{ "username" : session:get( "username" ) }
+         map{
+           "username" : session:get( "username" ),
+           "callbackURL" : "/zapolnititul/forms/u/"
+         }
        )
  
   let $userForms := 

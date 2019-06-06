@@ -94,8 +94,24 @@ function forms:main ( $page, $currentFormID ) {
           form:footer( "template", $meta, "_t24_", $buttons )
        }
     </div>
-    
-  let $map := map{ "sidebar": $sidebar, "content": ($sidebar, $content), "nav": "", "nav-login" : "" }
+  let $nav-login := 
+    if ( session:get( 'username' ) )
+    then ( 
+      html:fillHtmlTemplate(
+         serialize( $template:get( "logout" ) ), 
+         map{
+           "username" : session:get( "username" ),
+           "callbackURL" : "/zapolnititul/forms/a/form/" || $currentFormID
+         }
+       )
+     )
+    else ( 
+      html:fillHtmlTemplate(
+           serialize( $template:get( "login" ) ), 
+           map{ "callbackURL" : "/zapolnititul/forms/a/form/" || $currentFormID }
+         )
+    )
+  let $map := map{ "sidebar": $sidebar, "content": ($sidebar, $content), "nav": "", "nav-login" : $nav-login }
   let $tpl := serialize( $template:get( $page ) )
    
   return

@@ -7,6 +7,24 @@ import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/conf
 declare
   %private
   %rest:GET
+  %rest:path ( "/zapolnititul/api/v2/users/me" )
+function getUserData:me( ) {
+  if ( session:get( "userid" ) )
+  then(
+   <table>
+    <row type="user">
+      <cell id="id">{session:get( "userid" )}</cell>
+      <cell id="name">{session:get( "username" )}</cell>
+    </row>
+  </table>
+  )
+  else ( <error>Пользователь не авторизован</error>)
+ 
+};
+
+declare
+  %private
+  %rest:GET
   %rest:path ( "/zapolnititul/api/v2/user/{ $id }/data" )
 function getUserData:get( $id as xs:string ) {
   let $data := $config:userData( $id )

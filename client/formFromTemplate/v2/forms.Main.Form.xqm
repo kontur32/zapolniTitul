@@ -70,15 +70,15 @@ function form:main (
              "method" : "POST",
              "action" : "/zapolnititul/api/v2/forms/post/create",
              "class" : "btn btn-info btn-block",
-             "label" : "Создать новую форму"},
-           map{
-             "method" : "GET",
-             "action" : '/zapolnititul/forms/u/child/' || $currentFormID,
-             "class" : "btn btn-info btn-block",
-             "label" : "Создать дочернюю форму"}   
+             "label" : "Создать новую форму"}
          )
          return
-          form:footer( "upload", $meta, "", $buttons )
+          (
+            form:footer( "upload", $meta, "", $buttons ),
+            <div>
+              <a class="btn btn-info btn-block" href="{ '/zapolnititul/forms/u/child/' || $currentFormID }">Создать дочернюю форму</a>
+            </div>
+          )
        }
      </div>
    )

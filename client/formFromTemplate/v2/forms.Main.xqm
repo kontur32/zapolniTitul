@@ -47,7 +47,10 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
  
   let $userForms := 
         try {
-          fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form
+          let $requestPath := "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms"
+          let $request := web:create-url( $requestPath, map{ "limit" : $config:param( "formsLimit" ) } )
+          return
+            fetch:xml( $request )/forms/form
         }
         catch*{}
         

@@ -3,11 +3,11 @@
     <form method="GET" action="/zapolnititul/api/v1/users/login" class="form-group form-inline my-sm-0">
       <input type="text" name="username" placeholder="логин"  class="mr-sm-1"/>
       <input type="password" name="password" placeholder="пароль" class="mr-sm-1"/>
-      <input type="hidden" name="callbackURL" value="/zapolnititul/forms/u/"/>
+      <input type="hidden" name="callbackURL" value="{{callbackURL}}"/>
       <input class="btn btn-info" type="submit" value="Войти"/>
     </form>
   </div>
   <div class="my-sm-0">
-      <a class="text-muted" href="http://portal.titul24.ru/register/">Зарегистрироваться</a>
+      <a class="text-muted" href="http://portal.titul24.ru/register/" target="_blank">Зарегистрироваться</a>
   </div>
 </div>

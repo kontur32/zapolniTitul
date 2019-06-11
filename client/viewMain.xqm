@@ -50,13 +50,16 @@ function zt:start ( ) {
     then ( 
       html:fillHtmlTemplate(
          serialize( $template:get( "logout" ) ), 
-         map{ "username" : session:get( "username" ) }
+         map{
+           "username" : session:get( "username" ),
+           "callbackURL" : "/zapolnititul/forms/u/"
+         }
        )
      )
     else ( 
       html:fillHtmlTemplate(
            serialize( $template:get( "login" ) ), 
-           map{}
+           map{ "callbackURL" : "/zapolnititul/forms/u/" }
          )
     )
 

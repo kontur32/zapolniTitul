@@ -23,7 +23,6 @@ function dataSave:update( $data ){
 };
 
 declare
-  %updating
   %rest:path ( "/zapolnititul/api/v2/data/save" )
   %rest:POST
   %rest:form-param ( "_t24_id", "{ $id }", "" )
@@ -66,6 +65,37 @@ function dataSave:main( $id, $inst, $action, $redirect ){
               <cell label="{ $param }">{ $paramValue }</cell>
         }
         {
+          dataSave:id( request:parameter( '_t24_templateID' ) )
+        }
+        {
+          <cell label="id1">{ 
+                let $queryString := fetch:xml ( 'http://localhost:8984/zapolnititul/api/v2/forms/' || request:parameter( '_t24_templateID' ) || '/fields' )/child::*/record[ ID="__ОПИСАНИЕ__" ]/id/text()
+                let $query := 
+                  <query>
+                    <text>{ '<result>{' || $queryString || '}</result>' }</text>
+                    <context>
+                      <xml>
+                        <userid>{ session:get( 'userid' ) }</userid>
+                        <username>{ session:get( 'username' ) }</username>
+                      </xml>
+                    </context>
+                  </query>
+                
+                 let $response := 
+                    http:send-request(
+                       <http:request method='POST'>
+                         <http:header/>
+                          <http:body media-type = "xml" >
+                            { $query }
+                          </http:body>
+                       </http:request>,
+                      'http://localhost:8984/rest'
+                  )[2]/result/text()
+    
+               return $response
+          }</cell>
+        }
+        {
           for $param in $paramNames
           let $paramValue := request:parameter( $param )
           where ( $paramValue instance of map(*)  ) and not (  string( map:get( $paramValue, map:keys( $paramValue )[1] ) ) = "" ) 
@@ -79,22 +109,18 @@ function dataSave:main( $id, $inst, $action, $redirect ){
     
     let $model := fetch:xml ( $modelURL )/table
     let $request :=
-    <http:request method='POST'>
-      <http:multipart media-type = "multipart/form-data" >
-          <http:header name="Content-Disposition" value= 'form-data; name="data";'/>
-          <http:body media-type = "application/xml" >
-            { $data }
-          </http:body>
-          <http:header name="Content-Disposition" value= 'form-data; name="model";'/>
-          <http:body media-type = "application/xml" >
-            { $model }
-          </http:body>
-          <http:header name="Content-Disposition" value= 'form-data; name="modelPath";'/>
-          <http:body media-type = "text/plane" >
-            { $modelURL }
-          </http:body>
-      </http:multipart> 
-    </http:request>
+        <http:request method='POST'>
+          <http:multipart media-type = "multipart/form-data" >
+              <http:header name="Content-Disposition" value= 'form-data; name="data";'/>
+              <http:body media-type = "application/xml" >
+                { $data }
+              </http:body>
+              <http:header name="Content-Disposition" value= 'form-data; name="model";'/>
+              <http:body media-type = "application/xml" >
+                { $model }
+              </http:body>
+          </http:multipart> 
+        </http:request>
   
   let $response := 
     http:send-request(
@@ -115,7 +141,34 @@ function dataSave:main( $id, $inst, $action, $redirect ){
                "http://localhost:8984/zapolnititul/api/v2/data/update" 
         )
   return
-    db:output(
-       web:redirect( request:parameter( '_t24_saveRedirect' ) )
-    )
+     web:redirect( request:parameter( '_t24_saveRedirect' ) )
+};
+
+declare function dataSave:id( $templateID ){
+    <cell label="id">{ 
+        let $queryString := fetch:xml ( 'http://localhost:8984/zapolnititul/api/v2/forms/' || $templateID || '/fields' )/child::*/record[ ID="__ОПИСАНИЕ__" ]/id/text()
+        let $query := 
+          <query>
+            <text>{ '<result>{' || $queryString || '}</result>' }</text>
+            <context>
+              <xml>
+                <userid>{ session:get( 'userid' ) }</userid>
+                <username>{ session:get( 'username' ) }</username>
+              </xml>
+            </context>
+          </query>
+        
+         let $response := 
+            http:send-request(
+               <http:request method='POST'>
+                 <http:header/>
+                  <http:body media-type = "xml" >
+                    { $query }
+                  </http:body>
+               </http:request>,
+              'http://localhost:8984/rest'
+          )[2]/result/text()
+
+       return $response
+  }</cell>
 };

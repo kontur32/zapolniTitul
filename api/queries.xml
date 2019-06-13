@@ -1,0 +1,6 @@
+<queries>
+  <query>
+    <alias>_t24_userID</alias>
+    <text>"http://portal.titul24.ru/wp-json/wp/v2/users/" || ./child::*/userid/text()</text>
+  </query>
+</queries>

@@ -7,34 +7,27 @@ import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/conf
 declare
   %private
   %rest:GET
-  %rest:path ( "/zapolnititul/api/v2/users/me" )
-function getUserData:me( ) {
-  if ( session:get( "userid" ) )
-  then(
-   <table>
-    <row type="user">
-      <cell id="id">{session:get( "userid" )}</cell>
-      <cell id="name">{session:get( "username" )}</cell>
-    </row>
-  </table>
-  )
-  else ( <error>Пользователь не авторизован</error>)
- 
-};
-
-declare
-  %private
-  %rest:GET
-  %rest:path ( "/zapolnititul/api/v2/user/{ $id }/data" )
-function getUserData:get( $id as xs:string ) {
-  let $data := $config:userData( $id )
-  return 
-    if ( session:get( "userid" )= $id )
-    then( <data>{ $data }</data> )
-    else ( <error>Пользователь не опознан</error>)
+  %rest:query-param( "type", "{ $type }", ".*" )
+  %rest:query-param( "id", "{ $id }", ".*" )
+  %rest:query-param( "unique", "{ $unique }", "false" )
+  %rest:path ( "/zapolnititul/api/v2/user/{ $userID }/data" )
+function getUserData:get( $userID as xs:string, $type, $id, $unique as xs:boolean  ) {
+  let $data := $config:userData( $userID )[ row[ matches( @type, $type ) and matches( @id, $id ) ] ]
   
+  let $data := 
+    if ( $unique )
+    then(
+      for $subject in distinct-values( $data/@id )
+      return
+        $data[ @id = $subject ][ last() ]
+    )
+    else( $data )
+    
+  return 
+    if ( session:get( "userid" ) = $userID )
+    then( <data>{ $data }</data> )
+    else ( <error>Пользователь не опознан</error> ) 
 };
-
 
 declare
   %private

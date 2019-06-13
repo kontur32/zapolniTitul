@@ -43,3 +43,11 @@ declare variable $config:apiResult := function( $object as xs:string, $method as
     <error>Не удалось получить данные</error>
   }
 };
+
+declare variable $config:query := 
+  function( $alias as xs:string ) as xs:string
+  {
+    let $queries := doc( 'queries.xml' )
+    return
+      $queries/queries/query[ alias = $alias ][ last() ]/text/text()
+  };

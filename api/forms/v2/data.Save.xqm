@@ -32,7 +32,7 @@ declare
   %rest:form-param ( "_t24_id", "{ $id }", "" )
   %rest:form-param ( "_t24_type", "{ $aboutType }", "none" )
   %rest:form-param ( "_t24_action", "{ $action }", "add" )
-  %rest:form-param ( "_t24_redirect", "{ $redirect }", "/" )
+  %rest:form-param ( "_t24_saveRedirect", "{ $redirect }", "/" )
 function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
     let $paramNames := 
       for $name in  distinct-values( request:parameter-names() )
@@ -59,18 +59,6 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
         userID="{ session:get( 'userid' ) }" 
         modelURL="{  $modelURL }">
         <row>
-          (: добавляет идентификатор :)
-          {
-            if( not ( $paramNames = "id" ) )
-            then(
-              <cell label="id">{
-                let $queryString := $config:apiResult( $templateID, "fields" )/child::*/record[ ID="__ОПИСАНИЕ__" ]/id/text()
-                return
-                  dataSave:id( $queryString )
-              }</cell>
-            )
-            else()
-          }
           (: добавляет поля текстовые :)
           {
             for $param in $paramNames
@@ -89,6 +77,31 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
                 <cell label="{ $param }"> 
                   { map:get( $paramValue, map:keys( $paramValue )[1] )  }
                 </cell>  
+          }
+          (: добавляет идентификатор :)
+          {
+            if( not ( $paramNames = "id" ) )
+            then(
+               let $queryPath := 
+                  $config:apiResult( $templateID, "fields" )/child::*/record[ ID="__ОПИСАНИЕ__" ]/id/text()
+              return
+                if( $queryPath )
+                then(
+                  <cell label="id">{
+                    let $queryString := 
+                      try{
+                        fetch:text( $queryPath )
+                      }
+                      catch*{}
+                    return
+                      dataSave:id( $queryString )
+                  }</cell>
+                )
+                else(
+                  <cell id="id">{ $currentID }</cell>
+                )
+            )
+            else()
           }
         </row>
       </table>
@@ -131,7 +144,7 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
                "http://localhost:8984/zapolnititul/api/v2/data/update" 
         )
   return
-     web:redirect( request:parameter( '_t24_saveRedirect' ) )
+     web:redirect( $redirect )
 };
 
 declare function dataSave:id( $queryString ) as xs:string {
@@ -159,4 +172,29 @@ declare function dataSave:id( $queryString ) as xs:string {
           'http://localhost:8984/rest'
       )[2]/result/text()
    return $response
+};
+
+declare function dataSave:buildID( $paramNames, $templateID, $currentID ){
+    if( not ( $paramNames = "id" ) )
+    then(
+       let $queryPath := 
+          $config:apiResult( $templateID, "fields" )/child::*/record[ ID="__ОПИСАНИЕ__" ]/id/text()
+      return
+        if( $queryPath )
+        then(
+          <cell label="id">{
+            let $queryString := 
+              try{
+                fetch:text( $queryPath )
+              }
+              catch*{}
+            return
+              dataSave:id( $queryString )
+          }</cell>
+        )
+        else(
+          <cell id="id">{ $currentID }</cell>
+        )
+    )
+    else()
 };

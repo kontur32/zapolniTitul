@@ -51,7 +51,8 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
       if ( $action = "add" )
       then ( random:uuid() )
       else ( $id )
-    let $data :=
+    
+    let $record :=
       <table
         id="{ $currentID }"
         aboutType="{ $aboutType }" 
@@ -72,51 +73,42 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
           {
             for $param in $paramNames
             let $paramValue := request:parameter( $param )
-            where ( $paramValue instance of map(*)  ) and not (  string( map:get( $paramValue, map:keys( $paramValue )[1] ) ) = "" ) 
+            where
+              ( $paramValue instance of map(*)  ) and 
+              not (
+                string( map:get( $paramValue, map:keys( $paramValue )[1] ) ) = ""
+              ) 
             return
                 <cell label="{ $param }"> 
                   { map:get( $paramValue, map:keys( $paramValue )[1] )  }
                 </cell>  
           }
-          (: добавляет идентификатор :)
-          {
-            if( not ( $paramNames = "id" ) )
-            then(
-               let $queryPath := 
-                  $config:apiResult( $templateID, "fields" )/child::*/record[ ID="__ОПИСАНИЕ__" ]/id/text()
-              return
-                if( $queryPath )
-                then(
-                  <cell label="id">{
-                    let $queryString := 
-                      try{
-                        fetch:text( $queryPath )
-                      }
-                      catch*{}
-                    return
-                      dataSave:id( $queryString )
-                  }</cell>
-                )
-                else(
-                  <cell id="id">{ $currentID }</cell>
-                )
-            )
-            else()
-          }
         </row>
       </table>
     
+   let $record := 
+     if( not( $paramNames = "id" ) )
+     then(
+       $record update 
+       insert node dataSave:buildIDRecord( $templateID, $currentID, . ) 
+       into ./row
+     )
+     else(
+       $record
+     )
+       
     let $model :=
         try{
           fetch:xml ( $modelURL )/table
         }
         catch*{ <table/> }
+        
     let $request :=
         <http:request method='POST'>
           <http:multipart media-type = "multipart/form-data" >
               <http:header name="Content-Disposition" value= 'form-data; name="data";'/>
               <http:body media-type = "application/xml" >
-                { $data }
+                { $record }
               </http:body>
               <http:header name="Content-Disposition" value= 'form-data; name="model";'/>
               <http:body media-type = "application/xml" >
@@ -141,13 +133,41 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
                   </http:body>
               </http:multipart> 
             </http:request>,
-               "http://localhost:8984/zapolnititul/api/v2/data/update" 
+            "http://localhost:8984/zapolnititul/api/v2/data/update" 
         )
   return
      web:redirect( $redirect )
 };
 
-declare function dataSave:id( $queryString ) as xs:string {
+declare 
+  %private
+function dataSave:buildIDRecord( 
+  $templateID, 
+  $currentID, 
+  $record as element( table )
+) as element( cell )
+{
+  let $queryPath := 
+      $config:apiResult( $templateID, "fields" )/child::*/record[ ID="__ОПИСАНИЕ__" ]/idQueryPath/text()
+  return
+    if( $queryPath )
+    then(
+       let $queryString := 
+          try{
+            fetch:text( $queryPath )
+          }
+          catch*{}
+       return
+        <cell label="id">{
+            dataSave:query( $queryString, $record )
+        }</cell>
+    )
+    else(
+      <cell id="id">{ $currentID }</cell>
+    )
+};
+
+declare function dataSave:query( $queryString, $record ) as xs:string {
     let $query := 
       <query>
         <text>{
@@ -157,6 +177,7 @@ declare function dataSave:id( $queryString ) as xs:string {
           <xml>
             <userid>{ session:get( 'userid' ) }</userid>
             <username>{ session:get( 'username' ) }</username>
+            { $record }
           </xml>
         </context>
       </query>
@@ -172,29 +193,4 @@ declare function dataSave:id( $queryString ) as xs:string {
           'http://localhost:8984/rest'
       )[2]/result/text()
    return $response
-};
-
-declare function dataSave:buildID( $paramNames, $templateID, $currentID ){
-    if( not ( $paramNames = "id" ) )
-    then(
-       let $queryPath := 
-          $config:apiResult( $templateID, "fields" )/child::*/record[ ID="__ОПИСАНИЕ__" ]/id/text()
-      return
-        if( $queryPath )
-        then(
-          <cell label="id">{
-            let $queryString := 
-              try{
-                fetch:text( $queryPath )
-              }
-              catch*{}
-            return
-              dataSave:id( $queryString )
-          }</cell>
-        )
-        else(
-          <cell id="id">{ $currentID }</cell>
-        )
-    )
-    else()
 };

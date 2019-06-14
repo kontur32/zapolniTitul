@@ -1,6 +1,16 @@
 <queries>
   <query>
-    <alias>_t24_userID</alias>
+    <id>_t24_userID</id>
     <text>"http://portal.titul24.ru/wp-json/wp/v2/users/" || ./child::*/userid/text()</text>
+  </query>
+  <query>
+    <id>_t24_Фамилия_И_О</id>
+    <text>
+      let $a := ./child::*/table/row/cell 
+      return 
+        $a[ @label = "Фамилия" ] || " " || 
+        substring( $a[ @label = "Имя" ], 1, 1 ) || "." ||
+        substring( $a[ @label = "Отчество" ], 1, 1 ) || "."   
+    </text>
   </query>
 </queries>

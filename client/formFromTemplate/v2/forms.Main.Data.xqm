@@ -18,12 +18,13 @@ function data:main( $formMeta, $userData, $currentDataInst, $currentDataVer ){
        <div>{<a href='{ "/zapolnititul/api/v2/user/" || session:get( "userid" ) || "/models/" || $formMeta/@id }'>Ссылка на модель</a> }</div>
        <div>{<a href='{ "/zapolnititul/api/v2/user/" || session:get( "userid" ) || "/data/templates/" || $formMeta/@id }'>Ссылка на данные</a> }</div>
        <div>{ data:listOfInstance( $formMeta/@id, $userData ) }</div>
-     </div>,  
+     </div>,
+       
      <div class="col-md">
        {
          let $formID := $formMeta/@id/data()
-          return
-         data:currentVersionForm( $formID, $currentDataInst, $currentDataVer, $userData )
+         return
+           data:currentVersionForm( $formID, $currentDataInst, $currentDataVer, $userData )
        }
      </div>
   )
@@ -101,8 +102,93 @@ function data:currentInstForm( $currentDataSet ){
  }</div>
 };
 
+declare function data:listOfInstance( $currentFormID, $userData ){
+  <dl>
+       {
+         let $data := $userData[ @templateID = $currentFormID ]
+         let $instList := distinct-values( $data/@id/data() )
+         for $v in $instList
+         return
+           <div>
+             <dt>Экземпляр: {  $data[@id=$v][last()]/@label/data() }</dt>
+             <div class="ml-2">
+             {
+               for $i in $data[ @id = $v ]
+               count $c
+               return 
+                 <dd>
+                   <a class="float-right" href="{ $config:param( 'host' ) || '/zapolnititul/api/v2/data/delete/' ||$currentFormID || '/' || $i/@updated/data() }" onclick="return confirm( 'Удалить?' );">
+                      <i class="fa fa-trash-alt"/>
+                   </a>
+                   <a href="{
+                     web:create-url( '',
+                       map{
+                         'dataver' : web:encode-url( $i/@updated/data() ),
+                         'datainst' : $i/@id/data()
+                       }
+                     )
+                     }" >
+                     Версия { $c } : { $i/@label/data() }
+                   </a>
+                 </dd>
+                   }</div>
+                 </div>
+       }
+       </dl>
+};
+
+declare function data:currentVersionForm( $currentFormID, $currentDataInst, $currentDataVer, $userData ){
+       let $currentDataSet  := 
+            $userData[
+              @templateID = $currentFormID and
+              @id = $currentDataInst and
+              web:encode-url( @updated/data() ) = $currentDataVer 
+            ]
+       let $lastDataSet := 
+         $userData[
+              @templateID = $currentFormID and
+              @id = $currentDataInst  
+            ][ last() ]
+           return
+           <div>
+             <div class="font-weight-bold my-1">{ $currentDataSet/@label/data() }</div>
+             <div>Версия от: { replace( substring-before( web:decode-url( $currentDataVer ),"." ), "T", " ") } </div>
+             <div>Экземпляр: {  $lastDataSet/@label/data() }</div>
+             <div class="row">
+             {
+               data:currentInstForm( $currentDataSet )
+             }
+             </div>
+           </div>      
+};
+
+(:------------ старые версии на удаление ------------------- :)
+
+declare %private function data:instanceLabel1( $VersionData )
+{
+let $f := fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $VersionData/@templateID ||  "/fields")/csv/record[ID="__ОПИСАНИЕ__"]/labelOfInstance/text()
+
+let $fieldsNameList := tokenize($f, "--") => for-each( normalize-space( ? ) )
+
+let $modelFields := fetch:xml( web:decode-url( $VersionData/@modelURL/data() ) )/table/row
+
+let $fieldsIDList := 
+ if( $modelFields and ( $VersionData/@aboutType != "none" ) )
+ then(
+  for $i in $fieldsNameList
+   return
+     $modelFields[cell[@id="label"]=$i]/@id/data()
+  )
+  else( $fieldsNameList )
+  
+return 
+   string-join( 
+     for $i in $fieldsIDList return $VersionData/row/cell[@id=$i]/text(), " "
+   )
+};
+
 declare 
-  %public
+  %private
 function data:currentInstView( $currentDataSet ){
 <div class="container">{
      if ( $currentDataSet )
@@ -140,87 +226,4 @@ function data:currentInstView( $currentDataSet ){
        </div>
      )
  }</div>
-};
-
-declare function data:instanceLabel( $VersionData )
-{
-let $f := fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $VersionData/@templateID ||  "/fields")/csv/record[ID="__ОПИСАНИЕ__"]/labelOfInstance/text()
-
-let $fieldsNameList := tokenize($f, "--") => for-each( normalize-space( ? ) )
-
-let $modelFields := fetch:xml( web:decode-url( $VersionData/@modelURL/data() ) )/table/row
-
-let $fieldsIDList := 
- if( $modelFields and ( $VersionData/@aboutType != "none" ) )
- then(
-  for $i in $fieldsNameList
-   return
-     $modelFields[cell[@id="label"]=$i]/@id/data()
-  )
-  else( $fieldsNameList )
-  
-return 
-   string-join( 
-     for $i in $fieldsIDList return $VersionData/row/cell[@id=$i]/text(), " "
-   )
-};
-
-declare function data:listOfInstance( $currentFormID, $userData ){
-  <dl>
-       {
-         let $data := $userData[ @templateID = $currentFormID ]
-         let $instList := distinct-values( $data/@id/data() )
-         for $v in $instList
-         return
-           <div>
-             <dt>Экземпляр: {  data:instanceLabel( $data[@id=$v][last()] ) }</dt>
-             <div class="ml-2">
-             {
-               for $i in $data[ @id = $v ]
-               count $c
-               return 
-                 <dd>
-                   <a class="float-right" href="{ $config:param( 'host' ) || '/zapolnititul/api/v2/data/delete/' ||$currentFormID || '/' || $i/@updated/data() }" onclick="return confirm( 'Удалить?' );">
-                      <i class="fa fa-trash-alt"/>
-                   </a>
-                   <a href="{
-                     web:create-url( '',
-                       map{
-                         'dataver' : web:encode-url( $i/@updated/data() ),
-                         'datainst' : $i/@id/data()
-                       }
-                     )
-                     }" >
-                     Версия { $c } : { data:instanceLabel( $i )}
-                   </a>
-                 </dd>
-                   }</div>
-                 </div>
-       }
-       </dl>
-};
-
-declare function data:currentVersionForm( $currentFormID, $currentDataInst, $currentDataVer, $userData ){
-       let $currentDataSet  := 
-            $userData[
-              @templateID = $currentFormID and
-              @id = $currentDataInst and
-              web:encode-url( @updated/data() ) = $currentDataVer 
-            ]
-       let $lastDataSet := 
-         $userData[
-              @templateID = $currentFormID and
-              @id = $currentDataInst  
-            ][ last() ]
-           return
-           <div>
-             <div class="font-weight-bold my-1">{  data:instanceLabel( $currentDataSet ) }</div>
-             <div>Версия от: { replace( substring-before( web:decode-url( $currentDataVer ),"." ), "T", " ") } </div>
-             <div>Экземпляра: {  data:instanceLabel( $lastDataSet ) }</div>
-             <div class="row">
-             {
-               data:currentInstForm( $currentDataSet )
-             }
-             </div>
-           </div>      
 };

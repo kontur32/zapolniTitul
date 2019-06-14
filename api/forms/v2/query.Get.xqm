@@ -1,7 +1,5 @@
 module namespace queries = "http://dbx.iro37.ru/zapolnititul/api/forms/get";
 
-import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../../config.xqm";
-
 declare
   %private
   %rest:GET
@@ -14,5 +12,7 @@ function queries:get(
   $offset as xs:double, 
   $limit as xs:double 
 ) {
-   $config:query( $alias )
+    let $queries := doc( '../../queries.xml' )
+    return
+      $queries/queries/query[ id = $alias ][ last() ]/text/text()
 };

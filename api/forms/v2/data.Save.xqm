@@ -38,10 +38,13 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
       for $name in  distinct-values( request:parameter-names() )
       where not ( starts-with( $name, "_t24_" ) )
       return $name
+    
+    let $templateABOUT := $config:templateABOUT( $templateID )
+    
     let $modelURL := 
       if( substring( $aboutType, 1, 7 ) = "http://" )
       then(
-        $aboutType
+        $templateABOUT/modelURL/text()
       )
       else(
         web:create-url( "http://localhost:8984/trac/api/Model/ood", map{ "id" : $aboutType } )
@@ -54,7 +57,7 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
     
     let $record :=
       <table
-        id="{ $currentID }"
+        id = "{ $currentID }"
         aboutType="{ $aboutType }" 
         templateID="{ $templateID }" 
         userID="{ session:get( 'userid' ) }" 
@@ -87,21 +90,46 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
       </table>
     
    let $record := 
-     if( not( $paramNames = "id" ) )
+     if ( not ( $paramNames = "id" ) )
      then(
-       $record update 
-       insert node dataSave:buildIDRecord( $templateID, $currentID, . ) 
-       into ./row
+       let $recordID :=
+           let $queryString :=
+             try{  
+               fetch:text(
+                 iri-to-uri( $templateABOUT/idQueryURL/text() )
+               )
+             } catch*{ false() }
+           return
+             if( $queryString )
+             then( dataSave:query( $queryString,  $record ) )
+             else( false() )                    
+       return 
+         $record update 
+         insert node <cell label="id">{
+           if( $recordID )then( $recordID )else( $templateID )
+         }</cell> into ./row
      )
      else(
        $record
      )
+    
+    let $record := 
+      let $recordLabel := 
+        let $queryString :=
+               try{  
+                 fetch:text(
+                   iri-to-uri( $templateABOUT/labelQueryURL/text() )
+                 )
+               } catch*{ false() }
+             return
+               if( $queryString )
+               then( dataSave:query( $queryString,  $record ) )
+               else( $record/row/cell[ @label = "id" ] )
+       return
+         $record update insert node attribute { "label" } { $recordLabel } into .
+    
        
-    let $model :=
-        try{
-          fetch:xml ( $modelURL )/table
-        }
-        catch*{ <table/> }
+    let $model := try{ fetch:xml ( $modelURL )/table } catch*{ <table/> }
         
     let $request :=
         <http:request method='POST'>
@@ -126,7 +154,7 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
   let $dbUpdate := 
      http:send-request(
            <http:request method='POST'>
-              <http:multipart media-type = "multipart/form-data" >
+              <http:multipart media-type = "multipart/form-data">
                   <http:header name="Content-Disposition" value= 'form-data; name="data";'/>
                   <http:body media-type = "application/xml" >
                     { $response }
@@ -137,34 +165,6 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
         )
   return
      web:redirect( $redirect )
-};
-
-declare 
-  %private
-function dataSave:buildIDRecord( 
-  $templateID, 
-  $currentID, 
-  $record as element( table )
-) as element( cell )
-{
-  let $queryPath := 
-      $config:apiResult( $templateID, "fields" )/child::*/record[ ID="__ОПИСАНИЕ__" ]/idQueryPath/text()
-  return
-    if( $queryPath )
-    then(
-       let $queryString := 
-          try{
-            fetch:text( $queryPath )
-          }
-          catch*{}
-       return
-        <cell label="id">{
-            dataSave:query( $queryString, $record )
-        }</cell>
-    )
-    else(
-      <cell id="id">{ $currentID }</cell>
-    )
 };
 
 declare function dataSave:query( $queryString, $record ) as xs:string {
@@ -186,7 +186,7 @@ declare function dataSave:query( $queryString, $record ) as xs:string {
         http:send-request(
            <http:request method='POST'>
              <http:header/>
-              <http:body media-type = "xml" >
+             <http:body media-type = "xml" >
                 { $query }
               </http:body>
            </http:request>,

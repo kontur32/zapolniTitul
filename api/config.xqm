@@ -44,10 +44,6 @@ declare variable $config:apiResult := function( $object as xs:string, $method as
   }
 };
 
-declare variable $config:query := 
-  function( $alias as xs:string ) as xs:string
-  {
-    let $queries := doc( 'queries.xml' )
-    return
-      $queries/queries/query[ alias = $alias ][ last() ]/text/text()
-  };
+declare variable $config:templateABOUT := function( $templateID as xs:string ) {
+  $config:apiResult( $templateID, "fields" )/child::*/record[ ID = "__ОПИСАНИЕ__" ]
+};

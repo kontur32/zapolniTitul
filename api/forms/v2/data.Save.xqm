@@ -190,7 +190,7 @@ declare function dataSave:query( $queryString, $record ) as xs:string {
                 { $query }
               </http:body>
            </http:request>,
-          'http://localhost:8984/rest'
+          'http://test:test@localhost:8984/rest'
       )[2]/result/text()
    return $response
 };

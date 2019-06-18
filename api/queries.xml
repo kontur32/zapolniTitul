@@ -4,6 +4,14 @@
     <text>"http://portal.titul24.ru/wp-json/wp/v2/users/" || ./child::*/userid/text()</text>
   </query>
   <query>
+    <id>_t24_ID_Признак</id>
+    <text>./child::*/table/row/cell[1]/text()</text>
+  </query>
+  <query>
+    <id>_t24_label_Признак</id>
+    <text>./child::*/table/row/cell[ @label = "label" ]/text()</text>
+  </query>
+  <query>
     <id>_t24_Фамилия_И_О</id>
     <text>
       let $a := ./child::*/table/row/cell 
@@ -11,6 +19,16 @@
         $a[ @label = "Фамилия" ] || " " || 
         substring( $a[ @label = "Имя" ], 1, 1 ) || "." ||
         substring( $a[ @label = "Отчество" ], 1, 1 ) || "."   
+    </text>
+  </query>
+  <query>
+    <id>_t24_Фамилия_Имя_Отчество</id>
+    <text>
+      let $a := ./child::*/table/row/cell 
+      return 
+        $a[ @label = "Фамилия" ] || " " || 
+        $a[ @label = "Имя" ] || " " ||
+        $a[ @label = "Отчество" ]  
     </text>
   </query>
 </queries>

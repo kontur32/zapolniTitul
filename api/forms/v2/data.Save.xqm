@@ -42,7 +42,7 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
     let $templateABOUT := $config:templateABOUT( $templateID )
     
     let $modelURL := 
-      if( substring( $aboutType, 1, 7 ) = "http://" )
+      if( substring( $aboutType, 1, 7 ) = ( "http://", "https://" ) )
       then(
         $templateABOUT/modelURL/text()
       )

@@ -5,16 +5,25 @@ import module namespace request = "http://exquery.org/ns/request";
 declare 
   %rest:path ( "/zapolnititul/api/v1/document" )
   %rest:method ( "POST" )
+  %rest:form-param ( "_t24_templateID", "{ $templateID }" )
   %rest:form-param ( "_t24_fileName", "{ $fileName }", "ZapolniTitul.docx" )
   %rest:form-param ( "_t24_templatePath", "{ $templatePath }" )
-function restDocx:document-POST ( $fileName  as xs:string, $templatePath as xs:string ) {
+function restDocx:document-POST ( $templateID, $fileName  as xs:string, $templatePath as xs:string ) {
   let $template := 
     try {
       string( fetch:binary( iri-to-uri( $templatePath ) ) )
-    }
-    catch * { 
-    }
+    } catch * { }
     
+  let $templateData := 
+    try {
+      fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $templateID || "/data" )//row
+    } catch * { "oops.." }
+   
+  let $templateFields := 
+    try {
+      fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $templateID || "/fields" )
+    } catch * { "oops.." }
+  
   let $data :=
     <table>
       <row id="fields">
@@ -22,8 +31,14 @@ function restDocx:document-POST ( $fileName  as xs:string, $templatePath as xs:s
         for $param in request:parameter-names()
         let $paramValue := request:parameter( $param )
         where not ( $paramValue instance of map(*)  )
+        let $fieldIndex := string( $templateFields//record[ID=$param][1]/index/text() )
+        let $value :=
+          if( $fieldIndex )
+          then( $templateData[ cell [ @label = $fieldIndex ]/text() = request:parameter( $fieldIndex ) ]/cell[ @label = $param ]/text() )
+          else( $paramValue )
+          
         return
-            <cell id="{ $param }" contentType = "field">{ $paramValue }</cell>
+            <cell id="{ $param }" contentType = "field">{ $value }</cell>
       }
       </row>
       <row id="pictures">

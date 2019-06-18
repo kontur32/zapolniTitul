@@ -16,6 +16,10 @@
     <value>hidden</value>
   </record>
   <record>
+    <label>индекс</label>
+    <value>index</value>
+  </record>
+  <record>
     <label>значение</label>
     <value>defaultValue</value>
   </record>

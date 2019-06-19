@@ -8,7 +8,7 @@ declare %private variable
       <template id="form" path="main-tpl2.html" />
       <template id="data" path="main-tpl2.html" />
       <template id="complete" path="main-tpl.html" />
-      <template id="child" path="main-tpl.html" />
+      <template id="child" path="main-tpl2.html" />
       <template id="iframe" path="iframe-tpl.html" />
       <template id="logout" path="logout-tpl.html" />
       <template id="login" path="login-tpl.html" />

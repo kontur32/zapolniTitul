@@ -5,7 +5,7 @@
   </query>
   <query>
     <id>_t24_ID_Признак</id>
-    <text>./child::*/table/row/cell[1]/text()</text>
+    <text>./child::*/table/row/cell[ @label = "id"]/text()</text>
   </query>
   <query>
     <id>_t24_label_Признак</id>

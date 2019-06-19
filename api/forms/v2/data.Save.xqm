@@ -121,12 +121,12 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
                    iri-to-uri( $templateABOUT/labelQueryURL/text() )
                  )
                } catch*{ false() }
-             return
-               if( $queryString )
-               then( dataSave:query( $queryString,  $record ) )
-               else( $record/row/cell[ @label = "id" ] )
+         return
+           if( $queryString )
+           then( dataSave:query( $queryString,  $record ) )
+           else( $record/row/cell[ @label = "id" ]/text() )
        return
-         $record update insert node attribute { "label" } { $recordLabel } into .
+         $record update insert node attribute { "label" } { if( $recordLabel )then( $recordLabel )else( ./row/cell[ @label = "id" ]/text() ) } into .
     
        
     let $model := try{ fetch:xml ( $modelURL )/table } catch*{ <table/> }
@@ -167,7 +167,7 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
      web:redirect( $redirect )
 };
 
-declare function dataSave:query( $queryString, $record ) as xs:string {
+declare function dataSave:query( $queryString, $record )  {
     let $query := 
       <query>
         <text>{

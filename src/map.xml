@@ -15,6 +15,10 @@
     <label>скрытый</label>
     <value>hidden</value>
   </record>
+   <record>
+    <label>файл</label>
+    <value>file</value>
+  </record>
   <record>
     <label>индекс</label>
     <value>index</value>

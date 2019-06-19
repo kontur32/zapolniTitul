@@ -132,6 +132,33 @@ function buildForm:buildInputForm-main (
              <label>{ $label }</label>
              <input class="form-control" type="file"  name="{ $field/ID/text() }" value="{ $field/defaultValue/text() }" accept="image/*"/>
            </div>
+       case ( "file" )
+         return
+           <div class="form-group">
+             <label>{ $label }</label>
+             {
+               if( $field/link )
+               then(
+                 <div class="link">
+                  <a href="{$field/link/text()}">
+                    Скачать
+                  </a>
+                </div>
+               )
+               else()
+             }
+             <input class="form-control" type="file"  name="{ $field/ID/text() }" value="{ $field/defaultValue/text() }"/>
+           </div>
+        case ( "link" )
+          return
+            <div class="form-group">
+              <label>{  $label }</label>
+              <div class="form-control">
+                <a href="{$field/link/text()}">
+                  { $field/defaultValue/text() }
+                </a>
+              </div>
+            </div>
        default return ""
  
   return

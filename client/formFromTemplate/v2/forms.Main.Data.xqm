@@ -43,25 +43,32 @@ function data:currentInstForm( $currentDataSet ){
            for $i in $currentDataSet/row/cell
            return
              <record>
-               <ID>
-                 {
-                  
-                     $i/@id/data()
-                   
-                 } 
-               </ID>
+               <ID> {
+                   if (  $model/@id = $i/@id )
+                   then(
+                     $model[ @id = $i/@id ]/cell[ @id = "label" ]/text() 
+                   )
+                   else ( $i/@id/data() )
+               } </ID>
                <label>
                  {
                    if (  $model/@id = $i/@id )
                    then(
                      $model[ @id = $i/@id ]/cell[ @id = "label" ]/text() 
                    )
-                   else (
-                     $i/@id/data()
-                   )
+                   else ( $i/@id/data() )
                  }
                </label>
-               <defaultValue>{ $i/text() }</defaultValue>
+               {
+                 if(  $model[ @id = $i/@id ]/cell[ @id = "id" ]/text() = "https://schema.org/DigitalDocument" )
+                 then(
+                   <inputType>file</inputType>,
+                   <link>{"/zapolnititul/api/v2/users/" || $currentDataSet/@userID/data() || "/data/DigitalDocument/" || $i/table/row/@id/data() }</link>
+                 )
+                 else(
+                   <defaultValue>{ $i/text() }</defaultValue>
+                 )
+               }
               </record>
        }</csv> 
        return
@@ -167,70 +174,4 @@ declare function data:currentVersionForm( $currentFormID, $currentDataInst, $cur
              }
              </div>
            </div>      
-};
-
-(:------------ старые версии на удаление ------------------- :)
-
-declare %private function data:instanceLabel1( $VersionData )
-{
-let $f := fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/" || $VersionData/@templateID ||  "/fields")/csv/record[ID="__ОПИСАНИЕ__"]/labelOfInstance/text()
-
-let $fieldsNameList := tokenize($f, "--") => for-each( normalize-space( ? ) )
-
-let $modelFields := fetch:xml( web:decode-url( $VersionData/@modelURL/data() ) )/table/row
-
-let $fieldsIDList := 
- if( $modelFields and ( $VersionData/@aboutType != "none" ) )
- then(
-  for $i in $fieldsNameList
-   return
-     $modelFields[cell[@id="label"]=$i]/@id/data()
-  )
-  else( $fieldsNameList )
-  
-return 
-   string-join( 
-     for $i in $fieldsIDList return $VersionData/row/cell[@id=$i]/text(), " "
-   )
-};
-
-declare 
-  %private
-function data:currentInstView( $currentDataSet ){
-<div class="container">{
-     if ( $currentDataSet )
-     then (
-       <table class="table-striped">
-         <tr >
-           <th class="text-center">Свойство</th>
-           <th></th>
-           <th class="text-center">Значение</th>
-          </tr>
-         {
-           let $model := fetch:xml( web:decode-url( $currentDataSet/@modelURL/data() ) )/table/row
-           for $i in $currentDataSet/row/cell
-           return
-             <tr>
-               <td class="px-3">
-               {
-                 if (  $model/@id = $i/@id )
-                 then(
-                   $model[ @id = $i/@id ]/cell[ @id = "label" ]/text() 
-                 )
-                 else (
-                   $i/@id/data()
-                 )
-               } 
-               </td>
-               <td>:</td>
-               <td class="font-italic text-left px-3">{ $i/text()}</td>
-              </tr>
-       }</table> 
-     )
-     else(
-       <div>
-         <p>Сохраненных данных нет</p>
-       </div>
-     )
- }</div>
 };

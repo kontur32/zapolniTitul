@@ -44,16 +44,23 @@ function data:currentInstForm( $currentDataSet ){
            return
              <record>
                <ID>
-               {
-                 if (  $model/@id = $i/@id )
-                 then(
-                   $model[ @id = $i/@id ]/cell[ @id = "label" ]/text() 
-                 )
-                 else (
-                   $i/@id/data()
-                 )
-               } 
+                 {
+                  
+                     $i/@id/data()
+                   
+                 } 
                </ID>
+               <label>
+                 {
+                   if (  $model/@id = $i/@id )
+                   then(
+                     $model[ @id = $i/@id ]/cell[ @id = "label" ]/text() 
+                   )
+                   else (
+                     $i/@id/data()
+                   )
+                 }
+               </label>
                <defaultValue>{ $i/text() }</defaultValue>
               </record>
        }</csv> 

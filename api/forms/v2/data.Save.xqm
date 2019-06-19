@@ -42,7 +42,7 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
     let $templateABOUT := $config:templateABOUT( $templateID )
     
     let $modelURL := 
-      if( substring( $aboutType, 1, 7 ) = ( "http://", "https://" ) )
+      if( substring( $templateABOUT/modelURL/text(), 1, 7 ) = ( "http://", "https://" ) )
       then(
         $templateABOUT/modelURL/text()
       )
@@ -82,8 +82,14 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
                 string( map:get( $paramValue, map:keys( $paramValue )[1] ) ) = ""
               ) 
             return
-                <cell label="{ $param }"> 
-                  { map:get( $paramValue, map:keys( $paramValue )[1] )  }
+                <cell label="{ $param }">
+                  <table>
+                    <row id="{ random:uuid() }" label="{ map:keys( $paramValue )[1] }" type="https://schema.org/DigitalDocument">
+                      <cell id="content">
+                        { xs:string( map:get( $paramValue, map:keys( $paramValue )[1] ) )  }
+                      </cell>
+                    </row>
+                  </table> 
                 </cell>  
           }
         </row>

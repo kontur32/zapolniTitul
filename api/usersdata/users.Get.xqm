@@ -41,10 +41,13 @@ function getUserData:templateData( $userID as xs:string, $templateID as xs:strin
     }
     catch*{}
   return 
-    if ( session:get( "userid" ) = $userID and $formOwner = $userID )
-    then( <data>{ $data }</data> )
+    if ( session:get( "userid" ) = $userID or session:get( "userid" ) = $formOwner )
+    then( 
+      if( session:get( "userid" ) = $formOwner )
+      then ( <data>{ $data }</data> )
+      else( <data>{ $data[ @userID = $userID ] }</data> )
+     )
     else ( <error>Пользователь не опознан</error>)
-  
 };
 
 (:

@@ -100,13 +100,16 @@ function forms:main ( $page, $currentFormID ) {
     then ( 
       html:fillHtmlTemplate(
          serialize( $template:get( "logout" ) ), 
-         map{ "username" : session:get( "username" ) }
+         map{
+           "username" : session:get( "username" ),
+           "callbackURL" :  "/zapolnititul/forms/a/" || $page || "/" || $currentFormID 
+         }
        )
      )
     else ( 
       html:fillHtmlTemplate(
            serialize( $template:get( "login" ) ), 
-           map{}
+           map{ "callbackURL" :  "/zapolnititul/forms/a/" || $page || "/" || $currentFormID }
          )
     )
       

@@ -16,7 +16,7 @@ function user:login ( $username, $password, $callbackURL ){
       if ( $response//token/text() )
       then (
         let $token := $response//token/text()
-        let $userid := user:userIdJWT( $token )
+        let $userid := user:userIdJWT( $token,  $config:param( "JWTEndpoint" ) )
         return
           (
            session:set( 'token', $token ),
@@ -84,8 +84,9 @@ declare function user:getData( $host, $token )
       $response[2]
 };
 
-declare function user:userIdJWT( $token ) {
+declare function user:userIdJWT( $token, $host ) {
   let $t := function( $a ) { json:parse( convert:binary-to-string ( xs:base64Binary( $a ) ) ) }
+  let $data := user:getData( $host || "/wp-json/wp/v2/users/me?context=edit", $token )
   return
-     $t( tokenize( $token, "\." )[2] )/json/data/user/id/text()
+     $data/json/id/text()
 };

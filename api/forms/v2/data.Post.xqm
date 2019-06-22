@@ -1,4 +1,4 @@
-module namespace dataSave = "http://dbx.iro37.ru/zapolnititul/api/form/data/save";
+module namespace dataPost = "http://dbx.iro37.ru/zapolnititul/api/form/data/save";
 
 import module namespace request = "http://exquery.org/ns/request";
 import module namespace session = "http://basex.org/modules/session";
@@ -15,7 +15,7 @@ declare
   %rest:path ( "/zapolnititul/api/v2/data/update" )
   %rest:POST
   %rest:form-param ( "data", "{ $data }" )
-function dataSave:update( $data ){
+function dataPost:update( $data ){
   let $d := parse-xml( $data )/table
   let $db := db:open("titul24", "data" )/data
   return
@@ -33,7 +33,7 @@ declare
   %rest:form-param ( "_t24_type", "{ $aboutType }", "none" )
   %rest:form-param ( "_t24_action", "{ $action }", "add" )
   %rest:form-param ( "_t24_saveRedirect", "{ $redirect }", "/" )
-function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
+function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
     let $paramNames := 
       for $name in  distinct-values( request:parameter-names() )
       where not ( starts-with( $name, "_t24_" ) )
@@ -107,7 +107,7 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
              } catch*{ false() }
            return
              if( $queryString )
-             then( dataSave:query( $queryString,  $record ) )
+             then( dataPost:query( $queryString,  $record ) )
              else( false() )                    
        return 
          $record update 
@@ -129,7 +129,7 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
                } catch*{ false() }
          return
            if( $queryString )
-           then( dataSave:query( $queryString,  $record ) )
+           then( dataPost:query( $queryString,  $record ) )
            else( $record/row/cell[ @label = "id" ]/text() )
        return
          $record update insert node attribute { "label" } { if( $recordLabel )then( $recordLabel )else( ./row/cell[ @label = "id" ]/text() ) } into .
@@ -173,7 +173,7 @@ function dataSave:main( $templateID, $id, $aboutType, $action, $redirect ){
      web:redirect( $redirect )
 };
 
-declare function dataSave:query( $queryString, $record )  {
+declare function dataPost:query( $queryString, $record )  {
     let $query := 
       <query>
         <text>{

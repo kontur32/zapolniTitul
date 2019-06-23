@@ -16,13 +16,13 @@ function dd:get( $userID as xs:string, $digitalDocumentID as xs:string  ) {
   return 
     if ( session:get( "userid" ) = $userID )
     then(
-      let $ContentDispositionValue := "attachment; filename=" || $data/@label/data()
+      let $ContentDispositionValue := "attachment; filename=" || iri-to-uri( $data/@label/data() )
       return
          (
           <rest:response>
             <http:response status="200">
               <http:header name="Content-Disposition" value="{ $ContentDispositionValue }" />
-              <http:header name="Content-type" value="application/xml"/>
+              <http:header name="Content-type" value="application/octet-stream"/>
             </http:response>
           </rest:response>,
           xs:base64Binary( $data/cell[ @id = "content" ]/text() )

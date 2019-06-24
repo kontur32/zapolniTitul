@@ -66,7 +66,9 @@ function data:currentInstForm( $currentDataSet ){
                    <link>{"/zapolnititul/api/v2/users/" || $currentDataSet/@userID/data() || "/data/DigitalDocument/" || $i/table/row/@id/data() }</link>
                  )
                  else(
-                   <defaultValue>{ $i/text() }</defaultValue>
+                   <defaultValue>{
+                     replace( $i/text(), "\$", "-" ) (: костыль из-за проблем с выводом $ :)
+                   }</defaultValue>
                  )
                }
               </record>

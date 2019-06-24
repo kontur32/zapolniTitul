@@ -1,6 +1,6 @@
 module namespace getForms = "http://dbx.iro37.ru/zapolnititul/api/forms/get";
 
-import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../../config.xqm";
+import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../../../config.xqm";
 
 declare
   %private

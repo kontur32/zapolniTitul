@@ -2,7 +2,7 @@ module namespace dd = "http://dbx.iro37.ru/zapolnititul/api/user/data/DigitalDoc
 
 import module namespace session = "http://basex.org/modules/session";
 
-import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../config.xqm";
+import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../../config.xqm";
 
 declare
   %private

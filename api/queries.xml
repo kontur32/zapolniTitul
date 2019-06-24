@@ -8,8 +8,16 @@
     <text>./child::*/table/row/cell[ @label = "id"]/text()</text>
   </query>
   <query>
+    <id>_t24_ID_generateNew</id>
+    <text>"http://titul24.ru/items/Reports#" || random:uuid()</text>
+  </query>
+  <query>
     <id>_t24_label_Признак</id>
     <text>./child::*/table/row/cell[ @label = "label" ]/text()</text>
+  </query>
+  <query>
+    <id>_t24_label_Название</id>
+    <text>./child::*/table/row/cell[ @label = "Название" ]/text()</text>
   </query>
   <query>
     <id>_t24_Фамилия_И_О</id>

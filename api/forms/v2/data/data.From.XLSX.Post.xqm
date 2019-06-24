@@ -4,7 +4,7 @@ import module namespace request = "http://exquery.org/ns/request";
 import module namespace session = "http://basex.org/modules/session";
 
 import module namespace 
-    config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../../config.xqm";
+    config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../../../config.xqm";
 
 (:
   Точка для загрузки данных в виде .xlsx

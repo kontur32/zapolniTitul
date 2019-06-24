@@ -3,7 +3,7 @@ module namespace formPostChild = "http://dbx.iro37.ru/zapolnititul/api/form/post
 import module namespace session = "http://basex.org/modules/session";
 import module namespace request = "http://exquery.org/ns/request";
 
-import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../../config.xqm";
+import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../../../config.xqm";
 
 import module namespace formPost = "http://dbx.iro37.ru/zapolnititul/api/form/post" at "formPost.xqm";
 

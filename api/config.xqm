@@ -16,6 +16,7 @@ declare variable $config:userData := function( $id ) {
     db:open( "titul24", "data")/data/table[ @userID = $id ]
 };
 
+
 declare variable $config:templateData := function( $id ) {
     db:open( "titul24", "data")/data/table[ @templateID = $id ]
 };

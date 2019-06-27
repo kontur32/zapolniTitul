@@ -60,7 +60,18 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
   let $currentFormID := 
     if (  $config:getFormByAPI( $id,  "meta")/form ) 
     then( $id )
-    else ()
+    else (
+      let $userFormID :=
+        try{
+          fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || 
+            session:get( "userid" ) || 
+            "/forms" )//form[ 1 ]/@id/data()
+        }catch*{}
+      return
+        if( $userFormID )
+        then( $userFormID )
+        else()
+    )
 
   let $formMeta := $config:getFormByAPI( $currentFormID,  "meta" )/form
    
@@ -70,26 +81,49 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
        switch ( $page )
        case ( "form" )
          return (
-        <div class="col-md-3 border-right">
-          <h3>Мои шаблоны</h3> 
-            {
-              sidebar:userFormsList ( $currentFormID, $userForms, $config:param )
-            }
-        </div>
+           if( $currentFormID )
+           then(
+             <div class="col-md-3 border-right">
+                <h3>Мои шаблоны</h3> 
+                  {
+                    sidebar:userFormsList ( $currentFormID, $userForms, $config:param )
+                  }
+              </div>
+           )
+           else(
+             <div class="col-md-3 border-right">
+               <div>У Вас ещё нет загруженных шаблонов. Возможно, самое время создать свой первый шаблон..</div>
+               <p>
+                  Как это сделать посмотрите 
+                  <a class="my-2 btn btn-info" href="https://youtu.be/QzxlRRRCLeI">видео</a>
+                   или прочитайте <a class="btn btn-info" href="http://portal.titul24.ru/pervij-shablon/">инструкцию</a>
+               </p>
+             </div>
+           )
+          
       )
       case ( "data" )
          return 
-           <div class="col-md-3 border-right">
-             <h3>Мои формы</h3>
-             { 
+           
                let $data := $config:fetchUserData(
                    session:get( "userid"),
                    request:cookie('JSESSIONID')
-                 )
-            return 
-               sidebar:userDataList( $currentFormID, $data/data/table )
-             }
-           </div>
+                 )/data/table
+            return
+              if( $data )
+              then(
+                <div class="col-md-3 border-right">
+                   <h3>Мои данные</h3>
+                   { 
+                     sidebar:userDataList( $currentFormID, $data )
+                   }
+                </div> 
+              )
+              else(
+                <div class="col-md-3 border-right">
+                  У Вас ещё нет сохранённых данных
+                </div> 
+              )
       default return ""
     
   let $content := 
@@ -131,32 +165,39 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
                 $config:fetchUserData(
                     session:get( "userid" ), request:cookie('JSESSIONID')
                 )/data/table
-            
-            let $currentUserData := 
-              $userData[ @templateID = $formMeta/@id ]
-              [ @updated = web:decode-url( $dataver ) ]
-            
-            let $currentVerID := 
-              if( $currentUserData )
-              then ( $dataver )
-              else (
-               web:encode-url( 
-                 $userData[ @templateID = $formMeta/@id ][ last() ]/@updated/data()
-               )
-              )
-            let $currentInstID := 
-              $userData[ @templateID = $formMeta/@id ]
-              [ @updated = web:decode-url( $currentVerID ) ]/@id/data()
-              
-            return 
-              data:main( $formMeta, $userData, $currentInstID, $currentVerID )
+            return
+              if( $userData[ @templateID = $formMeta/@id ] )
+              then(
+                let $currentUserData := 
+                  $userData[ @templateID = $formMeta/@id ]
+                  [ @updated = web:decode-url( $dataver ) ]
+                
+                let $currentVerID := 
+                  if( $currentUserData )
+                  then ( $dataver )
+                  else (
+                   web:encode-url( 
+                     $userData[ @templateID = $formMeta/@id ][ last() ]/@updated/data()
+                   )
+                  )
+                let $currentInstID := 
+                  $userData[ @templateID = $formMeta/@id ]
+                  [ @updated = web:decode-url( $currentVerID ) ]/@id/data()
+                  
+                return 
+                  data:main( $formMeta, $userData, $currentInstID, $currentVerID )
+             )
+             else(
+               
+             )
        default return ""
   
   let $nav := 
+    let $id := if( $currentFormID )then( $currentFormID )else( "1" )
     let $items:= 
            (
-             ["form", '/zapolnititul/forms/u/' || 'form' || '/' || $currentFormID,  "Мои шаблоны" ],
-             ["data", '/zapolnititul/forms/u/' || 'data' || '/' || $currentFormID, "Мои данные" ]
+             ["form", '/zapolnititul/forms/u/' || 'form' || '/' || $id,  "Мои шаблоны" ],
+             ["data", '/zapolnititul/forms/u/' || 'data' || '/' || $id, "Мои данные" ]
            )
     return
       nav:main( $page, $items )

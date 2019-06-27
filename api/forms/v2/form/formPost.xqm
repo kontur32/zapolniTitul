@@ -93,7 +93,10 @@ function formPost:post(
       
     return
       (
-        if ( $config:form( $formID ) and not( $id = "create" ) )
+        if (
+          $config:form( $formID )
+          and not( $id = "create" )
+        )
         then (
           replace node $config:form( $formID ) with $formData
         )

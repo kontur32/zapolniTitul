@@ -17,12 +17,12 @@ function restDocx:document-POST ( $templateID, $fileName  as xs:string, $templat
   let $templateData := 
     try {
       fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $templateID || "/data" )//row
-    } catch * { "oops.." }
+    } catch * { "oops.. no data" }
    
   let $templateFields := 
     try {
       fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $templateID || "/fields" )
-    } catch * { "oops.." }
+    } catch * { "oops.. no fields" }
   
   let $data :=
     <table>

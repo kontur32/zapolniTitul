@@ -13,7 +13,7 @@ declare
 function data:main( $formMeta, $userData, $currentDataInst, $currentDataVer ){
   (
      <div class="col-md-4 border-right">
-       <h3>Экземпляры формы:</h3>
+       <h3>Экземпляры данных:</h3>
        <h4>{ '"' || $formMeta/@label/data() || '"'}</h4>
        <div>{<a href='{ "/zapolnititul/api/v2/user/" || session:get( "userid" ) || "/models/" || $formMeta/@id }'>Ссылка на модель</a> }</div>
        <div>{<a href='{ "/zapolnititul/api/v2/user/" || session:get( "userid" ) || "/data/templates/" || $formMeta/@id }'>Ссылка на данные</a> }</div>

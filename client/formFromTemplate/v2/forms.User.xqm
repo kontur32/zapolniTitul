@@ -26,3 +26,10 @@ function user:main ( ) {
   return 
     web:redirect ( $config:param( "host" ) ||  $redirect )
 };
+
+declare 
+  %rest:GET
+  %rest:path ( "/zapolnititul/forms/u/{ $page }" )
+function user:form ( $page ) {
+   web:redirect ( "/zapolnititul/forms/u" )
+};

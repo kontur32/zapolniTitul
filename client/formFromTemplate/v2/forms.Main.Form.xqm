@@ -139,7 +139,7 @@ function
            </li>
            <li class="nav-item">
              {
-             <a class="nav-link" href="/zapolnititul/forms/a/form/{ $formID } " target="blank">
+             <a class="nav-link" href="/zapolnititul/forms/a/form/{ $formID } " target="_blank">
                Cсылка на форму
              </a>
              }

@@ -34,6 +34,8 @@ function forms:main ( $page, $currentFormID ) {
     )
     
   let $meta := (
+     [ "fileName", "ZapolniTitul.docx" ],
+     [ "templatePath", $config:apiurl( $currentFormID, "template" ) ],
      [ "templateID", $currentFormID ],
      [ "type", $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/type/text() ],
      [ "saveRedirect", "/zapolnititul/forms/u/data/" || $currentFormID ]

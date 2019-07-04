@@ -22,6 +22,7 @@ function forms:main ( $page, $currentFormID ) {
   let $formMeta := $config:getFormByAPI( $currentFormID,  "meta")/form
      
   let $formFields := $config:getFormByAPI( $currentFormID,  "fields")/csv
+  let $formAboutField := $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]
   
   let $imgPath := 
     if( $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/img )
@@ -31,6 +32,38 @@ function forms:main ( $page, $currentFormID ) {
       then( $formMeta/@imageFullPath/data() )
       else()
     )
+    
+  let $meta := (
+     [ "templateID", $currentFormID ],
+     [ "type", $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/type/text() ],
+     [ "saveRedirect", "/zapolnititul/forms/u/data/" || $currentFormID ]
+   )
+  let $buttons := (
+    if( not( $formAboutField/displayDownloadButton/text() = "false" ) )
+    then(
+      map{
+       "method" : "POST",
+       "action" : "/zapolnititul/api/v1/document",
+       "class" : "btn btn-success btn-block",
+       "label" : "Скачать заполненный шаблон"
+     }
+    )
+    else(),
+     if( session:get( "userid" ) )
+     then(
+        map{
+         "method" : "POST",
+         "action" : "/zapolnititul/api/v2/data/save",
+         "class" : "btn btn-info btn-block",
+         "label" :
+           if ( $formAboutField/saveButtonText/text() )
+           then( $formAboutField/saveButtonText/text() )
+           else ( "Сохранить введенные данные" )
+       }
+     )
+     else( )
+   )
+  
   let $sidebar := 
     <div class="col-md-3">
       <img class="img-fluid my-3" src="{ $imgPath }"/>
@@ -42,61 +75,28 @@ function forms:main ( $page, $currentFormID ) {
         then( $formMeta/@label/data() )
         else( $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/name/text() )
       }</h3>
-      <div><a href="{ $formMeta/@fileFullPath/data() }">Шаблон формы</a></div>
+      {
+        if( not( $formAboutField/displayTemplateLink/text() = "false" ) )
+        then(
+          <div><a href="{ $formMeta/@fileFullPath/data() }">Шаблон формы</a></div>
+        )
+        else()
+      }
       <div>Заполните поля формы и нажмите</div>
       {
-        
-         let $meta := (
-           [ "type", $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/type/text() ],
-           [ "saveRedirect", "/zapolnititul/forms/u/data/" || $currentFormID ]
-         )
-        let $buttons := (
-           map{
-             "method" : "POST",
-             "action" : "/zapolnititul/api/v1/document",
-             "class" : "btn btn-success btn-block",
-             "label" : "Скачать заполненный шаблон"},
-             if( session:get( "userid" ) )
-             then(
-                map{
-                 "method" : "POST",
-                 "action" : "/zapolnititul/api/v2/data/save",
-                 "class" : "btn btn-info btn-block",
-                 "label" : "Сохранить введенные данные"}
-             )
-             else()
-         )
-         return
-          form:footer( "template", $meta, "_t24_", $buttons )
+          
+          
+          
+          ( form:footer( "template", $meta, "_t24_", $buttons ),
+            if( not ( session:get( "userid" ) ) )
+            then(
+              <a href="#" type="type" class="btn btn-info btn-block" data-toggle="modal" data-target="#exampleModal">{ $formAboutField/saveButtonText/text() }</a>
+            )
+            else()
+          )
       }
       { form:body ( $currentFormID, $formFields ) }
-       {
-         let $meta := (
-           [ "fileName", "ZapolniTitul.docx" ],
-           [ "templatePath", $config:apiurl( $currentFormID, "template" ) ],
-           [ "templateID", $currentFormID ],
-           [ "redirect", "/zapolnititul/forms/a/form/" || $currentFormID ]
-         )
-         let $buttons := (
-           map{
-             "method" : "POST",
-             "action" : "/zapolnititul/api/v1/document",
-             "class" : "btn btn-success btn-block",
-             "label" : "Скачать заполненный шаблон"},
-           if( session:get( "userid" ) )
-             then(
-                map{
-                 "method" : "POST",
-                 "action" : "/zapolnititul/api/v2/data/save",
-                 "class" : "btn btn-info btn-block",
-                 "label" : "Сохранить введенные данные"}
-             )
-             else()
-           
-         )
-         return
-          form:footer( "template", $meta, "_t24_", $buttons )
-       }
+      
     </div>
   
   let $nav-login := 

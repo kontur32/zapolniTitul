@@ -31,7 +31,7 @@ function
   
   let $queryString as xs:string := fetch:text( "http://localhost:8984/zapolnititul/api/v2/users/" || $userID || "/reports/" || $reportID || "/query" )
   
-  let $template := fetch:binary(  "http://localhost:8984/zapolnititul/api/v2/users/" || $userID || "/reports/" || $reportID || "/template" )
+  let $template as xs:base64Binary := fetch:binary(  "http://localhost:8984/zapolnititul/api/v2/users/" || $userID || "/reports/" || $reportID || "/template" )
   
   let $data :=  reports:query( $queryString, $context )
   
@@ -52,28 +52,35 @@ function
     )
 };
 
-declare function reports:query( $queryString as xs:string, $context as element()* ) as element( table ) {
-    let $query := 
-      <query>
-        <text>{'<result>{'|| $queryString || '}</result>'}</text>
-        <context>
-          <xml>
-            { $context }
-          </xml>
-        </context>
-      </query>
-    
-     let $response := 
-        http:send-request(
-           <http:request method='POST'>
-             <http:header/>
-             <http:body media-type = "xml" >
-                { $query }
-              </http:body>
-           </http:request>,
-          'http://test:test@localhost:8984/rest'
-      )
-   return $response[ 2 ]/result/table
+declare 
+  %private
+function 
+reports:query(
+  $queryString as xs:string,
+  $context as element()*
+) as element( table )
+{
+  let $query := 
+    <query>
+      <text>{'<result>{'|| $queryString || '}</result>'}</text>
+      <context>
+        <xml>
+          { $context }
+        </xml>
+      </context>
+    </query>
+  
+   let $response := 
+      http:send-request(
+         <http:request method='POST'>
+           <http:header/>
+           <http:body media-type = "xml" >
+              { $query }
+            </http:body>
+         </http:request>,
+        'http://test:test@localhost:8984/rest'
+    )
+  return $response[ 2 ]/result/table
 };
 
 declare function reports:fillTemplate ( $template as xs:base64Binary, $data as element( table ) ) {

@@ -66,10 +66,15 @@ function forms:main ( $page, $currentFormID ) {
      else( )
    )
   
-  let $sidebar := 
-    <div class="col-md-3">
-      <img class="img-fluid my-3" src="{ $imgPath }"/>
-    </div>
+  let $sidebar :=
+    let $imgLink := 
+      if( $formAboutField/imgLink/text() )
+      then(  $formAboutField/imgLink/text() )
+      else( "#" )
+    return
+      <div class="col-md-3">
+        <a href="{ $imgLink }"><img class="img-fluid my-3" src="{ $imgPath }"/></a>
+      </div>
   let $content := 
     <div class="col-md-9">
       <h3>{
@@ -77,6 +82,9 @@ function forms:main ( $page, $currentFormID ) {
         then( $formMeta/@label/data() )
         else( $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/name/text() )
       }</h3>
+      <div>
+        <iframe id="iframe" width="100%" height="50" frameborder="0" scrolling="no" src="{ $formAboutField/iframe/text() } " allowtransparency="true"></iframe>
+      </div>
       {
         if( not( $formAboutField/displayTemplateLink/text() = "false" ) )
         then(

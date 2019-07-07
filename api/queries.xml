@@ -39,4 +39,20 @@
         $a[ @label = "Отчество" ]  
     </text>
   </query>
+   <query>
+    <id>_t24_Год_Номер_ФИО</id>
+    <text>
+      let $a := ./child::*/table/row/cell 
+      return 
+        $a[ @label = "Год" ] || " " || 
+        $a[ @label = "Номер" ] || " " ||
+        $a[ @label = "ФИО" ]  
+    </text>
+  </query>
+  <query>
+    <id>_t24_ID_uuidWithNamespace</id> <!-- Интеллигенция и мир -->
+    <text>
+      ./child::*/table/row/cell[ @label = "Пространство имен" ] || random:uuid()
+    </text>
+  </query>
 </queries>

@@ -33,42 +33,59 @@ function data:main( $formMeta, $userData, $currentDataInst, $currentDataVer ){
 declare 
   %public
 function data:currentInstForm( $currentDataSet ){
-<div class="container">{
+<div class="container">
+{
      if ( $currentDataSet )
      then (
        let $formFields := 
        <csv>
          {
+           let $templateFields := $config:getFormByAPI( $currentDataSet/@templateID/data(), "fields" )
            let $model := fetch:xml( web:decode-url( $currentDataSet/@modelURL/data() ) )/table/row
+           
            for $i in $currentDataSet/row/cell
+           let $fieldLabel := $model[ @id = $i/@id ]/cell[ @id = "label" ]/text()
+           
            return
              <record>
                <ID> {
-                   if (  $model/@id = $i/@id )
-                   then(
-                     $model[ @id = $i/@id ]/cell[ @id = "label" ]/text() 
-                   )
+                   if ( $fieldLabel )
+                   then ( $fieldLabel )
                    else ( $i/@id/data() )
                } </ID>
                <label>
                  {
-                   if (  $model/@id = $i/@id )
-                   then(
-                     $model[ @id = $i/@id ]/cell[ @id = "label" ]/text() 
-                   )
+                   if ( $fieldLabel )
+                   then ( $fieldLabel )
                    else ( $i/@id/data() )
                  }
                </label>
                {
+                 if(
+                   $templateFields//record[ ID/text() = $fieldLabel ]/inputType/text() = "hidden"
+                 )
+                 then(
+                   <inputType>hidden</inputType>
+                 )
+                 else()
+               }
+               {
                  if(  $model[ @id = $i/@id ]/cell[ @id = "id" ]/text() = "https://schema.org/DigitalDocument" )
                  then(
                    <inputType>file</inputType>,
-                   <link>{"/zapolnititul/api/v2/users/" || $currentDataSet/@userID/data() || "/data/DigitalDocument/" || $i/table/row/@id/data() }</link>
+                   <link>
+                     {
+                       "/zapolnititul/api/v2/users/" || $currentDataSet/@userID/data() || "/data/DigitalDocument/" || $i/table/row/@id/data()
+                     }
+                   </link>
                  )
                  else(
-                   <defaultValue>{
-                     replace( $i/text(), "\$", "-" ) (: костыль из-за проблем с выводом $ :)
-                   }</defaultValue>
+                   (: костыль из-за проблем с выводом $ :)
+                   <defaultValue>
+                     {
+                       replace( $i/text(), "\$", "-" )
+                     }
+                   </defaultValue>
                  )
                }
               </record>

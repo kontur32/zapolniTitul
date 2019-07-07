@@ -75,7 +75,12 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
 
   let $formMeta := $config:getFormByAPI( $currentFormID,  "meta" )/form
    
-  let $formFields := $config:getFormByAPI( $currentFormID,  "fields" )/csv
+  let $formFields := 
+    if( $config:getFormByAPI( $currentFormID,  "fields" )/csv )
+    then(
+      $config:getFormByAPI( $currentFormID,  "fields" )/csv
+    )
+    else( <csv/> )
   
   let $sidebar := 
        switch ( $page )

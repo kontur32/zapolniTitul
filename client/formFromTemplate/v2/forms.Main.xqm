@@ -167,8 +167,8 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
        case ( "data" )
          return
            let $userData := 
-                $config:fetchUserData(
-                    session:get( "userid" ), request:cookie('JSESSIONID')
+                $config:fetchUserTemplateData(
+                  $currentFormID, session:get( "userid" ), request:cookie('JSESSIONID')
                 )/data/table
             return
               if( $userData[ @templateID = $formMeta/@id ] )

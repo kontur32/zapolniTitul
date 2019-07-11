@@ -154,7 +154,17 @@ declare function data:listOfInstance( $currentFormID, $userData ){
          for $v in $instList
          return
            <div>
-             <dt>Экземпляр: {  $data[@id=$v][last()]/@label/data() }</dt>
+             <dt>
+               <a href="{
+                     web:create-url( '',
+                       map{
+                         'dataver' : web:encode-url(  $data[@id=$v][last()]/@updated/data() ),
+                         'datainst' :  $data[@id=$v][last()]/@id/data()
+                       }
+                     )
+                     }">Экземпляр: {  $data[@id=$v][last()]/@label/data() }
+                 </a>
+              </dt>
              <div class="ml-2">
              {
                for $i in $data[ @id = $v ]

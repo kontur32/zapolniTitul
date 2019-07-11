@@ -62,7 +62,7 @@ function data:currentInstForm( $currentDataSet ){
                </label>
                {
                  if(
-                   $templateFields//record[ ID/text() = $fieldLabel ]/inputType/text() = "hidden"
+                   $templateFields//record[ ID/text() = $fieldLabel ]/inputType/text() = "hidden" or $i/@id/data() = "id"
                  )
                  then(
                    <inputType>hidden</inputType>

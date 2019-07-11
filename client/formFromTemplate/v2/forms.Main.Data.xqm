@@ -15,9 +15,20 @@ function data:main( $formMeta, $userData, $currentDataInst, $currentDataVer ){
      <div class="col-md-4 border-right">
        <h3>Экземпляры данных:</h3>
        <h4>{ '"' || $formMeta/@label/data() || '"'}</h4>
-       <div>{<a href='{ "/zapolnititul/api/v2/user/" || session:get( "userid" ) || "/models/" || $formMeta/@id }'>Ссылка на модель</a> }</div>
-       <div>{<a href='{ "/zapolnititul/api/v2/user/" || session:get( "userid" ) || "/data/templates/" || $formMeta/@id }'>Ссылка на данные</a> }</div>
+       <div>{
+         let $formID := $formMeta/@id/data()
+         let $formType := $config:getFormByAPI( $formID, "fields" )//record[ ID = "__ОПИСАНИЕ__" ]/type/text()
+         return 
+           if( $formType = "property" )
+           then(
+             <div>{<a href='{ "/zapolnititul/api/v2/user/" || session:get( "userid" ) || "/models/" || $formMeta/@id }'>Ссылка на модель</a> }</div>
+           )
+           else()
+       }</div>
        <div>{ data:listOfInstance( $formMeta/@id, $userData ) }</div>
+       <div>{
+         <a href='{ "/zapolnititul/api/v2/user/" || session:get( "userid" ) || "/data/templates/" || $formMeta/@id }'>Данные</a>
+       }</div>
      </div>,
        
      <div class="col-md">

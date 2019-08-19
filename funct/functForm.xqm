@@ -68,6 +68,10 @@ function form:fieldsAsString( $rowTpl, $pathFieldsAsCSV ) as element( csv ) {
     </http:request>,
     $pathFieldsAsCSV
     )[2],
-    map { 'header': false(), 'separator' : ';' }
+    map { 
+      'header': false() , (: без заголовка :)
+      'separator' : ';', (: разеделитель :)
+      "backslashes" : "yes" (: экранирование :)
+    }
   )/csv
 };

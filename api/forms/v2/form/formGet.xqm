@@ -84,6 +84,12 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
           file:read-binary( $form/@imageFullName/data() ), 
           "image"
           )
+      case( "model" )
+        return
+          (
+            getForm:buildModel( $form/csv ),
+            "application/xml"
+          ) 
       default 
         return ( $form/csv,  "application/xml" )
   return 
@@ -177,4 +183,28 @@ declare function getForm:data( $form as element( form ) ) as element( data ) {
   else (
     $form/data
   )  
+};
+
+declare 
+  %private
+function getForm:buildModel( $fields as element( csv ) ) as element( table ){
+  element { "table" } {
+    for $r in $fields/record
+    where not( $r/ID/text() = "__ОПИСАНИЕ__" )
+    return
+      element { "row" } {
+        attribute { "id" } { $r/ID/text() },
+        attribute { "type" } { "property" },
+        element { "cell" } {
+          attribute { "id" } { "id" },
+          $r/ID/text()
+        },
+        element { "cell" } {
+          attribute { "label" } { "label" },
+            if( $r/label/text() )
+            then( $r/label/text() )
+            else ( $r/ID/text() )
+        }
+      }
+  }
 };

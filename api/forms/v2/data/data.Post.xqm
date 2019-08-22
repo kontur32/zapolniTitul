@@ -42,12 +42,12 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
     let $templateABOUT := $config:templateABOUT( $templateID )
     
     let $modelURL := 
-      if( substring( $templateABOUT/modelURL/text(), 1, 7 ) = ( "http://", "https://" ) )
+      if( $templateABOUT/modelURL/text() )
       then(
         $templateABOUT/modelURL/text()
       )
       else(
-        web:create-url( "http://localhost:8984/trac/api/Model/ood", map{ "id" : $aboutType } )
+        "http://localhost:8984/zapolnititul/api/v2/forms/" || $templateID || "/model"
       )
        
     let $currentID := 

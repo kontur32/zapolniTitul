@@ -60,9 +60,12 @@ function data:currentInstForm( $currentDataSet ){
            return
              <record>
                <ID> {
-                   if ( $fieldLabel )
-                   then ( $fieldLabel )
-                   else ( $i/@id/data() )
+                 $i/@id/data()
+                   (:
+                     if ( $fieldLabel )
+                     then ( $fieldLabel )
+                     else ( $i/@id/data() )
+                   :)
                } </ID>
                <label>
                  {
@@ -94,7 +97,7 @@ function data:currentInstForm( $currentDataSet ){
                    (: костыль из-за проблем с выводом $ :)
                    <defaultValue>
                      {
-                       replace( $i/text(), "\$", "-" )
+                        replace( $i/text(), "\$", "-" )
                      }
                    </defaultValue>
                  )

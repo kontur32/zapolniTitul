@@ -200,7 +200,7 @@ function getForm:buildModel( $fields as element( csv ) ) as element( table ){
           $r/ID/text()
         },
         element { "cell" } {
-          attribute { "label" } { "label" },
+          attribute { "id" } { "label" },
             if( $r/label/text() )
             then( $r/label/text() )
             else ( $r/ID/text() )

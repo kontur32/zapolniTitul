@@ -40,6 +40,16 @@
     </text>
   </query>
    <query>
+    <id>_t24_Фамилия_Имя_Отчество_schema.org</id>
+    <text>
+      let $a := ./child::*/table/row/cell 
+      return 
+        $a[ @label = "https://schema.org/familyName" ] || " " || 
+        $a[ @label = "https://schema.org/givenName" ] || " " ||
+        $a[ @label = "https://schema.org/additionalName" ]  
+    </text>
+  </query>
+   <query>
     <id>_t24_Год_Номер_ФИО</id>
     <text>
       let $a := ./child::*/table/row/cell 

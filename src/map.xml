@@ -67,4 +67,12 @@
   <label>нет</label>
     <value>false</value>
   </record>
+  <record>
+   <label>ремарка</label>
+    <value>rem</value>
+  </record>
+  <record>
+   <label>стиль</label>
+    <value>style</value>
+  </record>
 </csv>

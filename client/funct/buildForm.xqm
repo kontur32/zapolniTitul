@@ -36,6 +36,7 @@ function buildForm:buildInputForm-main (
          if ( not( empty( $field/label/text() ) ) )
          then ( $field/label/text() )
          else ( $field/ID/text() )
+       let $ID := $field/ID/text()
      return
        switch ( $inputType )
        case ( "hidden" )
@@ -128,6 +129,13 @@ function buildForm:buildInputForm-main (
              <label>{ $label }</label>
              <input class="form-control" type="file"  name="{ $field/ID/text() }" value="{ $field/defaultValue/text() }" accept="image/*"/>
            </div>
+       case ( "rem" )
+         return 
+           element { "div" } {
+              attribute {"class"} { "form-group"},
+              element { "label" } { $label },
+              element { "input" } { }
+            }
        default return ""
  
   return

@@ -159,6 +159,13 @@ function buildForm:buildInputForm-main (
                 </a>
               </div>
             </div>
+         case ( "rem" )
+         return 
+           element { "div" } {
+              attribute { "class" } { "form-group"},
+              attribute { "style" } { $field/style/text() },
+              element { "label" } { $label }
+            }
        default return ""
  
   return

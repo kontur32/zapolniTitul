@@ -32,16 +32,25 @@ function getUserData:get( $userID as xs:string, $type, $id, $unique as xs:boolea
 declare
   %private
   %rest:GET
+  %rest:header-param("Authorization", "{$auth}")
   %rest:path ( "/zapolnititul/api/v2/user/{ $userID }/data/templates/{ $templateID }" )
-function getUserData:templateData( $userID as xs:string, $templateID as xs:string ) {
+function getUserData:templateData( $auth, $userID as xs:string, $templateID as xs:string ) {
   let $data := $config:templateData( $templateID )
   let $formOwner := 
     try {
       $config:apiResult( $templateID, "meta" )/form/@userid
     }
     catch*{}
+  let $sessionUserID := 
+    if( session:get( "userid" ) )
+    then(
+      session:get( "userid" )
+    )
+    else(
+      getUserData:getUserID( substring-after( $auth,  "Bearer " ) )
+    )
   return 
-    if ( session:get( "userid" ) = $userID or session:get( "userid" ) = $formOwner )
+    if ( $sessionUserID = ( $userID , $formOwner ) )
     then( 
       if( session:get( "userid" ) = $formOwner )
       then ( <data>{ $data }</data> )
@@ -99,4 +108,20 @@ function getUserData:model( $userID as xs:string,  $modelID as xs:string ) {
         return 
           $r/row
       }</table>    
+};
+
+
+declare function getUserData:getUserID( $token ){
+  let $request := 
+  <http:request method='get'>
+    <http:header name="Authorization" value= '{ "Bearer " || $token }' />
+  </http:request>
+
+  let $response := 
+      http:send-request(
+        $request,
+        "http://portal.titul24.ru" || "/wp-json/wp/v2/users/me?context=edit"
+    )
+    return
+      $response[2]/json/id/text()
 };

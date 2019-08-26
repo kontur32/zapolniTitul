@@ -12,16 +12,20 @@ declare
   %rest:query-param( "callbackURL", "{ $callbackURL }", "/zapolnititul")
 function user:login ( $username, $password, $callbackURL ){
     let $response := user:getToken( $config:param( "JWTEndpoint" ),  $username, $password )
+    
     return
       if ( $response//token/text() )
       then (
+       
         let $token := $response//token/text()
         let $userid := user:userIdJWT( $token,  $config:param( "JWTEndpoint" ) )
+               
         return
           (
            session:set( 'token', $token ),
            session:set( 'userid', $userid ),
            session:set( 'username', normalize-space( $username ) ),
+          
            web:redirect( $callbackURL )
           )
       )
@@ -85,7 +89,6 @@ declare function user:getData( $host, $token )
 };
 
 declare function user:userIdJWT( $token, $host ) {
-  let $t := function( $a ) { json:parse( convert:binary-to-string ( xs:base64Binary( $a ) ) ) }
   let $data := user:getData( $host || "/wp-json/wp/v2/users/me?context=edit", $token )
   return
      $data/json/id/text()

@@ -39,7 +39,7 @@ function restDocx:document-POST ( $templateID, $fileName  as xs:string, $templat
           else( $paramValue )
           
         return
-            <cell id="{ $param }" contentType = "field">{ $value }</cell>
+            <cell id="{ $param }" contentType = "field">{ replace($value, '(<(/?[^>]+)>)', "") }</cell>
       }
       </row>
       <row id="pictures">

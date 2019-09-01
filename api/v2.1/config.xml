@@ -1,0 +1,5 @@
+<config>
+  <param id="dbName">titul24</param>
+  <param id="logDir">logs</param>
+  <param id="JWTendpoit">http://portal.titul24.ru</param>
+</config>

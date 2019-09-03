@@ -46,8 +46,12 @@ declare
 function data:currentInstForm( $currentDataSet ){
 <div class="container">
 {
+     let $templateFields := $config:getFormByAPI( $currentDataSet/@templateID/data(), "fields" )
+     let $model := fetch:xml( web:decode-url( $currentDataSet/@modelURL/data() ) )/table/row
+     return
      if ( $currentDataSet )
      then (
+       
        let $formFields := 
        <csv>
          {
@@ -61,11 +65,6 @@ function data:currentInstForm( $currentDataSet ){
              <record>
                <ID> {
                  $i/@id/data()
-                   (:
-                     if ( $fieldLabel )
-                     then ( $fieldLabel )
-                     else ( $i/@id/data() )
-                   :)
                } </ID>
                <label>
                  {
@@ -76,8 +75,7 @@ function data:currentInstForm( $currentDataSet ){
                </label>
                {
                  if(
-                   $templateFields//record[ ID/text() = $fieldLabel ]/inputType/text() = "hidden" or $i/@id/data() = "id"
-                 )
+                   $templateFields//record[ ID/text() = $fieldLabel ]/inputType/text() = "hidden" or $i/@id/data() = "id" )
                  then(
                    <inputType>hidden</inputType>
                  )
@@ -103,7 +101,89 @@ function data:currentInstForm( $currentDataSet ){
                  )
                }
               </record>
-       }</csv> 
+       }</csv>
+  let $formFields := 
+       <csv>
+         {
+           for $i in $currentDataSet/row/cell
+           let $fieldLabel := $model[ @id = $i/@id ]/cell[ @id = "label" ]/text()
+           
+           return
+             <record>
+               <ID> {
+                 $i/@id/data()
+               } </ID>
+               <label>
+                 {
+                   if ( $fieldLabel )
+                   then ( $fieldLabel )
+                   else ( $i/@id/data() )
+                 }
+               </label>
+               {
+                 if(
+                   $templateFields/csv/record[ ID/text() = $fieldLabel ]/inputType/text() = "hidden" or $i/@id/data() = "id" )
+                 then(
+                   <inputType>hidden</inputType>
+                 )
+                 else()
+               }
+               {
+                 if(  $model[ @id = $i/@id ]/cell[ @id = "id" ]/text() = "https://schema.org/DigitalDocument" )
+                 then(
+                   <inputType>file</inputType>,
+                   <link>
+                     {
+                       "/zapolnititul/api/v2/users/" || $currentDataSet/@userID/data() || "/data/DigitalDocument/" || $i/table/row/@id/data()
+                     }
+                   </link>
+                 )
+                 else(
+                   (: костыль из-за проблем с выводом $ :)
+                   <defaultValue>
+                     {
+                        replace( $i/text(), "\$", "-" )
+                     }
+                   </defaultValue>
+                 )
+               }
+              </record>
+       }</csv>
+
+(:------------- новая версия ---------------------:)
+let $formFields :=
+  <csv/> update insert node
+  (
+    for $i in $templateFields/csv/record
+    let $id := $i/ID/text()
+    where $currentDataSet/row/cell[ @id = $id ]/text()
+    return 
+        $i update 
+          insert node
+            (
+              <defaultValue>
+                {  $currentDataSet/row/cell[ @id = $id ]/text() }
+              </defaultValue>, 
+              if( $id = "https://schema.org/DigitalDocument" )
+              then(
+                <link>
+                {
+                   "/zapolnititul/api/v2/users/" || $currentDataSet/@userID/data() || "/data/DigitalDocument/" || $currentDataSet/row/cell[ @id = $id ]/table/row/@id/data()
+                }
+                </link>
+              )
+              else()
+            )
+          into . ,
+    <record>
+      <ID>id</ID>
+      <label>id</label>
+      <inputType>hidden</inputType>
+      <defaultValue>{ $currentDataSet/row/cell[ @id = "id" ]/text() }</defaultValue>
+    </record>
+  ) 
+  into .
+(:-------- конец новой версии -------------------:)   
        return
          <div>
            <div>{

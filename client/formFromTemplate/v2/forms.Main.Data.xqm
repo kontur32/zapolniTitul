@@ -65,7 +65,7 @@ function data:currentInstForm( $currentDataSet ){
                       <defaultValue>
                         {  $currentDataSet/row/cell[ @id = $id ]/text() }
                       </defaultValue>, 
-                      if( $id = "https://schema.org/DigitalDocument" or $currentDataSet/row/cell[ @id = $id ]/table/row/@id/data() )
+                      if( $id = "https://schema.org/DigitalDocument" or $currentDataSet/row/cell[ @id = $id ]/table/row/@id/data() or 1 )
                       then(
                         <link>
                         {

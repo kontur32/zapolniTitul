@@ -2,6 +2,8 @@ module namespace forms = "http://dbx.iro37.ru/zapolnititul/forms/main";
 
 import module namespace session = "http://basex.org/modules/session";
 
+import module namespace request = "http://exquery.org/ns/request";
+
 import module namespace html =  "http://www.iro37.ru/xquery/lib/html";
 
 import module namespace 
@@ -15,9 +17,10 @@ import module namespace
   
 declare 
   %rest:GET
+  %rest:query-param( "fields", "{ $fields }", "{}" )
   %rest:path ( "/zapolnititul/forms/a/{ $page }/{ $currentFormID }" )
   %output:method ("xhtml")
-function forms:main ( $page, $currentFormID ) {
+function forms:main ( $fields, $page, $currentFormID ) {
   
   let $formMeta := $config:getFormByAPI( $currentFormID,  "meta")/form
      
@@ -94,9 +97,6 @@ function forms:main ( $page, $currentFormID ) {
       }
       <div>Заполните поля формы и нажмите</div>
       {
-          
-          
-          
           ( form:footer( "template", $meta, "_t24_", $buttons ),
             if( not ( session:get( "userid" ) ) )
             then(
@@ -107,6 +107,37 @@ function forms:main ( $page, $currentFormID ) {
       }
       { form:body ( $currentFormID, $formFields ) }
       
+      <!-- добавляет поля из параметра "fields" в формате json пример строки: {
+  "fields": {
+    "1": {
+      "name": "aaa",
+      "value": "xxx"
+    },
+    "2": {
+      "name": "aaa",
+      "value": "xxx"
+    }
+  }
+} -->
+
+      <div>{
+        let $json := 
+          try{
+            json:parse( $fields )/json/fields/child::*} catch*{ false()
+          }
+        return
+          if( $json )
+          then(
+            for $f in json:parse( $fields )/json/fields/child::*
+            return 
+              <input
+                form="template"
+                type="hidden"
+                name="{ $f/name/text() }"
+                value="{ $f/value/text() }"/>
+          )
+          else()
+      }</div>
     </div>
   
   let $nav-login := 

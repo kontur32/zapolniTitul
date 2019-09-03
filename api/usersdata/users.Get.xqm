@@ -9,10 +9,16 @@ declare
   %rest:GET
   %rest:query-param( "type", "{ $type }", ".*" )
   %rest:query-param( "id", "{ $id }", ".*" )
+  %rest:query-param( "tpl", "{ $tpl }", ".*" )
   %rest:query-param( "unique", "{ $unique }", "false" )
   %rest:path ( "/zapolnititul/api/v2/user/{ $userID }/data" )
-function getUserData:get( $userID as xs:string, $type, $id, $unique as xs:boolean  ) {
-  let $data := $config:userData( $userID )[ row[ matches( @type, $type ) and matches( @id, $id ) ] ]
+function getUserData:get( $userID as xs:string, $type, $id, $tpl, $unique as xs:boolean  ) {
+  let $data := 
+    $config:userData( $userID )[
+      row[
+        matches( @type, $type ) and
+        matches( @id, $id ) ]
+      ][ matches( @templateIDtemplateID, $tpl ) ]
   
   let $data := 
     if ( $unique )
@@ -33,8 +39,14 @@ declare
   %private
   %rest:GET
   %rest:header-param("Authorization", "{$auth}")
+  %rest:query-param( "unique", "{ $unique }", "false" )
   %rest:path ( "/zapolnititul/api/v2/user/{ $userID }/data/templates/{ $templateID }" )
-function getUserData:templateData( $auth, $userID as xs:string, $templateID as xs:string ) {
+function getUserData:templateData(
+  $auth,
+  $userID as xs:string,
+  $templateID as xs:string,
+  $unique
+) {
   let $data := $config:templateData( $templateID )
   let $formOwner := 
     try {

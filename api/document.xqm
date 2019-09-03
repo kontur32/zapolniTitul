@@ -39,7 +39,7 @@ function restDocx:document-POST ( $templateID, $fileName  as xs:string, $templat
           else( $paramValue )
           
         return
-            <cell id="{ $param }" contentType = "field">{ replace($value, '(<(/?[^>]+)>)', "") }</cell>
+            <cell id="{ $param }" contentType = "field">{ replace( $value, '(<(/?[^>]+)>)', "" ) }</cell>
       }
       </row>
       <row id="pictures">
@@ -91,7 +91,7 @@ function restDocx:document-POST ( $templateID, $fileName  as xs:string, $templat
         order by $param
         return $param || " : " || $paramValue ||  '&#xd;&#xa;'
       return 
-        file:write-text( $config:param( "logDir" ) || "document.log", string-join( $p ) ),
+        file:write-text( $config:param( "logDir" ) || "document.log", ( string-join( $p ) || '&#xd;&#xa;' || serialize( $data ) ) ),
       
       <rest:response>
         <http:response status="200">

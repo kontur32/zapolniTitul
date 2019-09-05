@@ -37,17 +37,17 @@ function data:templateData (
   $templateID as xs:string,
   $params as map(*)
 ) as element( data ) {
-   let $templatesData := data:templateData( $templateID )/table
+   let $templatesData := data:templateData( $templateID )
    return
      if( $params?mode = "full" )
      then(
        $templatesData
       )
       else(
-        let $ids := distinct-values( $templatesData/row/@id )
+        let $ids := distinct-values( $templatesData/table/row/@id )
         let $rows := 
            for $i in $ids [ position() >= $params?starts and position() <= $params?starts + $params?limit ]
-           let $b := $templatesData/row[ @id = $i ]
+           let $b := $templatesData/table/row[ @id = $i ]
            return 
             $b[ last() ]
         return

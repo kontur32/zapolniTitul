@@ -19,13 +19,15 @@ declare variable $data:userData := function( $id as xs:string ) {
 
 declare 
   %private
-function data:templateData ( $templateID as xs:string ) as element( table ) {
+function data:templateData ( $templateID as xs:string ) as element( data ) {
   let $rows := 
     db:open( $data:dbName, "data" )/data/table[ @templateID = $templateID ]/row
   return
-    element { "table" } {
-      attribute { "total" } { count( $rows ) },
-      $rows
+    element{ "data" }{
+      element { "table" } {
+        attribute { "total" } { count( $rows ) },
+        $rows
+      }
     }
 };
 
@@ -34,7 +36,7 @@ declare
 function data:templateData (
   $templateID as xs:string,
   $params as map(*)
-) as element( table ) {
+) as element( data ) {
    let $templatesData := data:templateData( $templateID )
    return
      if( $params?mode = "full" )

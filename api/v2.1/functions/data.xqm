@@ -37,7 +37,7 @@ function data:templateData (
   $templateID as xs:string,
   $params as map(*)
 ) as element( data ) {
-   let $templatesData := data:templateData( $templateID )
+   let $templatesData := data:templateData( $templateID )/table
    return
      if( $params?mode = "full" )
      then(

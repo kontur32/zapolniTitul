@@ -51,11 +51,13 @@ function data:templateData (
            return 
             $b[ last() ]
         return
-          element { "table" } {
-           attribute { "total" } { count( $rows ) },
-           attribute { "starts" } { $params?starts },
-           attribute { "limit" } { $params?limit },
-           $rows
+          element { "data" }{
+            element { "table" } {
+             attribute { "total" } { count( $rows ) },
+             attribute { "starts" } { $params?starts },
+             attribute { "limit" } { $params?limit },
+             $rows
+           }
          }
       )
 };

@@ -130,13 +130,13 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
           if( $templateABOUT/labelQueryURL/text() )
           then(
             try{  
-                 fetch:text(
-                   iri-to-uri( $templateABOUT/labelQueryURL/text() )
-                 )
-               } catch*{ false() }
+               fetch:text(
+                 iri-to-uri( $templateABOUT/labelQueryURL/text() )
+               )
+             } catch*{ false() } 
           )
           else( false() )
-               
+                 
          return
            if( $queryString )
            then( dataPost:query( $queryString,  $record ) )

@@ -99,6 +99,8 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
      if ( not ( $paramNames = "id" ) )
      then(
        let $recordID :=
+         if( $templateABOUT/idQueryURL/text() )
+         then(
            let $queryString :=
              try{  
                fetch:text(
@@ -108,7 +110,10 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
            return
              if( $queryString )
              then( dataPost:query( $queryString,  $record ) )
-             else( false() )                    
+             else( false() )
+         )
+         else( false() )
+                               
        return 
          $record update 
          insert node <cell label="id">{
@@ -122,11 +127,16 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
     let $record := 
       let $recordLabel := 
         let $queryString :=
-               try{  
+          if( $templateABOUT/labelQueryURL/text() )
+          then(
+            try{  
                  fetch:text(
                    iri-to-uri( $templateABOUT/labelQueryURL/text() )
                  )
                } catch*{ false() }
+          )
+          else( false() )
+               
          return
            if( $queryString )
            then( dataPost:query( $queryString,  $record ) )

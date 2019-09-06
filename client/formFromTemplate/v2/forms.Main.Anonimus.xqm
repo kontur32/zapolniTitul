@@ -85,9 +85,16 @@ function forms:main ( $fields, $page, $currentFormID ) {
         then( $formMeta/@label/data() )
         else( $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/name/text() )
       }</h3>
-      <div>
-        <iframe id="iframe" width="100%" height="50" frameborder="0" scrolling="no" src="{ $formAboutField/iframe/text() } " allowtransparency="true"></iframe>
-      </div>
+      {
+        if($formAboutField/iframe/text())
+        then(
+          <div>
+            <iframe id="iframe" width="100%" height="50" frameborder="0" scrolling="no" src="{ $formAboutField/iframe/text() } " allowtransparency="true"></iframe>
+          </div>
+        )
+        else()
+      }
+      
       {
         if( not( $formAboutField/displayTemplateLink/text() = "false" ) )
         then(

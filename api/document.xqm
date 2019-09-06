@@ -95,8 +95,8 @@ function restDocx:document-POST ( $templateID, $fileName  as xs:string, $templat
       
       <rest:response>
         <http:response status="200">
-          <http:header name="Content-Disposition" value="{$ContentDispositionValue}" />
-          <http:header name="Content-type" value="application/xml"/>
+          <http:header name="Content-Disposition" value="{ $ContentDispositionValue }" />
+          <http:header name="Content-type" value="application/octet-stream"/>
         </http:response>
       </rest:response>,
       $response[ 2 ]

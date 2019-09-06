@@ -9,30 +9,30 @@ import module namespace
 declare 
   %perm:check( '/zapolnititul/api/v2.1/data/users/', '{ $perm }' )
 function check:check( $perm ) {
-  let $authorization := request:header("Authorization")
-  let $requestID := 
+  let $authorization := request:header( "Authorization" )
+  let $requestUserID := 
     substring-before(
       substring-after( $perm?path, '/zapolnititul/api/v2.1/data/users/' ),
       "/"
     )
-  let $tokenID := 
+  let $tokenUserID := 
     auth:userID( $authorization )
   return
-  if( $authorization )
+    if( $authorization )
     then(
-      if( $requestID = $tokenID )
-      then()
+      if( $requestUserID = $tokenUserID )
+      then() (: разрешает обращение :)
       else(
         <rest:response>
           <http:response status="403" message="Forbidden"/>
         </rest:response>
       )
-  )
-  else(
-    <rest:response>
-      <http:response status="401" message="Unauthorized">
-        <http:header name="WWW-Authenticate" value="Required bearer token"/>
-      </http:response>
-    </rest:response>
-  )
+    )
+    else(
+      <rest:response>
+        <http:response status="401" message="Unauthorized">
+          <http:header name="WWW-Authenticate" value="Required bearer token"/>
+        </http:response>
+      </rest:response>
+    )
 };

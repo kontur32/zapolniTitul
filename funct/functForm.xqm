@@ -44,6 +44,7 @@ function form:buildFormRecord( $csv as element(csv) ) as element(csv) {
              form:map( normalize-space( $record/entry[ 1 ]/text() ) )
            },
            for $entry in $record/entry[ position() > 1 ]/text()
+           where normalize-space( $entry )
            return
              let $a := tokenize( $entry, $form:delimiter )
              return 

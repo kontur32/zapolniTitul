@@ -48,7 +48,7 @@ function data:templateData (
         let $rows := 
            for $i in $ids [ position() >= $params?starts and position() <= $params?starts + $params?limit - 1 ]
            let $b := $templatesData/table/row[ @id = $i ]
-           order by $b/cell[ @id = $params?orderby ][1]
+          
            return 
             $b[ last() ]
         return

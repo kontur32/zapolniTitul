@@ -8,7 +8,7 @@ import module namespace data = "http://dbx.iro37.ru/zapolnititul/api/v2.1/data" 
 declare
   %private
   %rest:GET
-  %rest:query-param( "mode", "{ $mode }", "" )
+  %rest:query-param( "mode", "{ $mode }", "last" )
   %rest:query-param( "starts", "{ $starts }", "1" )
   %rest:query-param( "limit", "{ $limit }", "10" )
   %rest:path ( "/zapolnititul/api/v2.1/data/users/{ $userID }/templates/{ $templateID }" )

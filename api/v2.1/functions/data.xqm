@@ -46,7 +46,7 @@ function data:templateData (
       else(
         let $ids := distinct-values( $templatesData/table/row/@id )
         let $rows := 
-           for $i in $ids [ position() >= $params?starts and position() <= $params?starts + $params?limit ]
+           for $i in $ids [ position() >= $params?starts and position() <= $params?starts + $params?limit - 1 ]
            let $b := $templatesData/table/row[ @id = $i ]
            return 
             $b[ last() ]

@@ -11,11 +11,13 @@ declare
   %rest:query-param( "mode", "{ $mode }", "last" )
   %rest:query-param( "starts", "{ $starts }", "1" )
   %rest:query-param( "limit", "{ $limit }", "10" )
+  %rest:query-param( "orderby", "{ $orderby }", "id" )
   %rest:path ( "/zapolnititul/api/v2.1/data/users/{ $userID }/templates/{ $templateID }" )
 function getUserData:templateData(
   $mode as xs:string,
   $starts as xs:integer,
   $limit as xs:integer,
+  $orderby as xs:string,
   $userID as xs:string,
   $templateID as xs:string
 )
@@ -23,7 +25,7 @@ function getUserData:templateData(
   let $log := 
     log:log( "users.data.template.log", ( request:uri(), request:query() ) )
   let $params := 
-    map{ "mode" : $mode, "starts" : $starts, "limit" : $limit }
+    map{ "mode" : $mode, "starts" : $starts, "limit" : $limit, "orderby" : $orderby }
   return
    data:templateData ( $templateID, $params )
 };

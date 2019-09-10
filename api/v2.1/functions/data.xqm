@@ -4,60 +4,49 @@ import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/v2.1/conf
 
 declare variable $data:dbName as xs:string := $config:param( "dbName" );
 
-declare variable $data:forms := function( ) {
-   db:open( $data:dbName, "forms" )/forms
-};
-
-declare variable $data:form := function( $id as xs:string ) {
-    $data:forms()/form[ @id = $id ]
-};
-
-declare variable $data:userData := function( $id as xs:string ) {
-    db:open( $data:dbName, "data")/data/table[ @userID = $id ]
-};
-
-
-declare 
-  %private
-function data:templateData ( $templateID as xs:string ) as element( data ) {
-  let $rows := 
-    db:open( $data:dbName, "data" )/data/table[ @templateID = $templateID ]/row
-  return
-    element{ "data" }{
-      element { "table" } {
-        attribute { "total" } { count( $rows ) },
-        $rows
-      }
-    }
-};
-
 declare 
   %public
 function data:templateData (
   $templateID as xs:string,
   $params as map(*)
 ) as element( data ) {
-   let $templatesData := data:templateData( $templateID )
+   let $rows := 
+     db:open( $data:dbName, "data" )
+     /data/table[ @templateID = $templateID and @userID = $params?userID ]/row
+     [
+       if( $params?about != "" )
+       then( @id/data() = $params?about )
+       else( true() )
+     ]
    return
      if( $params?mode = "full" )
      then(
-       $templatesData
+       element{ "data" }{
+          element { "table" } {
+            attribute { "total" } { count( $rows ) },
+            $rows
+          }
+        }
       )
       else(
-        let $ids := distinct-values( $templatesData/table/row/@id )
+        let $ids := 
+          distinct-values( $rows/@id )[ position() >= $params?starts and position() <= ( $params?starts + $params?limit - 1 ) ]
         let $rows := 
-           for $i in $ids [ position() >= $params?starts and position() <= $params?starts + $params?limit - 1 ]
-           let $b := $templatesData/table/row[ @id = $i ]
-          
+           for $i in $ids 
+           let $b := $rows[ @id = $i ]
            return 
             $b[ last() ]
+            
         return
           element { "data" }{
             element { "table" } {
              attribute { "total" } { count( $rows ) },
              attribute { "starts" } { $params?starts },
              attribute { "limit" } { $params?limit },
-             $rows
+               for $r in $rows
+               order by $r/cell[ @id = $params?orderby ]
+               return
+                 $r
            }
          }
       )

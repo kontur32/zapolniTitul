@@ -2,6 +2,10 @@ module namespace check = "http://dbx.iro37.ru/zapolnititul/api/v2.1/funct/check/
 
 import module namespace request = "http://exquery.org/ns/request";
 
+import module namespace
+  log = "http://dbx.iro37.ru/zapolnititul/api/v2.1/log/" 
+    at "../functions/log.xqm";
+
 import module namespace 
   auth = "http://dbx.iro37.ru/zapolnititul/api/v2.1/funct/auth/"
     at "../functions/auth.xqm";
@@ -9,6 +13,13 @@ import module namespace
 declare 
   %perm:check( '/zapolnititul/api/v2.1/data/users/', '{ $perm }' )
 function check:check( $perm ) {
+  
+  let $log :=
+    log:log(
+      "users.data.template.log",
+      ( request:uri(), request:query() )
+    )
+  
   let $authorization := request:header( "Authorization" )
   let $requestUserID := 
     substring-before(

@@ -68,7 +68,7 @@
   <query>
     <id>_t24_date_schema.org</id> 
     <text>
-      "прием " || ./child::*/table/row/cell[ @label = "https://schema.org/Date" ]
+       ./child::*/table/row/cell[ @label = "https://schema.org/Date" ]/text()
     </text>
   </query>
 </queries>

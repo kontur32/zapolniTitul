@@ -39,7 +39,7 @@ function restDocx:document-POST ( $templateID, $fileName  as xs:string, $templat
           else( $paramValue )
           
         return
-            <cell id="{ $param }" contentType = "field">{ replace( $value, '(<(/?[^>]+)>)', "" ) }</cell>
+            <cell id="{ $param }" contentType = "field">{ replace( $value[ 1 ], '(<(/?[^>]+)>)', "" ) }</cell>
       }
       </row>
       <row id="pictures">
@@ -87,7 +87,7 @@ function restDocx:document-POST ( $templateID, $fileName  as xs:string, $templat
         let $paramValue := 
           if( $paramValue instance of map(*)  )
           then( "map : " || map:keys( $paramValue ) )
-          else( $paramValue )
+          else( $paramValue[ 1 ] )
         order by $param
         return $param || " : " || $paramValue ||  '&#xd;&#xa;'
       return 

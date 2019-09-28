@@ -49,7 +49,7 @@
         $a[ @label = "https://schema.org/additionalName" ]  
     </text>
   </query>
-   <query>
+  <query>
     <id>_t24_Год_Номер_ФИО</id>
     <text>
       let $a := ./child::*/table/row/cell 
@@ -69,6 +69,15 @@
     <id>_t24_date_schema.org</id> 
     <text>
        ./child::*/table/row/cell[ @label = "https://schema.org/Date" ]/text()
+    </text>
+  </query>
+  <query>
+    <id>_t24_lipers_OO</id>
+    <text>
+      let $a := ./child::*/table/row/cell 
+      return 
+        $a[ @label = "дата" ] || " " || 
+        $a[ @label = "ОО" ]  
     </text>
   </query>
 </queries>

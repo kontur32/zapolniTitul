@@ -117,12 +117,15 @@ function buildForm:buildInputForm-main (
                       }
                   
                    for $item in $items
-                   return 
-                     <option value="{ $item/text() }">
-                       {
-                         $item/text()
-                       }
-                     </option>
+                   return
+                     element { "option" } {
+                       attribute { "value" } {  $item/text() },
+                       if( $field/defaultValue/text() =  $item/text() ) 
+                       then(
+                         attribute { "selected" } { "true" }
+                       ) else(),
+                       $item/text()
+                     } 
                  }
                </select>
             </div>

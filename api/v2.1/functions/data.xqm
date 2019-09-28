@@ -10,9 +10,19 @@ function data:templateData (
   $templateID as xs:string,
   $params as map(*)
 ) as element( data ) {
+   let $templateOwner := 
+      db:open( $data:dbName, "forms" )
+      /forms/form[ @id= $templateID ]/@userid/data()
    let $rows := 
-     db:open( $data:dbName, "data" )
-     /data/table[ @templateID = $templateID and @userID = $params?userID ]/row
+     if( $templateOwner = $params?userID )
+     then(
+       db:open( $data:dbName, "data" )
+       /data/table[ @templateID = $templateID ]/row
+     )
+     else(
+       db:open( $data:dbName, "data" )
+       /data/table[ @templateID = $templateID and @userID = $params?userID ]/row
+     )
      [
        if( $params?about != "" )
        then( @id/data() = $params?about )

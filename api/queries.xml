@@ -77,7 +77,8 @@
       let $a := ./child::*/table/row/cell 
       return 
         $a[ @label = "дата" ] || " " || 
-        $a[ @label = "ОО" ]  
+        $a[ @label = "ОО" ]  || " " ||
+        $a[ @label = "предмет" ]
     </text>
   </query>
 </queries>

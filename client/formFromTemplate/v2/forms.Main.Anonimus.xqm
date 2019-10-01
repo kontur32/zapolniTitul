@@ -43,7 +43,7 @@ function forms:main ( $fields, $page, $currentFormID ) {
      [ "type", $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/type/text() ],
      [ "saveRedirect", "/zapolnititul/forms/u/data/" || $currentFormID ]
    )
-  let $buttons := (
+let $buttons := (
     if( not( $formAboutField/displayDownloadButton/text() = "false" ) )
     then(
       map{
@@ -54,9 +54,10 @@ function forms:main ( $fields, $page, $currentFormID ) {
      }
     )
     else(),
-     if( session:get( "userid" ) )
-     then(
-        map{
+    if( not ( session:get( "userid" ) ) or ( $formAboutField/displaySaveButton/text() = "false" )  )
+    then( )
+    else(
+      map{
          "method" : "POST",
          "action" : "/zapolnititul/api/v2/data/save",
          "class" : "btn btn-info btn-block",
@@ -65,8 +66,7 @@ function forms:main ( $fields, $page, $currentFormID ) {
            then( $formAboutField/saveButtonText/text() )
            else ( "Сохранить введенные данные" )
        }
-     )
-     else( )
+    )
    )
   
   let $sidebar :=
@@ -102,10 +102,16 @@ function forms:main ( $fields, $page, $currentFormID ) {
         )
         else()
       }
-      <div>Заполните поля формы и нажмите</div>
+      {
+        if( $formAboutField/displaySaveButton/text() != "false" )
+        then(
+          <div>Заполните поля формы и нажмите</div>
+        )
+        else()
+      }
       {
           ( form:footer( "template", $meta, "_t24_", $buttons ),
-            if( not ( session:get( "userid" ) ) )
+            if( not ( session:get( "userid" ) ) and not ( $formAboutField/displaySaveButton/text() = "false" ) )
             then(
               <a href="#" type="type" class="btn btn-info btn-block" data-toggle="modal" data-target="#exampleModal">{ $formAboutField/saveButtonText/text() }</a>
             )

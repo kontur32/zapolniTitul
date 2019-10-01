@@ -169,6 +169,17 @@ function buildForm:buildInputForm-main (
               attribute { "style" } { $field/style/text() },
               element { "label" } { $label }
             }
+         case ( "fetch" )
+         return 
+           element { "div" } {
+              attribute { "class" } { "form-group"},
+              attribute { "style" } { $field/style/text() },
+              element { "label" } {
+                xquery:eval(
+                  fetch:text( $field/url/text() )
+                )
+              }
+            }
        default return ""
  
   return

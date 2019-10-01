@@ -155,12 +155,9 @@ function buildForm:buildInputForm-main (
         case ( "link" )
           return
             <div class="form-group">
-              <label>{  $label }</label>
-              <div class="form-control">
                 <a href="{$field/link/text()}">
                   { $field/defaultValue/text() }
                 </a>
-              </div>
             </div>
          case ( "rem" )
          return 

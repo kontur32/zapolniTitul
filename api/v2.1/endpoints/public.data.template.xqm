@@ -38,8 +38,14 @@ function getPublicData:templateData(
     )/csv/record[ ID/text() = "__ОПИСАНИЕ__" ]/access/text()
   let $data := 
     if( $access = "public" ) then ( data:templateData ( $templateID, $params ) ) else()
-  let $xquery := 
-    fetch:text( $xqurl )
+  let $xquery :=
+    try{
+      fetch:text( $xqurl )
+    }
+    catch*{
+      "."
+    } 
+    
   return
     xquery:eval( $xquery, map { '': $data }, map{ "permission" : "none" } )
 };

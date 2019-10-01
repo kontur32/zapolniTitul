@@ -35,13 +35,21 @@ function forms:main ( $fields, $page, $currentFormID ) {
       then( $formMeta/@imageFullPath/data() )
       else()
     )
-    
+  
+  let $saveRedirect := 
+    if( $formAboutField/saveRedirect )
+    then(
+      $formAboutField/saveRedirect/text()
+    )
+    else(
+      "/zapolnititul/forms/u/data/" || $currentFormID
+    )  
   let $meta := (
      [ "fileName", "ZapolniTitul.docx" ],
      [ "templatePath", $config:apiurl( $currentFormID, "template" ) ],
      [ "templateID", $currentFormID ],
      [ "type", $formFields/record[ ID/text() = "__ОПИСАНИЕ__" ]/type/text() ],
-     [ "saveRedirect", "/zapolnititul/forms/u/data/" || $currentFormID ]
+     [ "saveRedirect", $saveRedirect ]
    )
 let $buttons := (
     if( not( $formAboutField/displayDownloadButton/text() = "false" ) )

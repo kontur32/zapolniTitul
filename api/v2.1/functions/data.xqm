@@ -6,10 +6,12 @@ declare variable $data:dbName as xs:string := $config:param( "dbName" );
 
 declare 
   %public
-function data:templateData (
+function data:templateData
+(
   $templateID as xs:string,
   $params as map(*)
-) as element( data ) {
+) as element( data )
+{
    let $templateOwner := 
       db:open( $data:dbName, "forms" )
       /forms/form[ @id= $templateID ]/@userid/data()
@@ -56,7 +58,7 @@ function data:templateData (
                for $r in $rows
                order by $r/cell[ @id = $params?orderby ]
                return
-                 $r
+                  $r update insert node attribute { "containerID" } { $r/parent::*/@id/data() } into .
            }
          }
       )

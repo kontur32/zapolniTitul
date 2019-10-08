@@ -7,7 +7,7 @@ declare
   %rest:GET
   %rest:query-param( "mode", "{ $mode }", "last" )
   %rest:query-param( "starts", "{ $starts }", "1" )
-  %rest:query-param( "limit", "{ $limit }", "10" )
+  %rest:query-param( "limit", "{ $limit }", "100" )
   %rest:query-param( "orderby", "{ $orderby }", "id" )
   %rest:query-param( "about", "{ $about }", "" )
   %rest:path ( "/zapolnititul/api/v2.1/data/users/{ $userID }/templates/{ $templateID }" )

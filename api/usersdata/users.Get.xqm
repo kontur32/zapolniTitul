@@ -47,7 +47,7 @@ function getUserData:templateData(
   $templateID as xs:string,
   $unique
 ) {
-  let $data := $config:templateData( $templateID )
+  let $data := $config:templateData( $templateID )[ empty( @status ) or ( @status != "delete" )  ]
   let $formOwner := 
     try {
       $config:apiResult( $templateID, "meta" )/form/@userid

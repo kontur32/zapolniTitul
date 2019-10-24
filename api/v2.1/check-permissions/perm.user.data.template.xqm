@@ -10,9 +10,10 @@ import module namespace
   auth = "http://dbx.iro37.ru/zapolnititul/api/v2.1/funct/auth/"
     at "../functions/auth.xqm";
 
-declare 
+declare
+  %rest:query-param( "access_token", "{ $access_token }", "" ) 
   %perm:check( '/zapolnititul/api/v2.1/data/users/', '{ $perm }' )
-function check:check( $perm ) {
+function check:check( $perm, $access_token ) {
   
   let $log :=
     log:log(
@@ -20,7 +21,11 @@ function check:check( $perm ) {
       ( request:uri(), request:query() )
     )
   
-  let $authorization := request:header( "Authorization" )
+  let $authorization := 
+    if ( $access_token != "")
+    then( "Bearer " || $access_token )
+    else ( request:header( "Authorization" ) )
+    
   let $requestUserID := 
     substring-before(
       substring-after( $perm?path, '/zapolnititul/api/v2.1/data/users/' ),
@@ -32,11 +37,12 @@ function check:check( $perm ) {
     if( $authorization )
     then(
       if( $requestUserID = $tokenUserID )
-      then() (: разрешает обращение :)
+      then( ) (: разрешает обращение :)
       else(
         <rest:response>
           <http:response status="403" message="Forbidden"/>
-        </rest:response>
+        </rest:response>,
+        <error>Идентификатор текущего пользователя: { $tokenUserID }</error>
       )
     )
     else(

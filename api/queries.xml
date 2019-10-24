@@ -81,4 +81,13 @@
         $a[ @label = "предмет" ]
     </text>
   </query>
+  <query>
+    <id>_t24_date_promis.Record.Label</id> 
+    <text>
+      let $data := ./child::*/table/row/cell
+      return
+       $data[ @label = "https://schema.org/Date" ]/text() || " " ||
+       $data[ @label = "https://schema.org/Text" ]/text()
+    </text>
+  </query>
 </queries>

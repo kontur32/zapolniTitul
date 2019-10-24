@@ -111,8 +111,8 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
          return 
            
                let $data := $config:fetchUserData(
-                   session:get( "userid"),
-                   request:cookie('JSESSIONID')
+                   session:get( "userid" ),
+                   request:cookie( 'JSESSIONID' )
                  )/data/table
             return
               if( $data )

@@ -143,9 +143,16 @@ declare function data:listOfInstance( $currentFormID, $userData ){
          let $data := $userData[ @templateID = $currentFormID ]
          let $instList := distinct-values( $data/@id/data() )
          for $v in $instList
+         let $instUserID := $data[ @id = $v ][ 1 ]/@userID/data()
+         let $instLabel := $data[ @id = $v ][ 1 ]/@label/data()
+         let $href := 
+           $config:param( 'host' ) || '/zapolnititul/api/v2.1/data/users/' || session:get( 'userid' ) || '/templates/' ||  $currentFormID || '/instances/' || $v || '/delete' || '?access_token=' || session:get( 'token' )
          return
            <div>
              <dt>
+               <a class="float-right" href="{ $href }" onclick="return confirm( 'Удалить все Ваши экземпляры данной записи?');">
+                      <i class="fa fa-trash-alt"/>
+               </a>
                <a href="{
                      web:create-url( '',
                        map{

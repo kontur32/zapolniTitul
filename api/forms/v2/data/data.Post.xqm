@@ -61,7 +61,8 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
         aboutType="{ $aboutType }" 
         templateID="{ $templateID }" 
         userID="{ session:get( 'userid' ) }" 
-        modelURL="{  $modelURL }">
+        modelURL="{  $modelURL }"
+        status="active">
         <row>
           (: добавляет поля текстовые :)
           {

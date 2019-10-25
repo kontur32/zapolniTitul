@@ -5,14 +5,15 @@ import module namespace session = "http://basex.org/modules/session";
 declare
   %updating
   %rest:path ( "/zapolnititul/api/v2.1/data/users/{ $userID }/templates/{ $templateID }/instances/{ $inst }/delete" )
+  %rest:query-param( "redirect_url", "{ $redirect_url }", "" )
   %rest:GET
   %rest:POST
-function dataDelete:delete( $userID, $templateID, $inst ){
+function dataDelete:delete( $userID, $templateID, $inst, $redirect_url ){
   let $db := db:open( "titul24", "data" )/data
   let $nodeToDelete := 
     $db/table[
       @templateID = $templateID
-      and @userID = session:get( 'userid' )
+      and @userID = $userID
       and @id = $inst
     ]
   return
@@ -29,9 +30,17 @@ function dataDelete:delete( $userID, $templateID, $inst ){
                 insert node attribute { "status" } { "delete" } into $i
               )
       )
-      else ( ),
+      else (
+       db:output(
+         <a>{  session:get( 'userid' ) }</a>
+       )
+      ),
       db:output(
-        web:redirect( "/zapolnititul/forms/u/data/" || $templateID )
+        web:redirect(
+          if ( $redirect_url != "" )
+          then( $redirect_url )
+          else( "/zapolnititul/forms/u/data/" || $templateID ) 
       )
     )
+  )
 };

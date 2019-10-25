@@ -19,11 +19,12 @@ function data:templateData
      if( $templateOwner = $params?userID )
      then(
        db:open( $data:dbName, "data" )
-       /data/table[ @templateID = $templateID ]/row
+       /data/table[ @templateID = $templateID ][ empty( @status ) or ( @status != "delete" ) ]/row
      )
      else(
        db:open( $data:dbName, "data" )
-       /data/table[ @templateID = $templateID and @userID = $params?userID ]/row
+       /data/table[ @templateID = $templateID and @userID = $params?userID ]
+       [ empty( @status ) or ( @status != "delete" ) ]/row
      )
      [
        if( $params?about != "" )

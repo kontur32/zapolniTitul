@@ -42,7 +42,7 @@ function check:check( $perm, $access_token ) {
         <rest:response>
           <http:response status="403" message="Forbidden"/>
         </rest:response>,
-        <error>Идентификатор текущего пользователя: { $tokenUserID }</error>
+        <error>Ошибка: пользователю с индентификатором "{ $tokenUserID }" доступ запрещен</error>
       )
     )
     else(
@@ -50,6 +50,7 @@ function check:check( $perm, $access_token ) {
         <http:response status="401" message="Unauthorized">
           <http:header name="WWW-Authenticate" value="Required bearer token"/>
         </http:response>
-      </rest:response>
+      </rest:response>,
+      <error>Ошибка: запрос без авторизации</error>
     )
 };

@@ -60,6 +60,23 @@ function buildForm:buildInputForm-main (
                    attribute { "disabled" } { "disabled" }
                 ) else ()
               }
+            }
+            
+       case ( "date" )
+         return
+           element { "div" } {
+              attribute {"class"} { "form-group"},
+              element { "label" } { $label },
+              element { "input" } {
+                attribute { "class" } { "form-control" },
+                attribute { "type" } { "date" },
+                attribute { "name" } { $field/ID/text() },
+                attribute { "value" } { $field/defaultValue/text() },
+                if ( $field/disabled ) 
+                then (
+                   attribute { "disabled" } { "disabled" }
+                ) else ()
+              }
             } 
            
        case  ( "textarea" ) 

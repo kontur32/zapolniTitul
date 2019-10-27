@@ -59,7 +59,39 @@ function buildForm:buildInputForm-main (
                 ) else ()
               }
             } 
-           
+       case ( "date" )
+         return
+           element { "div" } {
+              attribute {"class"} { "form-group"},
+              element { "label" } { $label },
+              element { "input" } {
+                attribute { "class" } { "form-control" },
+                attribute { "type" } { "date" },
+                attribute { "name" } { $field/ID/text() },
+                attribute { "value" } { $field/defaultValue/text() },
+                if ( $field/disabled ) 
+                then (
+                   attribute { "disabled" } { "disabled" }
+                ) else ()
+              }
+            }
+       case ( "time" )
+         return
+           element { "div" } {
+              attribute {"class"} { "form-group"},
+              element { "label" } { $label },
+              element { "input" } {
+                attribute { "class" } { "form-control" },
+                attribute { "type" } { "time" },
+                attribute { "name" } { $field/ID/text() },
+                attribute { "value" } { $field/defaultValue/text() },
+                if ( $field/disabled ) 
+                then (
+                   attribute { "disabled" } { "disabled" }
+                ) else ()
+              }
+            }    
+    
        case  ( "textarea" ) 
          return
            let $rows := 

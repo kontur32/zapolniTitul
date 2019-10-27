@@ -181,7 +181,9 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
             "http://localhost:8984/zapolnititul/api/v2/data/update" 
         )
   return
-     web:redirect( $redirect )
+    (
+      web:redirect( $redirect ) 
+    )
 };
 
 declare function dataPost:query( $queryString, $record )  {

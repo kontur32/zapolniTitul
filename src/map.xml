@@ -75,4 +75,12 @@
    <label>стиль</label>
     <value>style</value>
   </record>
+  <record>
+   <label>дата</label>
+    <value>date</value>
+  </record>
+  <record>
+   <label>время</label>
+    <value>time</value>
+  </record>
 </csv>

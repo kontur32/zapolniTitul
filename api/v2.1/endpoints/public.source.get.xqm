@@ -15,7 +15,7 @@ function getSource:main(
     db:open( 'titul24' )
     /data/table[ row[ @id = "http://dbx.iro37.ru/zapolnititul/сущности/запросЯндексДиск#" || $sourceID ] ][last()]/row
   let $token := $data/cell[ @id="http://dbx.iro37.ru/zapolnititul/сущности/токенДоступа" ]/text()
-  let $path :=  $data/cell[ @id="http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть" ]/text()
+  let $path :=  iri-to-uri( $data/cell[ @id="http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть" ]/text() )
   
   let $XQueryPath := 
     $data/cell[ @id="https://schema.org/url" ]/text()

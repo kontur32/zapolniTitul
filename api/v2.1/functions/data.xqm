@@ -42,22 +42,24 @@ function data:templateData
         }
       )
       else(
-        let $ids := 
-          distinct-values( $rows/@id )[ position() >= $params?starts and position() <= ( $params?starts + $params?limit - 1 ) ]
-        let $rows := 
-           for $i in $ids 
-           let $b := $rows[ @id = $i ]
-           return 
-            $b[ last() ]
-            
+        let $rowsOrdered := 
+          for $i in distinct-values( $rows/@id )
+          let $r := $rows[ @id = $i ][ last() ]
+          order by $r/cell[ @id = $params?orderby ]/text() ascending
+          return 
+            $r
+        let $rowsForOutput := 
+          $rowsOrdered[
+            position() >= $params?starts and position() <= ( $params?starts + $params?limit - 1 )
+          ]
         return
           element { "data" }{
             element { "table" } {
-             attribute { "total" } { count( $rows ) },
+             attribute { "total" } { count( $rowsOrdered ) },
              attribute { "starts" } { $params?starts },
              attribute { "limit" } { $params?limit },
-               for $r in $rows
-               order by $r/cell[ @id = $params?orderby ]
+             attribute { "orderby" } { $params?orderby },
+               for $r in $rowsForOutput
                return
                   $r update insert node attribute { "containerID" } { $r/parent::*/@id/data() } into .
            }

@@ -34,12 +34,7 @@ function data:templateData
    return
      if( $params?mode = "full" )
      then(
-       element{ "data" }{
-          element { "table" } {
-            attribute { "total" } { count( $rows ) },
-            $rows
-          }
-        }
+       data:full-mode( $rows, $params )
       )
       else(
         if( $params?max_id )
@@ -48,6 +43,34 @@ function data:templateData
         )
         else( data:starts-mode( $rows, $params ) )
       )
+};
+
+declare function data:full-mode( $rows as element( row )*, $params as map(*) ){
+    element { "data" }{
+      element { "table" } {
+       attribute { "total" } { count( $rows ) },
+       attribute { "starts" } { $params?starts },
+       attribute { "limit" } { $params?limit },
+       attribute { "orderby" } { $params?orderby },
+         for $r in $rows
+         return
+            element{ "row" }{
+              $r/attribute::*,
+              attribute { "containerID" } { $r/parent::*/@id/data() },
+              attribute { "userID" } { $r/parent::*/@userID/data() },
+              $r/child::*
+            }
+     }
+   }
+};
+
+declare function data:full-mode1( $rows as element( row )*, $params as map(*) ){
+         element{ "data" }{
+          element { "table" } {
+            attribute { "total" } { count( $rows ) },
+            $rows
+          }
+        }
 };
 
 declare function data:starts-mode( $rows as element( row )*, $params as map(*) ){

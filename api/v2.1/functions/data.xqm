@@ -17,13 +17,13 @@ function data:templateData
      switch ( $params?mode )
      case "full" 
        return
-         data:full-mode( $rows, $params )
+         data:full-mode( $rows/row, $params )
      case "pagination"
        return
-         data:maxID-mode( $rows, $params )
+         data:maxID-mode( $rows/row, $params )
      default
        return
-         data:base-mode( $rows, $params )
+         data:base-mode( $rows/row, $params )
      
    return
      $result
@@ -33,22 +33,13 @@ declare function data:rows( $templateID as xs:string, $params as map(*) ){
    let $templateOwner := 
        db:open( $data:dbName, "forms" )
        /forms/form[ @id= $templateID ]/@userid/data()
+   let $data := db:open( $data:dbName, "data" )
+       /data/table[ @templateID = $templateID ][ empty( @status ) or ( @status != "delete" ) ]
+   
    return 
-     if( $templateOwner = $params?userID )
-     then(
-       db:open( $data:dbName, "data" )
-       /data/table[ @templateID = $templateID ][ empty( @status ) or ( @status != "delete" ) ]/row
-     )
-     else(
-       db:open( $data:dbName, "data" )
-       /data/table[ @templateID = $templateID and @userID = $params?userID ]
-       [ empty( @status ) or ( @status != "delete" ) ]/row
-     )
-     [
-       if( $params?about != "" )
-       then( @id/data() = $params?about )
-       else( true() )
-     ]
+        if( $templateOwner = $params?userID )
+        then( $data )
+        else( $data[ @userID = $params?userID ] )
 };
 
 declare function data:full-mode( $rows as element( row )*, $params as map(*) ){

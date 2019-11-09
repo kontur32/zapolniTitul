@@ -10,12 +10,30 @@ function data:templateData
 (
   $templateID as xs:string,
   $params as map(*)
-) as element( )*
-{
+) as element( data )*
+{  
+   let $rows := data:rows( $templateID, $params )  
+   let $result := 
+     switch ( $params?mode )
+     case "full" 
+       return
+         data:full-mode( $rows, $params )
+     case "pagination"
+       return
+         data:maxID-mode( $rows, $params )
+     default
+       return
+         data:base-mode( $rows, $params )
+     
+   return
+     $result
+};
+
+declare function data:rows( $templateID as xs:string, $params as map(*) ){
    let $templateOwner := 
-      db:open( $data:dbName, "forms" )
-      /forms/form[ @id= $templateID ]/@userid/data()
-   let $rows := 
+       db:open( $data:dbName, "forms" )
+       /forms/form[ @id= $templateID ]/@userid/data()
+   return 
      if( $templateOwner = $params?userID )
      then(
        db:open( $data:dbName, "data" )
@@ -31,18 +49,6 @@ function data:templateData
        then( @id/data() = $params?about )
        else( true() )
      ]
-   return
-     if( $params?mode = "full" )
-     then(
-       data:full-mode( $rows, $params )
-      )
-      else(
-        if( $params?max_id )
-        then(
-          data:maxID-mode( $rows, $params )
-        )
-        else( data:starts-mode( $rows, $params ) )
-      )
 };
 
 declare function data:full-mode( $rows as element( row )*, $params as map(*) ){
@@ -64,16 +70,8 @@ declare function data:full-mode( $rows as element( row )*, $params as map(*) ){
    }
 };
 
-declare function data:full-mode1( $rows as element( row )*, $params as map(*) ){
-         element{ "data" }{
-          element { "table" } {
-            attribute { "total" } { count( $rows ) },
-            $rows
-          }
-        }
-};
 
-declare function data:starts-mode( $rows as element( row )*, $params as map(*) ){
+declare function data:base-mode( $rows as element( row )*, $params as map(*) ){
   let $rowsForOutput :=  data:ordered( $rows, $params )
           [
             position() >= $params?starts and position() <= ( $params?starts + $params?limit - 1 )

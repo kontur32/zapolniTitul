@@ -59,24 +59,31 @@ declare function data:base-mode( $rows as element( row )*, $params as map(*) ){
 declare function data:max-mode( $rows, $params ){
   if( $params?id )
   then(
-    let $max_pos := 
-      for $i in $rows
-      count $c
-      return
-        if( $i/@id = $params?id )
-        then(
-          if( $c = count( $rows) )
-          then( $c )
-          else( $c - 1 )
-        )
-        else()
-      
-    let $max_num :=
-      if( $max_pos < $params?limit ) then( $params?limit ) else( $max_pos )
-    let $min_num :=  $max_num - $params?limit + 1
-        
-    return   
-        $rows[ position() = ( $min_num to $max_num ) ]
+    if( $params?id = "_first" )
+    then(
+      $rows[ position() = ( 1 to $params?limit ) ]
+    )
+    else(
+       let $max_pos := 
+          for $i in $rows
+          count $c
+          return
+            if( $i/@id = $params?id )
+            then(
+              if( $c = count( $rows) )
+              then( $c )
+              else( $c - 1 )
+            )
+            else()
+          
+        let $max_num :=
+          if( $max_pos < $params?limit ) then( $params?limit ) else( $max_pos )
+        let $min_num :=  $max_num - $params?limit + 1
+            
+        return   
+            $rows[ position() = ( $min_num to $max_num ) ]      
+    )
+    
   )
   else(
     $rows[ position() = ( last() - $params?limit + 1 to last() ) ]
@@ -86,7 +93,12 @@ declare function data:max-mode( $rows, $params ){
 declare function data:min-mode( $rows, $params ){
     if( $params?id )
     then(
-      let $min_pos := 
+      if( $params?id = "_last")
+      then(
+        $rows[ position() = ( ( last() - $params?limit + 1 ) to last() ) ]
+      )
+      else(
+        let $min_pos := 
         for $i in $rows
         count $c
         return
@@ -98,14 +110,15 @@ declare function data:min-mode( $rows, $params ){
           )
           else()
       
-      let $min_num :=  
-        if( $min_pos + $params?limit > count( $rows ) )
-        then( count( $rows ) - $params?limit + 1 )
-        else( $min_pos )
-      let $max_num :=  $min_pos + $params?limit - 1
-    
-      return   
-          $rows[ position() = ( $min_num to $max_num ) ]
+          let $min_num :=  
+            if( $min_pos + $params?limit > count( $rows ) )
+            then( count( $rows ) - $params?limit + 1 )
+            else( $min_pos )
+          let $max_num :=  $min_pos + $params?limit - 1
+        
+          return   
+              $rows[ position() = ( $min_num to $max_num ) ]  
+      )      
     )
     else(
       $rows[ position() = ( 1 to $params?limit ) ]

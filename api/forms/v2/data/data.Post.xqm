@@ -21,7 +21,7 @@ function dataPost:update( $data ){
   return
     (
       insert node  $d into $db,
-      db:output( <insert>{ $d }</insert> )
+      update:output( <insert>{ $d }</insert> )
     )
 };
 

@@ -31,11 +31,11 @@ function dataDelete:delete( $userID, $templateID, $inst, $redirect_url ){
               )
       )
       else (
-       db:output(
+       update:output(
          <a>{  session:get( 'userid' ) }</a>
        )
       ),
-      db:output(
+      update:output(
         web:redirect(
           if ( $redirect_url != "" )
           then( $redirect_url )

@@ -46,7 +46,7 @@ function formUpload:upload( $label, $template, $data, $redirect ) {
     return
       (
         insert node $formData into db:open("titul24","forms")/forms,
-        db:output( 
+        update:output( 
           (
             file:write-binary( $fileFullName, $f),
             web:redirect( $redirect || $formID )

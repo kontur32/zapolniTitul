@@ -103,7 +103,7 @@ function formPost:post(
         else ( 
           insert node $formData into $config:forms()
         ),
-        db:output( 
+        update:output( 
           (
             file:write-binary( $fileFullName, $t ),
             if ( map:keys( $template-image )[ 1 ] )

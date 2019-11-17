@@ -22,7 +22,7 @@ function dataDelete:delete( $id, $inst ){
         delete node $nodeToDelete
       )
       else ( ),
-      db:output(
+      update:output(
         web:redirect( "/zapolnititul/forms/u/data/" || $id )
       )
     )

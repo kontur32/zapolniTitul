@@ -85,7 +85,7 @@ function formPostChild:post(
       </form>
   return (
     insert node $formData into $config:forms(), 
-    db:output( web:redirect( $redirect || $formID ) )
+    update:output( web:redirect( $redirect || $formID ) )
     )
 };
 

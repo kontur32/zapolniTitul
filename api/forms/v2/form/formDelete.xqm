@@ -18,14 +18,14 @@ function formDelete:get(
         if ( $form ) 
         then ( 
           delete node $form,
-          db:output( 
+          update:output( 
             web:redirect( 
               web:create-url( $redirect, map{ "message" : "форма удалена"} ) 
             ) 
           )
         ) 
         else (
-          db:output( 
+          update:output( 
             web:redirect( 
               web:create-url( $redirect, map{ "message" : "форма не удалена"} ) 
             ) 
@@ -52,14 +52,14 @@ function formDelete:post(
         if ( $form ) 
         then ( 
           delete node $form,
-          db:output( 
+          update:output( 
             web:redirect( 
               web:create-url( $redirect, map{ "message" : "форма удалена"} ) 
             ) 
           )
         ) 
         else (
-          db:output( 
+          update:output( 
             web:redirect( 
               web:create-url( $redirect, map{ "message" : "форма не удалена"} ) 
             ) 

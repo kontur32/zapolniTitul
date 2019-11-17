@@ -1,6 +1,6 @@
 module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config";
 
-declare variable $config:param := function( $param ) {
+declare variable $config:param := function( $param as xs:string ) {
    doc("config.xml")//param[ @id = $param ]/text()
 };
 

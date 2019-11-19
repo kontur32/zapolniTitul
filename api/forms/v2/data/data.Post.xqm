@@ -1,8 +1,5 @@
 module namespace dataPost = "http://dbx.iro37.ru/zapolnititul/api/form/data/save";
 
-import module namespace request = "http://exquery.org/ns/request";
-import module namespace session = "http://basex.org/modules/session";
-
 import module namespace 
     config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "../../../config.xqm";
 
@@ -50,102 +47,41 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
         "http://localhost:8984/zapolnititul/api/v2/forms/" || $templateID || "/model"
       )
        
-    let $currentID := 
-      if ( $action = "add" )
-      then ( random:uuid() )
-      else ( $id )
-    
-    let $record :=
-      <table
-        id = "{ $currentID }"
-        aboutType="{ $aboutType }" 
-        templateID="{ $templateID }" 
-        userID="{ session:get( 'userid' ) }" 
-        modelURL="{  $modelURL }"
-        status="active">
-        <row>
-          (: добавляет поля текстовые :)
-          {
-            for $param in $paramNames
-            let $paramValue := request:parameter( $param )[1] (: если одинаковые параметры, то берет значение только первого :)
-            where not ( $paramValue instance of map(*)  ) and $paramValue
-            return
-                <cell label="{ $param }">{ $paramValue }</cell>
-          }
-          
-          (: добавляет поля-файлы :)
-          {
-            for $param in $paramNames
-            let $paramValue := request:parameter( $param )
-            where
-              ( $paramValue instance of map(*)  ) and 
-              not (
-                string( map:get( $paramValue, map:keys( $paramValue )[1] ) ) = ""
-              ) 
-            return
-                <cell label="{ $param }">
-                  <table>
-                    <row id="{ random:uuid() }" label="{ map:keys( $paramValue )[1] }" type="https://schema.org/DigitalDocument">
-                      <cell id="content">
-                        { xs:string( map:get( $paramValue, map:keys( $paramValue )[1] ) )  }
-                      </cell>
-                    </row>
-                  </table> 
-                </cell>  
-          }
-        </row>
-      </table>
-    
+    let $currentID := if( $action = "add" )then( random:uuid() )else( $id )
+         
+   let $record := 
+     dataPost:buldDataRecord(
+       map{
+         "currentID" : $currentID,
+         "aboutType" : $aboutType,
+         "templateID" : $templateID,
+         "modelURL" : $modelURL,
+         "paramNames" : $paramNames
+       }
+     )
+   
+   let $recordID := dataPost:recordID( $templateABOUT, $record )
+   
    let $record := 
      if ( not ( $paramNames = "id" ) )
-     then(
-       let $recordID :=
-         if( $templateABOUT/idQueryURL/text() )
-         then(
-           let $queryString :=
-             try{  
-               fetch:text(
-                 iri-to-uri( $templateABOUT/idQueryURL/text() )
-               )
-             } catch*{ false() }
-           return
-             if( $queryString )
-             then( dataPost:query( $queryString,  $record ) )
-             else( false() )
-         )
-         else( false() )
-                               
-       return 
+     then( 
          $record update 
          insert node <cell label="id">{
-           if( $recordID )then( $recordID )else( $templateID )
+           $recordID
          }</cell> into ./row
      )
      else(
        $record
      )
+        
+    let $recordLabel := dataPost:recordLabel( $templateABOUT, $record )
     
     let $record := 
-      let $recordLabel := 
-        let $queryString :=
-          if( $templateABOUT/labelQueryURL/text() )
-          then(
-            try{  
-               fetch:text(
-                 iri-to-uri( $templateABOUT/labelQueryURL/text() )
-               )
-             } catch*{ false() } 
-          )
-          else( false() )
-                 
-         return
-           if( $queryString )
-           then( dataPost:query( $queryString,  $record ) )
-           else( $record/row/cell[ @label = "id" ]/text() )
-       return
-         $record update insert node attribute { "label" } { if( $recordLabel )then( $recordLabel )else( ./row/cell[ @label = "id" ]/text() ) } into .
+         $record 
+           update insert node attribute { "label" } {
+             if( $recordLabel )then( $recordLabel )else( ./row/cell[ @label = "id" ]/text() )
+           } into .
     
-       
     let $model := try{ fetch:xml ( $modelURL )/table } catch*{ <table/> }
         
     let $request :=
@@ -161,7 +97,7 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
               </http:body>
           </http:multipart> 
         </http:request>
-  
+    
   let $response := 
     http:send-request(
       $request,
@@ -205,11 +141,93 @@ declare function dataPost:query( $queryString, $record )  {
         http:send-request(
            <http:request method='POST'>
              <http:header/>
-             <http:body media-type = "xml" >
+             <http:body media-type = "application/xml" >
                 { $query }
               </http:body>
            </http:request>,
           'http://test:test@localhost:8984/rest'
       )[2]/result/text()
    return $response
+};
+
+declare 
+  %private
+function dataPost:buldDataRecord( $params ){
+  <table
+      id = "{ $params?currentID }"
+      aboutType = "{ $params?aboutType }" 
+      templateID = "{ $params?templateID }" 
+      userID = "{ session:get( 'userid' ) }" 
+      modelURL = "{  $params?modelURL }"
+      status = "active">
+      <row>
+        (: добавляет поля текстовые :)
+        {
+          for $param in $params?paramNames
+          let $paramValue := request:parameter( $param )[1] (: если одинаковые параметры, то берет значение только первого :)
+          where not ( $paramValue instance of map(*)  ) and $paramValue
+          return
+              <cell label="{ $param }">{ $paramValue }</cell>
+        }
+        
+        (: добавляет поля-файлы :)
+        {
+          for $param in $params?paramNames
+          let $paramValue := request:parameter( $param )
+          where
+            ( $paramValue instance of map(*)  ) and 
+            not (
+              string( map:get( $paramValue, map:keys( $paramValue )[1] ) ) = ""
+            ) 
+          return
+              <cell label="{ $param }">
+                <table>
+                  <row id="{ random:uuid() }" label="{ map:keys( $paramValue )[1] }" type="https://schema.org/DigitalDocument">
+                    <cell id="content">
+                      { xs:string( map:get( $paramValue, map:keys( $paramValue )[1] ) )  }
+                    </cell>
+                  </row>
+                </table> 
+              </cell>  
+        }
+      </row>
+    </table>
+};
+
+declare
+  %private
+function dataPost:recordID( $templateABOUT, $record ){
+   if( $templateABOUT/idQueryURL/text() )
+   then(
+     let $queryString :=
+       try{  
+         fetch:text(
+           iri-to-uri( $templateABOUT/idQueryURL/text() )
+         )
+       } catch*{ false() }
+     return
+       if( $queryString )
+       then( dataPost:query( $queryString,  $record ) )
+       else( false() )
+   )
+   else( random:uuid() )
+};
+
+declare
+  %private
+function dataPost:recordLabel( $templateABOUT, $record ){
+  let $queryString :=
+      if( $templateABOUT/labelQueryURL/text() )
+      then(
+        try{  
+           fetch:text(
+             iri-to-uri( $templateABOUT/labelQueryURL/text() )
+           )
+         } catch*{ false() } 
+      )
+      else( false() )    
+    return
+       if( $queryString )
+       then( dataPost:query( $queryString,  $record ) )
+       else( $record/row/cell[ @label = "id" ]/text() )
 };

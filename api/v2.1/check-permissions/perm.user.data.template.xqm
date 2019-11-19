@@ -1,7 +1,5 @@
 module namespace check = "http://dbx.iro37.ru/zapolnititul/api/v2.1/funct/check/";
 
-import module namespace request = "http://exquery.org/ns/request";
-
 import module namespace
   log = "http://dbx.iro37.ru/zapolnititul/api/v2.1/log/" 
     at "../functions/log.xqm";

@@ -1,7 +1,5 @@
 module namespace dataDelete = "http://dbx.iro37.ru/zapolnititul/api/form/data/delete";
 
-import module namespace session = "http://basex.org/modules/session";
-
 declare
   %updating
   %rest:path ( "/zapolnititul/api/v2.1/data/users/{ $userID }/templates/{ $templateID }/instances/{ $inst }/delete" )

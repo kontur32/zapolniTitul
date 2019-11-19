@@ -1,15 +1,21 @@
 module namespace restDocx = "http://iro37.ru/xq/modules/docx/rest";
 
 import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/form/config" at "config.xqm";
-import module namespace request = "http://exquery.org/ns/request";
 
 declare 
   %rest:path ( "/zapolnititul/api/v1/document" )
   %rest:method ( "POST" )
-  %rest:form-param ( "_t24_templateID", "{ $templateID }" )
-  %rest:form-param ( "_t24_fileName", "{ $fileName }", "ZapolniTitul.docx" )
-  %rest:form-param ( "_t24_templatePath", "{ $templatePath }" )
-function restDocx:document-POST ( $templateID, $fileName  as xs:string, $templatePath as xs:string ) {
+    (:
+        %rest:form-param ( "_t24_templateID", "{ $templateID }" )
+        %rest:form-param ( "_t24_fileName", "{ $fileName }", "ZapolniTitul.docx" )
+        %rest:form-param ( "_t24_templatePath", "{ $templatePath }" )
+    :)
+function restDocx:document-POST( ) {
+
+  let $templateID := request:parameter( "_t24_templateID" )
+  let $templatePath := request:parameter( "_t24_templatePath" )
+  let $fileName := "ZapolniTitul.docx"
+ 
   let $template := 
     try {
       string( fetch:binary( iri-to-uri( $templatePath ) ) )
@@ -74,31 +80,33 @@ function restDocx:document-POST ( $templateID, $fileName  as xs:string, $templat
     </http:request>
 
   let $response := 
-    http:send-request(
+   http:send-request (
       $request,
       'http://localhost:8984/api/v1/ooxml/docx/template/complete'
-  )
+    )
+    
   let $ContentDispositionValue := "attachment; filename=" || $fileName
-  return
-     (
+  let $log := 
       let $p := 
-        for $param in request:parameter-names()
-        let $paramValue := request:parameter( $param )
-        let $paramValue := 
-          if( $paramValue instance of map(*)  )
-          then( "map : " || map:keys( $paramValue ) )
-          else( $paramValue[ 1 ] )
-        order by $param
-        return $param || " : " || $paramValue ||  '&#xd;&#xa;'
+            for $param in request:parameter-names()
+            let $paramValue := request:parameter( $param )
+            let $paramValue := 
+              if( $paramValue instance of map(*)  )
+              then( "map : " || map:keys( $paramValue ) )
+              else( $paramValue[ 1 ] )
+            order by $param
+          return $param || " : " || $paramValue ||  '&#xd;&#xa;'
       return 
-        file:write-text( $config:param( "logDir" ) || "document.log", ( string-join( $p ) || '&#xd;&#xa;' || serialize( $data ) ) ),
-      
+        file:write-text( $config:param( "logDir" ) || "document.log", ( string-join( $p ) || '&#xd;&#xa;' || serialize( $data ) ) )
+  
+  return
+    (
       <rest:response>
         <http:response status="200">
           <http:header name="Content-Disposition" value="{ $ContentDispositionValue }" />
           <http:header name="Content-type" value="application/octet-stream"/>
         </http:response>
       </rest:response>,
-      $response[ 2 ]
-     )
+      $response[2]
+    )  
 };

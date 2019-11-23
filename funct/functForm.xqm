@@ -1,6 +1,6 @@
 module namespace form = "http://dbx.iro37.ru/zapolnititul/funct/form";
 
-declare variable $form:pathFieldsAsCSV := 'http://localhost:8984/ooxml/api/v1/docx/fields';
+declare variable $form:pathFieldsAsCSV := 'http://localhostupdate:output/ooxml/api/v1/docx/fields';
 declare variable $form:delimiter := "::";
 
 declare 

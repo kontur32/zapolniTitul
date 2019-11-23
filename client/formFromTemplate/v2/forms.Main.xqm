@@ -50,7 +50,7 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
  
   let $userForms := 
         try {
-          let $requestPath := "http://localhost:8984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms"
+          let $requestPath := "http://localhostupdate:output/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms"
           let $request := web:create-url( $requestPath, map{ "limit" : $config:param( "formsLimit" ) } )
           return
             fetch:xml( $request )/forms/form
@@ -63,7 +63,7 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
     else (
       let $userFormID :=
         try{
-          fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || 
+          fetch:xml( "http://localhostupdate:output/zapolnititul/api/v2/users/" || 
             session:get( "userid" ) || 
             "/forms" )//form[ 1 ]/@id/data()
         }catch*{}
@@ -224,6 +224,6 @@ function forms:main ( $page, $id, $datainst, $dataver, $message ) {
         html:fillHtmlTemplate( $siteTemplate, $templateFieldsMap )
     )
     else(
-        web:redirect( "http://localhost:8984/zapolnititul/forms/u/" )
+        web:redirect( "http://localhostupdate:output/zapolnititul/forms/u/" )
     )
 };

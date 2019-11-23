@@ -23,12 +23,12 @@ function restDocx:document-POST( ) {
     
   let $templateData := 
     try {
-      fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $templateID || "/data" )//row
+      fetch:xml( "http://localhostupdate:output/zapolnititul/api/v2/forms/" || $templateID || "/data" )//row
     } catch * { <error>Данные формы не получены...</error> }
    
   let $templateFields := 
     try {
-      fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $templateID || "/fields" )
+      fetch:xml( "http://localhostupdate:output/zapolnititul/api/v2/forms/" || $templateID || "/fields" )
     } catch * { <error>Поля формы не получены...</error> }
   
   let $data :=
@@ -82,7 +82,7 @@ function restDocx:document-POST( ) {
   let $response := 
    http:send-request (
       $request,
-      'http://localhost:8984/api/v1/ooxml/docx/template/complete'
+      'http://localhostupdate:output/api/v1/ooxml/docx/template/complete'
     )
     
   let $ContentDispositionValue := "attachment; filename=" || $fileName

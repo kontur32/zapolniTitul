@@ -112,7 +112,7 @@ function buildForm:buildInputForm-main (
                   let $itemsQueryURL :=
                     if ( $inputFormData/csv/record[ ID = "__ОПИСАНИЕ__" ]/itemsSourceURL/text() = "true" and not ( $field/itemsSourceURL ) ) 
                     then (
-                      "http://localhost:8984/zapolnititul/api/v1/forms/data/" 
+                      "http://localhostupdate:output/zapolnititul/api/v1/forms/data/" 
                       || $id 
                       || "?f=" 
                       || $field/ID/text()
@@ -141,7 +141,7 @@ function buildForm:buildInputForm-main (
                      }
                      catch* { 
                        try {
-                          fetch:xml("http://localhost:8984/zapolnititul/api/v2/forms/"|| $id|| "/data")/data/table/row/cell[ @label = $field/ID/text() ]
+                          fetch:xml("http://localhostupdate:output/zapolnititul/api/v2/forms/"|| $id|| "/data")/data/table/row/cell[ @label = $field/ID/text() ]
                        }
                        catch*{
                          <label>(!) Ошибка: Данные для списка пустые или недлежащего формата</label>

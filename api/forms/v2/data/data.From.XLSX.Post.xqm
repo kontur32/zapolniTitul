@@ -31,7 +31,7 @@ function dataPost:main( $templateID, $xlsx, $redirect ){
   let $response := 
     http:send-request(
       $request,
-      'http://localhost:8984/xlsx/api/parse/raw-trci'
+      'http://localhostupdate:output/xlsx/api/parse/raw-trci'
     )[2]
   
   return

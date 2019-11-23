@@ -44,7 +44,7 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
         $templateABOUT/modelURL/text()
       )
       else(
-        "http://localhost:8984/zapolnititul/api/v2/forms/" || $templateID || "/model"
+        "http://localhostupdate:output/zapolnititul/api/v2/forms/" || $templateID || "/model"
       )
        
     let $currentID := if( $action = "add" )then( random:uuid() )else( $id )
@@ -101,7 +101,7 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
   let $response := 
     http:send-request(
       $request,
-      'http://localhost:8984/xlsx/api/v1/trci/bind/meta'
+      'http://localhostupdate:output/xlsx/api/v1/trci/bind/meta'
     )[2]
   
   let $dbUpdate := 
@@ -114,7 +114,7 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
                   </http:body>
               </http:multipart> 
             </http:request>,
-            "http://localhost:8984/zapolnititul/api/v2/data/update" 
+            "http://localhostupdate:output/zapolnititul/api/v2/data/update" 
         )
   return
     (
@@ -145,7 +145,7 @@ declare function dataPost:query( $queryString, $record )  {
                 { $query }
               </http:body>
            </http:request>,
-          'http://test:test@localhost:8984/rest'
+          'http://test:test@localhostupdate:output/rest'
       )[2]/result/text()
    return $response
 };

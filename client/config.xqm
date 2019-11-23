@@ -20,7 +20,7 @@ declare variable $config:getFormByAPI := function( $object, $method ) {
 declare variable $config:fetchUserData := function ( $userID, $cookie ){
   http:send-request(
     <http:request method='get'
-       href='{ "http://localhost:8984/zapolnititul/api/v2/user/" || $userID ||"/data" }'>
+       href='{ "http://localhostupdate:output/zapolnititul/api/v2/user/" || $userID ||"/data" }'>
       <http:header name="Cookie" value="{ 'JSESSIONID=' || $cookie }" />
     </http:request>
    )[2]
@@ -29,7 +29,7 @@ declare variable $config:fetchUserData := function ( $userID, $cookie ){
 declare variable $config:fetchUserTemplateData := function ( $templateID, $userID, $cookie ){
   http:send-request(
     <http:request method='get'
-       href='{ "http://localhost:8984/zapolnititul/api/v2/user/" || $userID ||"/data/templates/" || $templateID }'>
+       href='{ "http://localhostupdate:output/zapolnititul/api/v2/user/" || $userID ||"/data/templates/" || $templateID }'>
       <http:header name="Cookie" value="{ 'JSESSIONID=' || $cookie }" />
     </http:request>
    )[2]

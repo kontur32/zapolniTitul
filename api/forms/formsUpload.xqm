@@ -76,7 +76,7 @@ function formUpload:request ( $data ) {
 let $response := 
     http:send-request(
       $request,
-      "http://localhost:8984/xlsx/api/parse/raw-trci"
+      "http://localhostupdate:output/xlsx/api/parse/raw-trci"
   )
   return
    $response[2]

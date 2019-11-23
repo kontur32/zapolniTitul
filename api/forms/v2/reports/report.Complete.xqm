@@ -11,10 +11,10 @@ declare
   %rest:query-param( "inst", "{ $instID }", "" )
   (:
     Шаблон для одной записи
-    http://localhost:8984/zapolnititul/api/v2/users/6/reports/9b4cbc2c-a0a4-4794-a5cf-96291a7ebb0e/complete?template=5cca0292-925c-46cc-befa-94904f273cbc&inst=43470160-e788-43f1-9a4d-0c34e8d3a405
+    http://localhostupdate:output/zapolnititul/api/v2/users/6/reports/9b4cbc2c-a0a4-4794-a5cf-96291a7ebb0e/complete?template=5cca0292-925c-46cc-befa-94904f273cbc&inst=43470160-e788-43f1-9a4d-0c34e8d3a405
     
     Шаблон с таблицей
-    http://localhost:8984/zapolnititul/api/v2/users/6/reports/1afcc0d7-bf56-4bad-80ec-d3a2bda697ec/complete?template=5cca0292-925c-46cc-befa-94904f273cbc 
+    http://localhostupdate:output/zapolnititul/api/v2/users/6/reports/1afcc0d7-bf56-4bad-80ec-d3a2bda697ec/complete?template=5cca0292-925c-46cc-befa-94904f273cbc 
    :)
 function 
   reports:getReportProperty(
@@ -29,9 +29,9 @@ function
     then( $data:userTemplateInstance( $userID, $templateID, $instID ) )
     else( $data:userTemplate( $userID, $templateID ) )
   
-  let $queryString as xs:string := fetch:text( "http://localhost:8984/zapolnititul/api/v2/users/" || $userID || "/reports/" || $reportID || "/query" )
+  let $queryString as xs:string := fetch:text( "http://localhostupdate:output/zapolnititul/api/v2/users/" || $userID || "/reports/" || $reportID || "/query" )
   
-  let $template as xs:base64Binary := fetch:binary(  "http://localhost:8984/zapolnititul/api/v2/users/" || $userID || "/reports/" || $reportID || "/template" )
+  let $template as xs:base64Binary := fetch:binary(  "http://localhostupdate:output/zapolnititul/api/v2/users/" || $userID || "/reports/" || $reportID || "/template" )
   
   let $data :=  reports:query( $queryString, $context )
   
@@ -78,7 +78,7 @@ reports:query(
               { $query }
             </http:body>
          </http:request>,
-        'http://test:test@localhost:8984/rest'
+        'http://test:test@localhostupdate:output/rest'
     )
   return $response[ 2 ]/result/table
 };
@@ -101,6 +101,6 @@ declare function reports:fillTemplate ( $template as xs:base64Binary, $data as e
  return
     http:send-request(
       $request,
-      'http://localhost:8984/api/v1/ooxml/docx/template/complete'
+      'http://localhostupdate:output/api/v1/ooxml/docx/template/complete'
     )[2]
 };

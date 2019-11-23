@@ -11,7 +11,7 @@ declare function getFormID:id( $id as xs:string, $userID as xs:integer ) as xs:s
  let $isExist := 
    let $formMeta := 
          try {
-           fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $id || "/meta" )/form
+           fetch:xml( "http://localhostupdate:output/zapolnititul/api/v2/forms/" || $id || "/meta" )/form
          }
          catch* { }
    return not( empty( $formMeta ) )
@@ -22,7 +22,7 @@ declare function getFormID:id( $id as xs:string, $userID as xs:integer ) as xs:s
    else (
      let $userFormID := 
          try {
-           fetch:xml( "http://localhost:8984/zapolnititul/api/v2/users/" || $userID || "/forms" )/forms/form[ last() ]/@id/data()
+           fetch:xml( "http://localhostupdate:output/zapolnititul/api/v2/users/" || $userID || "/forms" )/forms/form[ last() ]/@id/data()
          }
          catch* { }
      return
@@ -40,7 +40,7 @@ declare function getFormID:id( $id as xs:string ) as xs:string* {
  let $isExist := 
    let $formMeta := 
          try {
-           fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms/" || $id || "/meta" )/form
+           fetch:xml( "http://localhostupdate:output/zapolnititul/api/v2/forms/" || $id || "/meta" )/form
          }
          catch* { }
    return not( empty( $formMeta ) )
@@ -52,7 +52,7 @@ declare function getFormID:id( $id as xs:string ) as xs:string* {
      let $total := getFormID:total()
      let $id := 
        try {
-          fetch:xml( web:create-url( "http://localhost:8984/zapolnititul/api/v2/forms", map {"offset" : $total - 1, "limit" : 1 } ) )/forms/form/@id/data()
+          fetch:xml( web:create-url( "http://localhostupdate:output/zapolnititul/api/v2/forms", map {"offset" : $total - 1, "limit" : 1 } ) )/forms/form/@id/data()
          }
          catch* { }
       return
@@ -70,7 +70,7 @@ declare
   %private
 function getFormID:total() as xs:integer {
   try {
-   let $totalFormCount := fetch:xml( "http://localhost:8984/zapolnititul/api/v2/forms" )/forms/@total/data()
+   let $totalFormCount := fetch:xml( "http://localhostupdate:output/zapolnititul/api/v2/forms" )/forms/@total/data()
    return
      if( $totalFormCount )
      then( $totalFormCount )

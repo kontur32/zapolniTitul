@@ -1,5 +1,7 @@
 module namespace getSource = "http://dbx.iro37.ru/zapolnititul/api/v2.1/public/";
 
+import module namespace request = "http://exquery.org/ns/request";
+
 import module namespace data = "http://dbx.iro37.ru/zapolnititul/api/v2.1/data" at "../functions/data.xqm";
 
 declare
@@ -23,8 +25,15 @@ function getSource:main(
   let $xquery := fetch:text( $XQueryPath )
   
   let $source :=   getSource:ya( $path, $token )
+  let $params := 
+    map:merge(
+      for $i in request:parameter-names()
+      return
+        map{ $i : request:parameter( $i ) }
+    )
+  
   return 
-    xquery:eval( $xquery, map{ "" :  $source } )
+    xquery:eval( $xquery, map{ "" :  $source, 'params' : $params } )
 };
 
 declare function getSource:ya(

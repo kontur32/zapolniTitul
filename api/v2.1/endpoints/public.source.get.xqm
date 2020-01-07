@@ -33,7 +33,7 @@ function getSource:main(
     )
   
   return 
-    xquery:eval( $xquery, map{ "" :  $source, 'params' : $params } )
+    xquery:eval( $xquery, map{ "" :  $source, 'params' : $params, 'ID' : $sourceID } )
 };
 
 declare function getSource:ya(

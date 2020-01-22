@@ -34,7 +34,7 @@ function getPublicData:templateData(
     }
   let $access := 
     fetch:xml(
-      "http://localhostupdate:output/zapolnititul/api/v2/forms/" || $templateID || "/fields"
+      "http://localhost:9984/zapolnititul/api/v2/forms/" || $templateID || "/fields"
     )/csv/record[ ID/text() = "__ОПИСАНИЕ__" ]/access/text()
   let $data := 
     if( $access = "public" ) then ( data:templateData ( $templateID, $params ) ) else()

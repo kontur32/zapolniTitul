@@ -1,8 +1,8 @@
 <config>
-  <param id="host">http://localhostupdate:output</param>
-  <param id="fieldsAsStringPath">http://localhostupdate:output/ooxml/api/v1/docx/fields</param>
+  <param id="host">http://localhost:9984</param>
+  <param id="fieldsAsStringPath">http://localhost:9984/ooxml/api/v1/docx/fields</param>
   <param id="static">C:\BaseX-projects\webapp\static\</param>
   <param id="usersTemplatePath">raw/users/templates/</param>
-  <param id="httpStatic">http://localhostupdate:output/zapolnititul/api/v2/forms/</param>
+  <param id="httpStatic">http://localhost:9984/zapolnititul/api/v2/forms/</param>
   <param id="JWTEndpoint">http://portal.titul24.ru/</param>
 </config>

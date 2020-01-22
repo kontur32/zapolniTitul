@@ -111,7 +111,7 @@ function
      then ( $formMeta/@label/data() )
      else ( "Шаблон без названия" )
    let $templatePath := 
-     "http://localhostupdate:output/zapolnititul/api/v2/forms/" || $formID || "/template"
+     "http://localhost:9984/zapolnititul/api/v2/forms/" || $formID || "/template"
    return
        <div class="row">
          <ul class="nav">

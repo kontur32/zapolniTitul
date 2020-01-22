@@ -27,7 +27,7 @@ function formPost:post(
       formPost:request( 
         $t, 
         "template", 
-        "http://localhost:8984/ooxml/api/v1/docx/fields/record"
+        "http://localhost:9984/ooxml/api/v1/docx/fields/record"
       )
      
     let $d := 
@@ -38,7 +38,7 @@ function formPost:post(
           formPost:request( 
             $data( map:keys( $data )[ 1 ] ), 
             "data", 
-            "http://localhostupdate:output/xlsx/api/parse/raw-trci"
+            "http://localhost:9984/xlsx/api/parse/raw-trci"
           )
         )
         else( )

@@ -1,5 +1,5 @@
 <config>
-  <param id="host">http://localhostupdate:output</param>
+  <param id="host">http://localhost:9984</param>
   <param id="currentAPIEndpoint">/zapolnititul/api/v2/forms/</param>
   <param id="uploadForm">/zapolnititul/forms/u/upload/</param>
   <param id="deleteAPI">/zapolnititul/api/v2/forms/delete/</param>

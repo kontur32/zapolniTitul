@@ -14,7 +14,7 @@ function user:main ( ) {
     then (
       let $userFormID := 
         try {
-          fetch:xml( "http://localhostupdate:output/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form[1]/@id/data()
+          fetch:xml( "http://localhost:9984/zapolnititul/api/v2/users/" || session:get( "userid" ) || "/forms")/forms/form[1]/@id/data()
         }
         catch*{}
       return

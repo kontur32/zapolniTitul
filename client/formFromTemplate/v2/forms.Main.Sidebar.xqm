@@ -57,7 +57,7 @@ declare function sidebar:userDataList ( $currentFormID, $userData as element( ta
          let $formLabel := 
            try{
              fetch:xml(
-               "http://localhostupdate:output/zapolnititul/api/v2/forms/" || $d || "/meta"
+               "http://localhost:9984/zapolnititul/api/v2/forms/" || $d || "/meta"
              )/form/@label/data()}
            catch*{ "Форма не найдена" }
          return

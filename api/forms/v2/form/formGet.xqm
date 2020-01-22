@@ -116,7 +116,7 @@ function getForm:get( $id as xs:string, $component as xs:string ) {
 declare function getForm:parentTemplate( $formID, $data ){
     let $template := 
       string(
-       fetch:binary( "http://localhostupdate:output/zapolnititul/api/v2/forms/" || $formID ||"/template")
+       fetch:binary( "http://localhost:9984/zapolnititul/api/v2/forms/" || $formID ||"/template")
       )
     let $request :=
     <http:request method='post'>
@@ -135,16 +135,16 @@ declare function getForm:parentTemplate( $formID, $data ){
   let $response := 
     http:send-request(
       $request,
-      'http://localhostupdate:output/api/v1/ooxml/docx/template/complete'
+      'http://localhost:9984/api/v1/ooxml/docx/template/complete'
   )
   return
       $response[2]
 };
 
 declare function getForm:fields( $id ) {
-  let $parentid := fetch:xml("http://localhostupdate:output/zapolnititul/api/v2/forms/"|| $id ||"/meta")/form/@parentid/data()
-  let $r := fetch:xml("http://localhostupdate:output/zapolnititul/api/v2/forms/" || $parentid || "/fields")
-  let $p := fetch:xml("http://localhostupdate:output/zapolnititul/api/v2/forms/"|| $id ||"/prefilled")/prefilled/table/row[ @id = "fields" ]
+  let $parentid := fetch:xml("http://localhost:9984/zapolnititul/api/v2/forms/"|| $id ||"/meta")/form/@parentid/data()
+  let $r := fetch:xml("http://localhost:9984/zapolnititul/api/v2/forms/" || $parentid || "/fields")
+  let $p := fetch:xml("http://localhost:9984/zapolnititul/api/v2/forms/"|| $id ||"/prefilled")/prefilled/table/row[ @id = "fields" ]
   return
     <csv>
     {

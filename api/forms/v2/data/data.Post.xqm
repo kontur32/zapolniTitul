@@ -114,7 +114,7 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
                   </http:body>
               </http:multipart> 
             </http:request>,
-            "http://localhostupdate:output/zapolnititul/api/v2/data/update" 
+            "http://localhost:8984/zapolnititul/api/v2/data/update" 
         )
   return
     (
@@ -145,7 +145,7 @@ declare function dataPost:query( $queryString, $record )  {
                 { $query }
               </http:body>
            </http:request>,
-          'http://test:test@localhostupdate:output/rest'
+          'http://test:test@http://localhost:8984/rest'
       )[2]/result/text()
    return $response
 };

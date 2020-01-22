@@ -44,7 +44,7 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
         $templateABOUT/modelURL/text()
       )
       else(
-        "http://localhostupdate:output/zapolnititul/api/v2/forms/" || $templateID || "/model"
+        "http://localhost:8984/zapolnititul/api/v2/forms/" || $templateID || "/model"
       )
        
     let $currentID := if( $action = "add" )then( random:uuid() )else( $id )

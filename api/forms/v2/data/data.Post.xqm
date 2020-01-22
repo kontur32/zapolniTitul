@@ -101,7 +101,7 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
   let $response := 
     http:send-request(
       $request,
-      'http://localhostupdate:output/xlsx/api/v1/trci/bind/meta'
+      'http://localhost:8984/xlsx/api/v1/trci/bind/meta'
     )[2]
   
   let $dbUpdate := 

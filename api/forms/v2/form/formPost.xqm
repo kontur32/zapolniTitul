@@ -27,9 +27,9 @@ function formPost:post(
       formPost:request( 
         $t, 
         "template", 
-        "http://localhostupdate:output/ooxml/api/v1/docx/fields/record"
+        "http://localhost:8984/ooxml/api/v1/docx/fields/record"
       )
-      
+     
     let $d := 
       if( $data instance of map(*) ) 
       then(

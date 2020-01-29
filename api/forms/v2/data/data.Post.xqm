@@ -104,8 +104,10 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
       'http://localhost:9984/xlsx/api/v1/trci/bind/meta'
     )[2]
   
-  let $dbUpdate := 
-     http:send-request(
+  let $dbUpdate :=
+    if( session:get('userid'))
+    then(
+      http:send-request(
            <http:request method='POST'>
               <http:multipart media-type = "multipart/form-data">
                   <http:header name="Content-Disposition" value= 'form-data; name="data";'/>
@@ -114,8 +116,10 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
                   </http:body>
               </http:multipart> 
             </http:request>,
-            "http://localhost:9984/zapolnititul/api/v2/data/update" 
+            "http://localhost:8984/zapolnititul/api/v2/data/update" 
         )
+    )
+    else()
   return
     (
       web:redirect( $redirect ) 

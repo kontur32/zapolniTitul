@@ -26,11 +26,12 @@ declare
   %rest:path ( "/zapolnititul/api/v2/data/save" )
   %rest:POST
   %rest:form-param ( "_t24_templateID", "{ $templateID }", "" )
-  %rest:form-param ( "_t24_id", "{ $id }", "" )
+  %rest:form-param ( "_t24_id", "{ $id }", "" ) (: id контейнера table :)
   %rest:form-param ( "_t24_type", "{ $aboutType }", "none" )
   %rest:form-param ( "_t24_action", "{ $action }", "add" )
+  %rest:form-param ( "_t24_access_token", "{ $access_token }", "" )
   %rest:form-param ( "_t24_saveRedirect", "{ $redirect }", "/" )
-function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
+function dataPost:main( $templateID, $id, $aboutType, $action, $access_token, $redirect ){
     let $paramNames := 
       for $name in  distinct-values( request:parameter-names() )
       where not ( starts-with( $name, "_t24_" ) )
@@ -104,8 +105,10 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
       'http://localhost:8984/xlsx/api/v1/trci/bind/meta'
     )[2]
   
-  let $dbUpdate := 
-     http:send-request(
+  let $dbUpdate :=
+    if( session:get('userid'))
+    then(
+      http:send-request(
            <http:request method='POST'>
               <http:multipart media-type = "multipart/form-data">
                   <http:header name="Content-Disposition" value= 'form-data; name="data";'/>
@@ -116,6 +119,9 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
             </http:request>,
             "http://localhost:8984/zapolnititul/api/v2/data/update" 
         )
+    )
+    else() 
+     
   return
     (
       web:redirect( $redirect ) 

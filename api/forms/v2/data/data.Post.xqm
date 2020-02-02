@@ -237,7 +237,7 @@ function dataPost:recordLabel( $templateABOUT, $record ){
       else( $record/row/cell[ @label = "id" ]/text() )
     let $log := 
       file:write(
-        '../../../../logs/data.post.lable.log',
+        '/root/basex93/webapp/zapolniTitul/logs/data.post.lable.log',
         <log>{$result}</log>
       )
     return

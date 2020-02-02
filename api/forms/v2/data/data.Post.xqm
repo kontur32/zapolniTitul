@@ -152,12 +152,8 @@ declare function dataPost:query( $queryString, $record )  {
           'http://test:test@localhost:9984/rest'
       )
    
-   let $log := 
-      file:write(
-        '/root/basex93/webapp/zapolniTitul/logs/data.post.request.log',
-        <log>{ ( $response ) }</log>
-      )
-   return $response[2]/result/text()
+   return
+     $response[2]/result/text()
 };
 
 declare 
@@ -241,11 +237,6 @@ function dataPost:recordLabel( $templateABOUT, $record ){
       if( $queryString )
       then( dataPost:query( $queryString,  $record ) )
       else( $record/row/cell[ @label = "id" ]/text() )
-    let $log := 
-      file:write(
-        '/root/basex93/webapp/zapolniTitul/logs/data.post.lable.log',
-        <log>{ ( $queryString, $record ) }</log>
-      )
     return
        $result
 };

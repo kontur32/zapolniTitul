@@ -238,7 +238,7 @@ function dataPost:recordLabel( $templateABOUT, $record ){
     let $log := 
       file:write(
         '/root/basex93/webapp/zapolniTitul/logs/data.post.lable.log',
-        <log>{ $record/row/cell[ @label = "id" ]/text() }</log>
+        <log>{ ( $queryString, $record ) }</log>
       )
     return
        $result

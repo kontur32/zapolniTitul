@@ -150,8 +150,14 @@ declare function dataPost:query( $queryString, $record )  {
               </http:body>
            </http:request>,
           'http://test:test@http://localhost:9984/rest'
-      )[2]/result/text()
-   return $response
+      )
+   
+   let $log := 
+      file:write(
+        '/root/basex93/webapp/zapolniTitul/logs/data.post.request.log',
+        <log>{ ( $response ) }</log>
+      )
+   return $response[2]/result/text()
 };
 
 declare 

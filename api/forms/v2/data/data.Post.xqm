@@ -149,7 +149,7 @@ declare function dataPost:query( $queryString, $record )  {
                 { $query }
               </http:body>
            </http:request>,
-          'http://test:test@http://localhost:9984/rest'
+          'http://test:test@localhost:9984/rest'
       )
    
    let $log := 

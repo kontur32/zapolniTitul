@@ -230,8 +230,16 @@ function dataPost:recordLabel( $templateABOUT, $record ){
          } catch*{ false() } 
       )
       else( false() )    
+    
+    let $result := 
+      if( $queryString )
+      then( dataPost:query( $queryString,  $record ) )
+      else( $record/row/cell[ @label = "id" ]/text() )
+    let $log := 
+      file:write(
+        '../../../../logs/data.post.lable.log',
+        <log>{$result}</log>
+      )
     return
-       if( $queryString )
-       then( dataPost:query( $queryString,  $record ) )
-       else( $record/row/cell[ @label = "id" ]/text() )
+       $result
 };

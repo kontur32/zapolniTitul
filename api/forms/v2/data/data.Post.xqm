@@ -44,7 +44,7 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
         $templateABOUT/modelURL/text()
       )
       else(
-        "http://localhost:9984/zapolnititul/api/v2/forms/" || $templateID || "/model"
+        $config:param( 'host' ) || "/zapolnititul/api/v2/forms/" || $templateID || "/model"
       )
        
     let $currentID := if( $action = "add" )then( random:uuid() )else( $id )
@@ -205,12 +205,24 @@ declare
 function dataPost:recordID( $templateABOUT, $record ){
    if( $templateABOUT/idQueryURL/text() )
    then(
+     let $modelURL := 
+       replace(
+         web:decode-url( $templateABOUT/idQueryURL/text() ),
+         'http://localhost:8984',
+         $config:param( 'host' )
+       )
      let $queryString :=
        try{  
          fetch:text(
-           iri-to-uri( $templateABOUT/idQueryURL/text() )
+           iri-to-uri( $modelURL )
          )
        } catch*{ false() }
+     let $queryString := 
+       replace(
+         web:decode-url( $queryString ),
+         'http://localhost:8984',
+         $config:param( 'host' )
+       )
      return
        if( $queryString )
        then( dataPost:query( $queryString,  $record ) )
@@ -222,17 +234,23 @@ function dataPost:recordID( $templateABOUT, $record ){
 declare
   %private
 function dataPost:recordLabel( $templateABOUT, $record ){
+  let $templateURL := 
+    replace(
+         web:decode-url(  $templateABOUT/labelQueryURL/text() ),
+         'http://localhost:8984',
+         $config:param( 'host' )
+       )
   let $queryString :=
-      if( $templateABOUT/labelQueryURL/text() )
+      if( $templateURL )
       then(
         try{  
            fetch:text(
-             iri-to-uri( $templateABOUT/labelQueryURL/text() )
+             iri-to-uri( $templateURL )
            )
          } catch*{ false() } 
       )
       else( false() )    
-    
+       
     let $result := 
       if( $queryString )
       then( dataPost:query( $queryString,  $record ) )

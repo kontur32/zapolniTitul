@@ -47,7 +47,13 @@ function data:currentInstForm( $currentDataSet ){
 <div class="container">
 {
      let $templateFields := $config:getFormByAPI( $currentDataSet/@templateID/data(), "fields" )
-     let $model := fetch:xml( web:decode-url( $currentDataSet/@modelURL/data() ) )/table/row
+     let $modelURL := (: замена хоста на текущий :)
+       replace(
+         web:decode-url( $currentDataSet/@modelURL/data() ),
+         'http://localhost:8984',
+         $config:param( 'host' )
+       )
+     let $model := fetch:xml( $modelURL )/table/row
      return
      if ( $currentDataSet )
      then (
@@ -196,6 +202,7 @@ declare function data:currentVersionForm( $currentFormID, $currentDataInst, $cur
               @id = $currentDataInst and
               web:encode-url( @updated/data() ) = $currentDataVer 
             ]
+      
        let $lastDataSet := 
          $userData[
               @templateID = $currentFormID and

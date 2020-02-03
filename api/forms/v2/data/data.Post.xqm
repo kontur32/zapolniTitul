@@ -37,13 +37,7 @@ function dataPost:main( $templateID, $id, $aboutType, $action, $redirect ){
       return $name
     
     let $templateABOUT := $config:templateABOUT( $templateID )
-    
-    let $log := 
-      file:write(
-        '/root/basex93/webapp/zapolniTitul/logs/data.Post.templateABOUT.log',
-        <log>{ $templateID }-{ $templateABOUT }</log>
-      )
-    
+
     let $modelURL := 
       if( $templateABOUT/modelURL/text() )
       then(

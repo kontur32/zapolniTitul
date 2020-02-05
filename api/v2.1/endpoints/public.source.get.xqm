@@ -41,17 +41,27 @@ declare function getSource:ya(
   $token as xs:string
 )
 {
-  let $href := 
-     http:send-request(
-               <http:request method='GET'>
-                 <http:header name="Authorization" value="{ 'OAuth ' || $token }"/>
-                 <http:body media-type = "text" >              
-                  </http:body>
-               </http:request>,
-              'https://cloud-api.yandex.net:443/v1/disk/resources/download?path=disk:/' || $path || '&amp;fields=href'
+  let $href :=
+    try{
+       http:send-request(
+         <http:request method='GET'>
+           <http:header name="Authorization" value="{ 'OAuth ' || $token }"/>
+           <http:body media-type = "text" >              
+            </http:body>
+         </http:request>,
+        'https://cloud-api.yandex.net:443/v1/disk/resources/download?path=disk:/' || $path || '&amp;fields=href'
           )[2]/*:json/*:href/text()
+    }
+    catch*{
+      <error></error>
+    }
     
-  let $rowData := fetch:xml( $href )
+  let $rowData := 
+    if( $href/error )
+    then(
+      <Data></Data>
+    )
+    else ( fetch:xml( $href ) )
   return
     $rowData
 };

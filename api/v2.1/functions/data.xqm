@@ -13,7 +13,8 @@ function data:templateData
 ) as element( data )*
 {  
    let $rows := data:rows( $templateID, $params )/row 
-   let $ordered := data:ordered( $rows, $params ) 
+   let $ordered := data:ordered( $rows, $params )
+   
    let $result := 
      switch ( $params?mode )
      case "full" 
@@ -30,7 +31,17 @@ function data:templateData
          data:id-mode( $ordered, $params )
      default
        return
-         data:base-mode( $ordered, $params )
+         if( $params?searchField = "" and $params?query = "" )
+         then(
+           data:base-mode( $ordered, $params )
+         )
+         else(
+           try{
+             data:base-mode( $ordered, $params )
+             [ matches( lower-case( cell[ @id= $params?searchField ]/text() ) ,  lower-case( $params?query ) ) ]
+           }
+           catch*{}
+         )      
      
    return
      element { "data" }{

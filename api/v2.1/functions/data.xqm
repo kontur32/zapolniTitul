@@ -32,11 +32,14 @@ function data:templateData
      case "search"
        return
            try{
-             $ordered
-             [ matches(
-               lower-case( cell[ @id= $params?searchField ]/text() ) , 
-               lower-case( $params?query ) )
-             ]
+             data:base-mode(
+               $ordered
+               [ matches(
+                 lower-case( cell[ @id= $params?searchField ]/text() ) , 
+                 lower-case( $params?query ) )
+               ],
+               $params  
+             )
            }
            catch*{}
      default

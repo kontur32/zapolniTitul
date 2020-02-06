@@ -29,19 +29,19 @@ function data:templateData
      case "id"
        return
          data:id-mode( $ordered, $params )
-     default
+     case "search"
        return
-         if( $params?searchField = "" and $params?query = "" )
-         then(
-           data:base-mode( $ordered, $params )
-         )
-         else(
            try{
-             data:base-mode( $ordered, $params )
-             [ matches( lower-case( cell[ @id= $params?searchField ]/text() ) ,  lower-case( $params?query ) ) ]
+             $ordered
+             [ matches(
+               lower-case( cell[ @id= $params?searchField ]/text() ) , 
+               lower-case( $params?query ) )
+             ]
            }
            catch*{}
-         )      
+     default
+       return
+         data:base-mode( $ordered, $params )  
      
    return
      element { "data" }{

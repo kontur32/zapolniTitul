@@ -1,6 +1,10 @@
 module namespace getSource = "http://dbx.iro37.ru/zapolnititul/api/v2.1/public/";
 
-import module namespace data = "http://dbx.iro37.ru/zapolnititul/api/v2.1/data" at "../functions/data.xqm";
+import module namespace data = "http://dbx.iro37.ru/zapolnititul/api/v2.1/data" 
+  at "../functions/data.xqm";
+
+import module namespace yandex = "http://dbx.iro37.ru/zapolnititul/api/v2.1/resource/yandex"
+  at '../functions/yandex.xqm';
 
 declare
   %private
@@ -22,37 +26,7 @@ function getSource:main(
   
   let $xquery := fetch:text( $XQueryPath )
   
-  let $source :=   getSource:ya( $path, $token )
+  let $source :=  yandex:getResourceFile( $path, $token )
   return 
     xquery:eval( $xquery, map{ "" :  $source } )
-};
-
-declare function getSource:ya(
-  $path as xs:string,
-  $token as xs:string
-)
-{
-  let $href :=
-    try{
-       http:send-request(
-         <http:request method='GET'>
-           <http:header name="Authorization" value="{ 'OAuth ' || $token }"/>
-           <http:body media-type = "text" >              
-            </http:body>
-         </http:request>,
-        'https://cloud-api.yandex.net:443/v1/disk/resources/download?path=disk:/' || $path || '&amp;fields=href'
-          )[2]/*:json/*:href/text()
-    }
-    catch*{
-      <error></error>
-    }
-    
-  let $rowData := 
-    if( $href/error )
-    then(
-      <Data></Data>
-    )
-    else ( fetch:xml( $href ) )
-  return
-    $rowData
 };

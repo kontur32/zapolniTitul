@@ -60,7 +60,16 @@ function publicSource:main(
   let $запросURL := $запрос/cell[ @id = 'https://schema.org/url' ]/text()
   
   let $xquery := fetch:text( $запросURL )
-  let $result := xquery:eval( $xquery, map{ "" :  $source } )
+  
+  let $params := 
+      map:merge(
+        for $i in request:parameter-names()
+        return
+          map{ $i : request:parameter( $i ) }
+      )
+  
+  let $result := xquery:eval( $xquery, map{ "" :  $source, 'params' : $params, 'ID' : $publicationID } )
+  
   return
     (
       <rest:response>

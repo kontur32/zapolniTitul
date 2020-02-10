@@ -30,11 +30,18 @@ function getSource:main(
       let $xquery := fetch:text( $XQueryPath )
       
       let $source :=  yandex:getResourceFile( $path, $token )
-      return 
-        xquery:eval( $xquery, map{ "" :  $source } )    
-    )
-    else(
       
-    )
+      
+     let $params := 
+      map:merge(
+        for $i in request:parameter-names()
+        return
+          map{ $i : request:parameter( $i ) }
+      )
+    
+    return 
+      xquery:eval( $xquery, map{ "" :  $source, 'params' : $params, 'ID' : $sourceID } )  
+      )
+    else( ) (: если данные не получены пустой ответ :)
   
 };

@@ -7,7 +7,7 @@ import module namespace parseExcel = "http://dbx.iro37.ru/zapolnititul/api/v2.1/
   at '../functions/parseExcel.xqm';
 
 declare
-  %private
+  %public
   %rest:GET
   %rest:path ( "/zapolnititul/api/v2.1/data/publication/{ $publicationID }" )
 function publicSource:main(
@@ -29,7 +29,15 @@ function publicSource:main(
     $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/ресурс']/text()
   
   let $форматВывода := 
-    $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/форматВывода']/text()
+    let $формат :=
+      $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/форматВывода']/text()
+    return
+      switch ( $формат )
+      case 'plain' return 'text/plain'
+      case 'html' return 'text/html'
+      case 'json' return 'application/json'
+      case 'xml' return 'application/xml'
+      default return 'text/plain'
   
   let $ресурс := $data( $ресурсID  )
   
@@ -40,6 +48,9 @@ function publicSource:main(
   
   let $локальныйПутьРесурс :=  
     $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть']/text()
+  
+  let $типРесурса := 
+    $ресурс/cell[ @id = "http://dbx.iro37.ru/zapolnititul/признаки/типРесурса" ]/text()
   
   let $хранилищеID := 
     $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/хранилище']/text()
@@ -52,10 +63,21 @@ function publicSource:main(
   let $хранилищеЛокальныйПуть := 
     $хранилище/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть' ]/text()
   
+  let $rawSource := 
+    yandex:getResourceFile( $хранилищеЛокальныйПуть || '/' ||  $локальныйПутьРесурс, $токен )
+  
   let $source := 
-    parseExcel:parseBookToTRCI(
-      yandex:getResourceFile( $хранилищеЛокальныйПуть || '/' ||  $локальныйПутьРесурс, $токен )
-    )
+    switch ( $типРесурса )
+    case 'excel-xml'
+      return
+        parseExcel:XMLToTRCI(
+          parse-xml( convert:binary-to-string( $rawSource ) )
+        )
+    case 'xlsx'
+      return
+        parseExcel:xlsxToTRCI( $rawSource )
+    default 
+      return false()
   
   let $запросURL := $запрос/cell[ @id = 'https://schema.org/url' ]/text()
   
@@ -74,7 +96,7 @@ function publicSource:main(
     (
       <rest:response>
           <http:response status="200">
-            <http:header name="Content-type" value="{'text/' || $форматВывода }"/>
+            <http:header name="Content-type" value="{ $форматВывода }"/>
           </http:response>
       </rest:response>,
      $result

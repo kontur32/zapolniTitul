@@ -29,8 +29,8 @@ function getSource:main(
       
       let $xquery := fetch:text( $XQueryPath )
       
-      let $source :=  yandex:getResourceFile( $path, $token )
-      
+      let $rawSource :=  yandex:getResourceFile( $path, $token )
+      let $source :=  parse-xml( convert:binary-to-string( $rawSource ) )
       
      let $params := 
       map:merge(

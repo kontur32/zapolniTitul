@@ -1,9 +1,9 @@
-module namespace parseExcel = "http://dbx.iro37.ru/zapolnititul/api/v2.1/parse/excel/XML";
+module namespace excel = "http://dbx.iro37.ru/zapolnititul/api/v2.1/parse/excel/XML";
 
 declare default element namespace  "urn:schemas-microsoft-com:office:spreadsheet";
 declare namespace ss="urn:schemas-microsoft-com:office:spreadsheet";
 
-declare function parseExcel:parseWorksheetToTRCI( $Worksheet ){
+declare function excel:XMLWorksheetToTRCI( $Worksheet ){
   let $заголовки := $Worksheet/Table/Row[ 1 ]/Cell/Data/text()
   let $rows := 
     for $row in $Worksheet/Table/Row[ position() > 1 ]
@@ -13,7 +13,7 @@ declare function parseExcel:parseWorksheetToTRCI( $Worksheet ){
         count $count
         return
           element { QName( '', 'cell' ) }{
-            attribute {'label'} { $заголовки[ $count ] },
+            attribute { 'label' } { $заголовки[ $count ] },
             $cell/Data/text()
           }
       }
@@ -26,10 +26,31 @@ declare function parseExcel:parseWorksheetToTRCI( $Worksheet ){
     }  
 };
 
-declare function parseExcel:parseBookToTRCI( $Book ){
+declare function excel:XMLToTRCI( $Book ){
   element{ QName( '', 'data' ) }{
     for $Worksheet in $Book//Worksheet
     return
-      parseExcel:parseWorksheetToTRCI( $Worksheet )
+      excel:XMLWorksheetToTRCI( $Worksheet )
   }  
+};
+
+declare function excel:xlsxToTRCI( $data ){
+  let $request := 
+    <http:request method='post'>
+        <http:header name="Content-type" value="multipart/form-data; boundary=----7MA4YWxkTrZu0gW"/>
+        <http:multipart media-type = "multipart/form-data" >
+            <http:header name='Content-Disposition' value='form-data; name="data"'/>
+            <http:body media-type = "application/octet-stream">
+               { $data }
+            </http:body>
+        </http:multipart> 
+      </http:request>
+  
+  let $response := 
+      http:send-request(
+        $request,
+        "http://localhost:9984/xlsx/api/parse/raw-trci"
+    )
+    return
+     $response[2]
 };

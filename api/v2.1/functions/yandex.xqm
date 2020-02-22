@@ -20,12 +20,12 @@ declare function yandex:getResourceFile(
       <error></error>
     }
     
-  let $rowData := 
+  let $rawData := 
     if( $href/error )
     then(
       <Data></Data>
     )
-    else ( fetch:xml( $href ) )
+    else ( fetch:binary( $href ) )
   return
-    $rowData
+    $rawData
 };

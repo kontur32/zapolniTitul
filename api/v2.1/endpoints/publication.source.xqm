@@ -47,7 +47,10 @@ function publicSource:main(
   let $запрос := $data( $запросID  )
   
   let $локальныйПутьРесурс :=  
-    $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть']/text()
+    iri-to-uri(
+      $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть']/text()
+    )
+    
   
   let $типРесурса := 
     $ресурс/cell[ @id = "http://dbx.iro37.ru/zapolnititul/признаки/типРесурса" ]/text()
@@ -60,8 +63,10 @@ function publicSource:main(
   let $токен := 
     $хранилище/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/сущности/токенДоступа' ]/text()
   
-  let $хранилищеЛокальныйПуть := 
-    $хранилище/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть' ]/text()
+  let $хранилищеЛокальныйПуть :=
+    iri-to-uri( 
+      $хранилище/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть' ]/text()
+    )
   
   let $rawSource := 
     yandex:getResourceFile( $хранилищеЛокальныйПуть || '/' ||  $локальныйПутьРесурс, $токен )

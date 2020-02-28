@@ -67,9 +67,14 @@ function publicSource:main(
       $хранилище/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть' ]/text()
     )
   
+  let $полныйПуть := $хранилищеЛокальныйПуть || '/' ||  $локальныйПутьРесурс
+     
   let $rawSource := 
-    yandex:getResourceFile( $хранилищеЛокальныйПуть || '/' ||  $локальныйПутьРесурс, $токен )
-  
+    yandex:getResource(
+      $типРесурса,
+      $полныйПуть,
+      $токен
+    )
   let $source := 
     switch ( $типРесурса )
     case 'excel-xml'
@@ -83,6 +88,17 @@ function publicSource:main(
     case 'xlsx-workbook'
       return
         parseExcel:WorkbookToTRCI( $rawSource )
+    case 'xlsx-dir'
+      return
+        <directory path = '{ web:decode-url( $полныйПуть ) }'>{
+          for $i in $rawSource//_[ type = 'file' ][ ends-with( name, '.xlsx' ) ]
+          let $filePath := $i/file/text()
+          let $file := fetch:binary( $filePath )
+          return
+            parseExcel:WorkbookToTRCI( $file )
+            update insert node attribute { 'filename' } { $i/name/text() } into ./child::*
+        }</directory>
+        
     default 
       return false()
   

@@ -52,5 +52,28 @@ declare function excel:xlsxToTRCI( $data ){
         "http://localhost:9984/xlsx/api/parse/raw-trci"
     )
     return
-     $response[2]
+     $response[ 2 ]
+};
+
+declare 
+  %public
+function excel:WorkbookToTRCI( $data ) {
+    let $request := 
+      <http:request method='POST'>
+          <http:header name="Content-type" value="multipart/form-data; boundary=----7MA4YWxkTrZu0gW"/>
+          <http:multipart media-type = "multipart/form-data" >
+              <http:header name='Content-Disposition' value='form-data; name="data"'/>
+              <http:body media-type = "application/octet-stream">
+                 { $data }
+              </http:body>
+          </http:multipart> 
+        </http:request>
+  
+  let $response := 
+      http:send-request(
+        $request,
+        "http://localhost:9984/ooxml/api/v1.1/xlsx/parse/workbook"
+    )
+  return
+   $response[ 2 ]
 };

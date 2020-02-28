@@ -51,7 +51,6 @@ function publicSource:main(
       $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть']/text()
     )
     
-  
   let $типРесурса := 
     $ресурс/cell[ @id = "http://dbx.iro37.ru/zapolnititul/признаки/типРесурса" ]/text()
   
@@ -81,6 +80,9 @@ function publicSource:main(
     case 'xlsx'
       return
         parseExcel:xlsxToTRCI( $rawSource )
+    case 'xlsx-workbook'
+      return
+        parseExcel:WorkbookToTRCI( $rawSource )
     default 
       return false()
   

@@ -54,6 +54,9 @@ function publicSource:main(
   let $типРесурса := 
     $ресурс/cell[ @id = "http://dbx.iro37.ru/zapolnititul/признаки/типРесурса" ]/text()
   
+  let $видРесурса := 
+    $ресурс/cell[ @id = "http://dbx.iro37.ru/zapolnititul/признаки/видРесурса" ]/text()
+  
   let $хранилищеID := 
     $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/хранилище']/text()
   
@@ -70,37 +73,45 @@ function publicSource:main(
   let $полныйПуть := $хранилищеЛокальныйПуть || '/' ||  $локальныйПутьРесурс
      
   let $rawSource := 
-    yandex:getResource(
-      $типРесурса,
-      $полныйПуть,
-      $токен
-    )
+    yandex:getResource( $видРесурса, $типРесурса, $полныйПуть, $токен )
+  
   let $source := 
-    switch ( $типРесурса )
-    case 'excel-xml'
-      return
-        parseExcel:XMLToTRCI(
-          parse-xml( convert:binary-to-string( $rawSource ) )
-        )
-    case 'xlsx'
-      return
+    switch ( $видРесурса )
+    case 'лист'
+      return 
         parseExcel:xlsxToTRCI( $rawSource )
-    case 'xlsx-workbook'
+    case 'файл'
       return
-        parseExcel:WorkbookToTRCI( $rawSource )
-    case 'xlsx-dir'
-      return
-        <directory path = '{ web:decode-url( $полныйПуть ) }'>{
-          for $i in $rawSource//_[ type = 'file' ][ ends-with( name, '.xlsx' ) ]
-          let $filePath := $i/file/text()
-          let $file := fetch:binary( $filePath )
+        switch ( $типРесурса )
+        case 'excel-xml'
           return
-            parseExcel:WorkbookToTRCI( $file )
-            update insert node attribute { 'filename' } { $i/name/text() } into ./child::*
-        }</directory>
-        
+            parseExcel:XMLToTRCI(
+              parse-xml( convert:binary-to-string( $rawSource ) )
+            )
+        case 'xlsx-workbook'
+          return
+            parseExcel:WorkbookToTRCI( $rawSource )
+        default 
+          return false()
+    case 'коллекция'
+      return
+        switch ( $типРесурса )
+        case 'xlsx'
+          return 
+            <directory path = '{ web:decode-url( $полныйПуть ) }'>{
+              for $i in $rawSource//_[ type = 'file' ][ ends-with( name, '.xlsx' ) ]
+              let $filePath := $i/file/text()
+              let $file := fetch:binary( $filePath )
+              return
+                parseExcel:WorkbookToTRCI( $file )
+                update insert node attribute { 'filename' } { $i/name/text() } into ./child::*
+            }</directory>
+        default
+          return
+            false()
     default 
-      return false()
+      return
+        false()
   
   let $запросURL := $запрос/cell[ @id = 'https://schema.org/url' ]/text()
   

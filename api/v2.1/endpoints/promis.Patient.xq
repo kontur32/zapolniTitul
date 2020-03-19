@@ -4,84 +4,92 @@ import module namespace
   pagin = "http://dbx.iro37.ru/zapolnititul/api/v2.1/public/promis" 
     at 'http://localhost:9984/static/promis/functions/pagination.xqm';
 
-declare variable $getUserData:ns := '';
-
 declare
   %rest:GET
   %rest:query-param( "mode", "{ $mode }" )
-  %rest:path ( "/zapolnititul/api/v2.1/data/users/21/uqx/promis.patient" )
-function getUserData:templateData(
+  %rest:path ( "/zapolnititul/api/v2.1/data/users/{ $userID }/uqx/promis.patient" )
+function getUserData:main(
+  $userID as xs:integer,
   $mode as xs:string
 )
 {
-  let $записи:= 
-    for $i in db:open( 'titul24', 'data' )/data/table
-          [ @userID = 21 ]
-          [ @templateID = 'c1d33e2e-0f07-41bc-ab93-a6dc1fd51ee6' ]
-          [ @status = "active" ]
-       
-    let $id := $i/row/@id      
-    group by $id 
+  let $data := db:open( 'titul24', 'data' )/data/table
+          [ @userID = $userID ]
+  
+  return
+    getUserData:eval( $data, map{ 'mode' : $mode } )
+};
+
+declare function getUserData:eval( $data, $params ){
+  let $ns := 'http://dbx.iro37.ru/promis/сущности/пациенты#'
+  let $mode :=
+    let $m := tokenize( $params?mode, ':' )
     return
-      $i[ last() ]
-        
-  let $пациенты :=
-     for $i in db:open('titul24', 'data')/data/table
-          [ @userID = 21 ]
-          [ @templateID = 'ad52a99b-2153-4a3f-8327-b23810fb38e4' ]
-          [ @status = "active" ]
-          /row
-    let $id := $i/@id
-    group by $id 
-    return
-      $i[ last() ]
+      if( $m[ 1 ] = ( 'up', 'down' ) )
+      then( $m[ 1 ] || ':' || $ns || $m[ 2 ]  )
+      else( 'self:' || $ns || $m[ 2 ] )
+      
+  let $записи := getUserData:getLast( $data, 'c1d33e2e-0f07-41bc-ab93-a6dc1fd51ee6' )
+  
+  let $пациенты := getUserData:getLast( $data, 'ad52a99b-2153-4a3f-8327-b23810fb38e4' ) 
   
   let $последняяЗаписьПациента :=       
     for $i in $записи/row
+    where not( empty( $i/cell[ @id="https://schema.org/Date" ]/text() ) )
     let $p := $i/cell[ @id = ( 'partID' ) ]/text()
     group by $p
-    return 
-      let $d :=  $i/cell[ @id="https://schema.org/Date" ]/text()
-      let $t :=  
-            if( matches( $i/cell[ @id="https://schema.org/Time" ]/text(), '\d{2}:\d{2}' ) )
-            then( $i/cell[ @id="https://schema.org/Time" ]/text() || ":00.000" )
-            else( "00:00:00.000" )
-      where not( empty( $d ) )
-      order by xs:dateTime( $d || 'T' || $t ) 
+    return
+      let $order := getUserData:dateTime( $i )
+      order by $order
       return
            $i[ last() ]
   
   let $пациентыПоДате := 
     for $i in $последняяЗаписьПациента
-    let $p := $i/cell[@id= ('partID')]/text()
-    let $d :=  $i/cell[@id="https://schema.org/Date"]/text()
-    let $t :=  
-        if( matches( $i/cell[ @id="https://schema.org/Time" ]/text(), '\d{2}:\d{2}' ) )
-        then( $i/cell[ @id="https://schema.org/Time" ]/text() || ":00.000" )
-        else( "00:00:00.000" )
-    order by xs:dateTime( $d || 'T' || $t )
+    order by getUserData:dateTime( $i )
     return
-      $p
-  
-  let $mode1 :=
-    let $m := tokenize( $mode, ':' )
-    return
-      if( $m[ 1 ] = ( 'up', 'down' ) )
-      then( $m[ 1 ] || ':http://dbx.iro37.ru/promis/сущности/пациенты#' || $m[ 2 ]  )
-      else( 'self:http://dbx.iro37.ru/promis/сущности/пациенты#' || $m[ 2 ] )
-  
-  let $aa := ( reverse( $пациенты[ not( @id/data() = $пациентыПоДате ) ]/@id/data() ), $пациентыПоДате )
-  let $пацинетыРеузльтат := 
-    let $pagin := pagin:fromTo( $mode1, $aa )
+      $i/cell[ @id = ( 'partID' ) ]/text()
+
+  let $seq :=
+    (
+      reverse( $пациенты/row[ not( @id/data() = $пациентыПоДате ) ]/@id/data() ),
+      $пациентыПоДате
+    )
+  let $пациентыРеузльтат := 
+    let $pagin := pagin:fromTo( $mode, $seq )
     for $i in $pagin?1 to $pagin?2 
     return
-        $пациенты[ @id = $aa[ $i ] ]
+        $пациенты/row[ @id = $seq[ $i ] ]
   
   return
-    <data total="{ count( $пациенты ) }" mode = "{ $mode1 }">{
-      $пацинетыРеузльтат,
-      for $i in $записи[ row[ cell[ @id = 'partID' ]/text() = $пацинетыРеузльтат/@id/data() ] ]
+    <data total="{ count( $пациенты ) }">{
+      $пациентыРеузльтат,
+      for $i in $записи[ row[ cell[ @id = 'partID' ]/text() = $пациентыРеузльтат/@id/data() ] ]
       return
         $i/row update  insert node attribute { 'containerID' } {  $i/@id/data() } into .
     }</data>
+};
+
+declare
+function 
+  getUserData:getLast( $data as element( table )*, $templateID as xs:string )
+  as element( table )*
+{
+  for $i in $data
+        [ @templateID = $templateID ]
+        [ @status = "active" ]
+  let $id := $i/row/@id      
+  group by $id 
+  return
+    $i[ last() ]
+};
+
+declare function getUserData:dateTime ( $var ){
+  let $d :=  $var/cell[@id="https://schema.org/Date"]/text()
+  let $t :=  
+      if( matches( $var/cell[ @id="https://schema.org/Time" ]/text(), '\d{2}:\d{2}' ) )
+      then( $var/cell[ @id="https://schema.org/Time" ]/text() || ":00.000" )
+      else( "00:00:00.000" )
+  return
+    xs:dateTime( $d || 'T' || $t )
 };

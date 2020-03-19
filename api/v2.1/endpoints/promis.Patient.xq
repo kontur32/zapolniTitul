@@ -6,9 +6,28 @@ import module namespace
 
 declare
   %rest:GET
+  %rest:query-param( "query", "{ $query }" )
+  %rest:path ( "/zapolnititul/api/v2.1/data/users/{ $userID }/uqx/promis.patient.search" )
+function getUserData:promis.patient.search(
+  $userID as xs:integer,
+  $query as xs:string
+)
+{
+  let $data := db:open( 'titul24', 'data' )/data/table
+          [ @userID = $userID ]
+  let $пациенты := getUserData:getLast( $data, 'ad52a99b-2153-4a3f-8327-b23810fb38e4' ) 
+  return
+    <data>{
+      $пациенты[ matches( row/cell[ @id = 'https://schema.org/familyName']/text(), $query ) ]
+    }</data>
+    
+};
+
+declare
+  %rest:GET
   %rest:query-param( "mode", "{ $mode }" )
   %rest:path ( "/zapolnititul/api/v2.1/data/users/{ $userID }/uqx/promis.patient" )
-function getUserData:main(
+function getUserData:promis.patient(
   $userID as xs:integer,
   $mode as xs:string
 )

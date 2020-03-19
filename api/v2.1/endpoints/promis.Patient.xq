@@ -9,7 +9,7 @@ declare variable $getUserData:ns := '';
 declare
   %rest:GET
   %rest:query-param( "mode", "{ $mode }" )
-  %rest:path ( "/zapolnititul/api/v2.2/data/users/21/uqx/promis.patient" )
+  %rest:path ( "/zapolnititul/api/v2.1/data/users/21/uqx/promis.patient" )
 function getUserData:templateData(
   $mode as xs:string
 )

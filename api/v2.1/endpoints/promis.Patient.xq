@@ -6,8 +6,39 @@ import module namespace
 
 declare
   %rest:GET
+  %rest:path ( "/zapolnititul/api/v2.1/data/users/{ $userID }/uqx/{ $xqueryPath }" )
+function getUserData:promis.patient(
+  $userID as xs:integer,
+  $xqueryPath as xs:string
+)
+{
+  let $params := 
+    map:merge(
+      for $i in request:parameter-names() 
+      return
+        map{ $i : request:parameter( $i ) }
+    )
+    
+  let $xquery :=
+    fetch:text(
+      'http://localhost:9984/static/promis/functions/' || $xqueryPath || '.xq'
+    )
+    
+  let $data := db:open( 'titul24', 'data' )/data/table
+            [ @userID = $userID ]
+    
+  return
+    xquery:eval(
+      $xquery,
+      map{ '' : $data, 'params' : $params },
+      map{ 'permission' : 'none'}
+    )
+};
+
+declare
+  %rest:GET
   %rest:query-param( "query", "{ $query }" )
-  %rest:path ( "/zapolnititul/api/v2.1/data/users/{ $userID }/uqx/promis.patient.search" )
+  %rest:path ( "/zapolnititul/api/v2.1/data/users/{ $userID }/uqx/promis.patient.search1" )
 function getUserData:promis.patient.search(
   $userID as xs:integer,
   $query as xs:string
@@ -21,22 +52,6 @@ function getUserData:promis.patient.search(
       $пациенты[ matches( row/cell[ @id = 'https://schema.org/familyName']/text(), $query ) ]
     }</data>
     
-};
-
-declare
-  %rest:GET
-  %rest:query-param( "mode", "{ $mode }" )
-  %rest:path ( "/zapolnititul/api/v2.1/data/users/{ $userID }/uqx/promis.patient" )
-function getUserData:promis.patient(
-  $userID as xs:integer,
-  $mode as xs:string
-)
-{
-  let $data := db:open( 'titul24', 'data' )/data/table
-          [ @userID = $userID ]
-  
-  return
-    getUserData:eval( $data, map{ 'mode' : $mode } )
 };
 
 declare function getUserData:eval( $data, $params ){

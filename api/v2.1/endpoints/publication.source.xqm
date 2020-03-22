@@ -73,7 +73,7 @@ function publicSource:main(
   let $полныйПуть := $хранилищеЛокальныйПуть || '/' ||  $локальныйПутьРесурс
      
   let $rawSource := 
-    yandex:getResource( $видРесурса, $типРесурса, $полныйПуть, $токен )
+    yandex:getResource( $типРесурса, $полныйПуть, $токен )
   
   let $source := 
     switch ( $видРесурса )

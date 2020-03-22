@@ -1,13 +1,14 @@
 module namespace yandex = "http://dbx.iro37.ru/zapolnititul/api/v2.1/resource/yandex";
 
 declare function yandex:getResource(
+  $category as xs:string,
   $type as xs:string,
   $path as xs:string,
   $token as xs:string
 )
 {
-  switch ( $type )
-  case 'xlsx-dir'
+  switch ( $category )
+  case 'коллекция'
     return 
       yandex:getDirList( $path, $token )
   default return

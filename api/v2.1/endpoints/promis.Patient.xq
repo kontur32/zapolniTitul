@@ -1,10 +1,5 @@
 module namespace getUserData = "http://dbx.iro37.ru/zapolnititul/api/v2.1/users/";
 
-(:
-  import module namespace 
-  pagin = "http://dbx.iro37.ru/zapolnititul/api/v2.1/public/promis" 
-    at 'http://localhost:9984/static/promis/modules/pagination.xqm';
-:)
 
 declare
   %rest:GET

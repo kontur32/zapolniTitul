@@ -28,6 +28,6 @@ function getUserData:promis.patient(
     xquery:eval(
       $xquery,
       map{ '' : $data, 'params' : $params },
-      map{ 'permission' : 'none'}
+      map{ 'permission' : 'read'}
     )
 };

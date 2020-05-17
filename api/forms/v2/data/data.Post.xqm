@@ -235,11 +235,16 @@ declare
   %private
 function dataPost:recordLabel( $templateABOUT, $record ){
   let $templateURL := 
-    replace(
-         web:decode-url(  $templateABOUT/labelQueryURL/text() ),
-         'http://localhost:8984',
-         $config:param( 'host' )
-       )
+    if( $templateABOUT/labelQueryURL/text() != "" )
+    then(
+      replace(
+           web:decode-url(  $templateABOUT/labelQueryURL/text() ),
+           'http://localhost:8984',
+           $config:param( 'host' )
+         )
+    )
+    else( false() )
+    
   let $queryString :=
       if( $templateURL )
       then(

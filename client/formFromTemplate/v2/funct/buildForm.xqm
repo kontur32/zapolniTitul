@@ -217,6 +217,12 @@ function buildForm:buildInputForm-main (
        { 
          $inputFormFields
        }
+       <div class="form-group">
+         <hr/>
+         <label>Выберите формат для выгрузки</label>
+         <input type="radio" name="_t24_outputFormat" value = 'docx' checked = 'yes'>docx</input>
+         <input type="radio" name="_t24_outputFormat" value = 'pdf'>pdf</input>
+       </div>
      </form>
     </div>
  };

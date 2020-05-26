@@ -14,7 +14,12 @@ function restDocx:document-POST( ) {
 
   let $templateID := request:parameter( "_t24_templateID" )
   let $templatePath := request:parameter( "_t24_templatePath" )
-  let $fileName := "ZapolniTitul.docx"
+  let $outputFormat := request:parameter( "_t24_outputFormat" )
+  
+  let $fileName := 
+    if( $outputFormat != 'pdf' )
+    then( "ZapolniTitul.docx" )
+    else( "ZapolniTitul.pdf" )
  
   let $template := 
     try {
@@ -86,6 +91,7 @@ function restDocx:document-POST( ) {
     )
     
   let $ContentDispositionValue := "attachment; filename=" || $fileName
+  
   let $log := 
       let $p := 
             for $param in request:parameter-names()
@@ -99,6 +105,13 @@ function restDocx:document-POST( ) {
       return 
         file:write-text( $config:param( "logDir" ) || "document.log", ( string-join( $p ) || '&#xd;&#xa;' || serialize( $data ) ) )
   
+  let $convertToPDF :=  restDocx:convertToPDF( $response[2] )
+  
+  let $result := 
+    if( $outputFormat != 'pdf' )
+    then( $response[2] )
+    else( $convertToPDF )
+  
   return
     (
       <rest:response>
@@ -107,6 +120,42 @@ function restDocx:document-POST( ) {
           <http:header name="Content-type" value="application/octet-stream"/>
         </http:response>
       </rest:response>,
-      $response[2]
+      $result
     )  
+};
+
+declare function restDocx:convertToPDF( $data ) as xs:base64Binary{
+  
+  let $fileName := 'titul24.docx'
+  let $fileNamePDF := 'titul24.pdf'
+  
+  let $file := 
+    file:write-binary(
+      file:temp-dir() || $fileName,
+      $data
+    ) 
+  
+  let $command :=
+    if( starts-with( file:temp-dir(), '/tmp/') )
+    then(
+        '/opt/libreoffice6.3/program/soffice'
+    )
+    else(
+        'C:/Program Files/LibreOffice/program/soffice'
+    )
+  let $params := 
+    (
+      '--headless',
+      '--convert-to',
+      'pdf:writer_pdf_Export', 
+      '--outdir',
+      file:temp-dir(),
+      file:temp-dir() || $fileName
+    )
+  let $result := proc:execute( $command, $params )
+  
+  let $f := file:read-binary( file:temp-dir() || $fileNamePDF )
+  
+  return
+    $f
 };

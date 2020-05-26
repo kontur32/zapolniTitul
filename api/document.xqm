@@ -105,12 +105,10 @@ function restDocx:document-POST( ) {
       return 
         file:write-text( $config:param( "logDir" ) || "document.log", ( string-join( $p ) || '&#xd;&#xa;' || serialize( $data ) ) )
   
-  let $convertToPDF :=  restDocx:convertToPDF( $response[2] )
-  
   let $result := 
     if( $outputFormat != 'pdf' )
     then( $response[2] )
-    else( $convertToPDF )
+    else( restDocx:convertToPDF( $response[2] ) )
   
   return
     (
@@ -124,8 +122,7 @@ function restDocx:document-POST( ) {
     )  
 };
 
-declare function restDocx:convertToPDF( $data ) as xs:base64Binary{
-  
+declare function restDocx:convertToPDF( $data ) as xs:base64Binary{ 
   let $fileName := 'titul24.docx'
   let $fileNamePDF := 'titul24.pdf'
   
@@ -153,9 +150,7 @@ declare function restDocx:convertToPDF( $data ) as xs:base64Binary{
       file:temp-dir() || $fileName
     )
   let $result := proc:execute( $command, $params )
-  
-  let $f := file:read-binary( file:temp-dir() || $fileNamePDF )
-  
+  let $file := file:read-binary( file:temp-dir() || $fileNamePDF )
   return
-    $f
+    $file
 };

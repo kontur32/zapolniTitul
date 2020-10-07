@@ -14,22 +14,57 @@ function publicSource:main(
   $publicationID as xs:string
 )
 {
-    let $data := function( $ID ){ 
+  let $data := 
+    function( $ID ){ 
       db:open( 'titul24', 'data' )
-      /data/table[ row[ @id = $ID ] ][ last() ]/row
-   }
+      /data/table[ row[ ends-with( @id/data(), $ID ) ] ][ last() ]/row
+    }
   
-  let $ID := 
-    "http://dbx.iro37.ru/zapolnititul/сущности/публикацияРесурса#" || 
-    $publicationID
-
-  let $публикация := $data( $ID )
+  let $публикация := $data( $publicationID )
   
   let $ресурсID := 
     $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/ресурс']/text()
   
-  let $форматВывода := 
-    let $формат :=
+  let $ресурс := $data( $ресурсID  )
+  
+  let $source := publicSource:получениеРесурсаЯндекса( $ресурс, $data )
+  
+  let $xquery := publicSource:получениеТекстаЗапроса( $публикация, $data )
+  
+  let $params := 
+      map:merge(
+        for $i in request:parameter-names()
+        return
+          map{ $i : request:parameter( $i ) }
+      )
+  
+  let $result := 
+    xquery:eval(
+      $xquery,
+      map{ '' :  $source, 'params' : $params, 'ID' : $publicationID }
+    )
+  
+  let $форматВывода := publicSource:форматВывода( $публикация )
+  
+  return
+    (
+      <rest:response>
+          <http:response status="200">
+            <http:header name="Content-type" value="{ $форматВывода }"/>
+          </http:response>
+      </rest:response>,
+     $result
+   )
+};
+
+(:----------------------------------------------------------------------------:)
+(:
+  вспомогательные функции
+:)
+declare
+  %private
+function publicSource:форматВывода( $публикация ){
+  let $формат :=
       $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/форматВывода']/text()
     return
       switch ( $формат )
@@ -38,15 +73,48 @@ function publicSource:main(
       case 'json' return 'application/json'
       case 'xml' return 'application/xml'
       default return 'text/plain'
-  
-  let $ресурс := $data( $ресурсID  )
-  
-  let $запросID := 
-    $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/запрос']/text()
-  
-  let $запрос := $data( $запросID  )
-  
-  let $локальныйПутьРесурс :=  
+};
+
+declare
+  %private
+function 
+  publicSource:обработкаРесурсаЯндекса(
+    $типРесурса,
+    $rawSource,
+    $полныйПуть
+  ){
+  switch ( $типРесурса )
+    case 'excel-xml'
+      return
+        parseExcel:XMLToTRCI(
+          parse-xml( convert:binary-to-string( $rawSource ) )
+        )
+    case 'xlsx'
+      return
+        parseExcel:xlsxToTRCI( $rawSource )
+    case 'xlsx-workbook'
+      return
+        parseExcel:WorkbookToTRCI( $rawSource )
+    case 'xlsx-dir'
+      return
+        <directory path = '{ web:decode-url( $полныйПуть ) }'>{
+          for $i in $rawSource//_[ type = 'file' ][ ends-with( name, '.xlsx' ) ]
+          let $filePath := $i/file/text()
+          let $file := fetch:binary( $filePath )
+          return
+            parseExcel:WorkbookToTRCI( $file )
+            update insert node attribute { 'filename' } { $i/name/text() } into ./child::*
+        }</directory>
+        
+    default 
+      return false()
+};
+
+declare
+  %private
+function 
+  publicSource:получениеРесурсаЯндекса( $ресурс, $data ){
+    let $локальныйПутьРесурс :=  
     iri-to-uri(
       $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть']/text()
     )
@@ -75,53 +143,24 @@ function publicSource:main(
       $полныйПуть,
       $токен
     )
-  let $source := 
-    switch ( $типРесурса )
-    case 'excel-xml'
-      return
-        parseExcel:XMLToTRCI(
-          parse-xml( convert:binary-to-string( $rawSource ) )
-        )
-    case 'xlsx'
-      return
-        parseExcel:xlsxToTRCI( $rawSource )
-    case 'xlsx-workbook'
-      return
-        parseExcel:WorkbookToTRCI( $rawSource )
-    case 'xlsx-dir'
-      return
-        <directory path = '{ web:decode-url( $полныйПуть ) }'>{
-          for $i in $rawSource//_[ type = 'file' ][ ends-with( name, '.xlsx' ) ]
-          let $filePath := $i/file/text()
-          let $file := fetch:binary( $filePath )
-          return
-            parseExcel:WorkbookToTRCI( $file )
-            update insert node attribute { 'filename' } { $i/name/text() } into ./child::*
-        }</directory>
-        
-    default 
-      return false()
   
+  return 
+    publicSource:обработкаРесурсаЯндекса(
+      $типРесурса,
+      $rawSource,
+      $полныйПуть
+    )
+};
+  
+declare 
+  %private
+function publicSource:получениеТекстаЗапроса( $публикация, $data ){
+  let $запросID := 
+    $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/запрос']/text()
+  let $запрос := $data( $запросID  )
   let $запросURL := $запрос/cell[ @id = 'https://schema.org/url' ]/text()
-  
-  let $xquery := fetch:text( $запросURL )
-  
-  let $params := 
-      map:merge(
-        for $i in request:parameter-names()
-        return
-          map{ $i : request:parameter( $i ) }
-      )
-  
-  let $result := xquery:eval( $xquery, map{ "" :  $source, 'params' : $params, 'ID' : $publicationID } )
-  
   return
-    (
-      <rest:response>
-          <http:response status="200">
-            <http:header name="Content-type" value="{ $форматВывода }"/>
-          </http:response>
-      </rest:response>,
-     $result
-   )
+    if( $запросURL )
+    then( fetch:text( $запросURL ) )
+    else( '.' )
 };

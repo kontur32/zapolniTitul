@@ -1,10 +1,18 @@
 module namespace publicSource = "http://dbx.iro37.ru/zapolnititul/api/v2.1/publicSource/";
 
+import module namespace config = "http://dbx.iro37.ru/zapolnititul/api/v2.1/config"
+  at '../config.xqm';
+
 import module namespace yandex = "http://dbx.iro37.ru/zapolnititul/api/v2.1/resource/yandex"
   at '../functions/yandex.xqm';
 
+import module namespace nextCloud = 'http://dbx.iro37.ru/zapolnititul/api/v2.1/nextCloud/'
+  at '../functions/nextCloud.xqm';
+
 import module namespace parseExcel = "http://dbx.iro37.ru/zapolnititul/api/v2.1/parse/excel/XML"
   at '../functions/parseExcel.xqm';
+
+
 
 declare
   %public
@@ -17,7 +25,10 @@ function publicSource:main(
   let $data := 
     function( $ID ){ 
       db:open( 'titul24', 'data' )
-      /data/table[ row[ ends-with( @id/data(), $ID ) ] ][ last() ]/row
+      /data/table
+      [ row[ ends-with( @id/data(), $ID ) ] ]
+      [ @status = 'active' ][ last() ]
+      /row
     }
   
   let $публикация := $data( $publicationID )
@@ -27,7 +38,21 @@ function publicSource:main(
   
   let $ресурс := $data( $ресурсID  )
   
-  let $source := publicSource:получениеРесурсаЯндекса( $ресурс, $data )
+  let $source := 
+    switch( tokenize( $ресурс/@id/data(), '#')[ 1 ] )
+    case ( 'http://dbx.iro37.ru/zapolnititul/сущности/ресурсЯндексДиск' )
+      return publicSource:получениеРесурсаЯндекса( $ресурс, $data )
+    case ( 'http://dbx.iro37.ru/zapolnititul/сущности/ресурсSaaS' )
+    return
+      let $fileData := 
+        nextCloud:получитьРесурс(
+          $ресурс, $data,
+          $config:param( 'tokenRecordsFilePath' )
+        )
+      return
+        parseExcel:WorkbookToTRCI( $fileData )
+    default
+      return $ресурс
   
   let $xquery := publicSource:получениеТекстаЗапроса( $публикация, $data )
   

@@ -113,7 +113,14 @@ declare function nextCloud:получитьВсеФайлыИзПапки( $toke
          map{ $fileName : $file }
 };
 
-declare function nextCloud:получитьРесурс( $ресурс, $data, $tokenRecordsFilePath ){
+declare
+  %public
+function
+  nextCloud:получитьРесурс(
+    $ресурс,
+    $data,
+    $tokenRecordsFilePath
+  ){
   let $resourceRecord := trciToRdf:sourceData( $ресурс  )
 
   let $storeRecord := $data( $resourceRecord/п:хранилище/text() )

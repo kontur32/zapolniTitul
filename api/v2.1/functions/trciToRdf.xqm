@@ -18,26 +18,22 @@ declare function trciToRdf:tokenData( $tokenData as element( table )* ){
   }
 };
 
+declare function trciToRdf:transformRow( $storeData as element( row ), $rootElement ){
+   element { xs:QName( $rootElement ) }{
+      attribute { 'about' } { $storeData/@id/data() },
+      for $i in $storeData/cell
+      let $признак :=
+        replace( tokenize( $i/@id/data(), '/' )[ last() ], ' ', '-' )
+      return
+        element { xs:QName( 'п:' || $признак ) } { $i/text() },
+      element { 'п:userID' } {  $storeData/@userID/data() }
+    }
+};
+
 declare function trciToRdf:storeData( $storeData as element( row ) ){
- element { xs:QName( 'с:хранилищеNextcloud' ) }{
-    attribute { 'about' } { $storeData/@id/data() },
-    for $i in $storeData/cell
-    let $признак :=
-      replace( tokenize( $i/@id/data(), '/' )[ last() ], ' ', '-' )
-    return
-      element { xs:QName( 'п:' || $признак ) } { $i/text() },
-    element { 'п:userID' } {  $storeData/@userID/data() }
-  }
+   trciToRdf:transformRow( $storeData, 'с:хранилищеNextcloud' )
 };
 
 declare function trciToRdf:sourceData( $sourceData as element( row ) ){
- element { xs:QName( 'с:ресурсNextcloud' ) }{
-    attribute { 'about' } { $sourceData/@id/data() },
-    for $i in $sourceData/cell
-    let $признак :=
-      replace( tokenize( $i/@id/data(), '/' )[ last() ], ' ', '-' )
-    return
-      element { xs:QName( 'п:' || $признак ) } { $i/text() },
-    element { 'п:userID' } {  $sourceData/@userID/data() }
-  }
+  trciToRdf:transformRow( $sourceData, 'с:ресурсNextcloud' )
 };

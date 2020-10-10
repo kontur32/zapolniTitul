@@ -64,15 +64,15 @@ function
   nextCloud:токен(
     $storeRecord,
     $tokenRecords as element( data )*,
-    $tokenRecordsFilePath
+    $tokenRecordsFilePath,
+    $fullDavPath
   ){
   let $storeData := trciToRdf:storeData( $storeRecord )
   let $tokenData := 
     trciToRdf:tokenData( 
       $tokenRecords/table[ row[ cell[ @id = 'storeID'] = $storeData/п:id ] ]
     )
-  let $fullDavPath := nextCloud:полныйПутьDAV( $storeRecord )
-  
+    
   let $tokenEndPoint :=
     string-join( ( $storeData/п:путьРесурс, $storeData/п:tokenEndpoint ), '/' )
   
@@ -123,18 +123,21 @@ function nextCloud:получитьРесурс(
   
   let $tokenRecords := fetch:xml( $tokenRecordsFilePath )//data
   
+  let $полныйПутьDAV := nextCloud:полныйПутьDAV( $storeRecord )
+  
   let $token := 
     nextCloud:токен(
       $storeRecord,
       $tokenRecords,
-      $tokenRecordsFilePath
+      $tokenRecordsFilePath,
+      $полныйПутьDAV
     )
   
   return
     if( $token instance of element( err ) )
     then( $token )
     else(
-      let $полныйПутьDAV := nextCloud:полныйПутьDAV( $storeRecord )
+      
       let $путьФайла :=  $resourceRecord/п:локальныйПуть/text()
       let $source := dav:получитьФайл( $token, $полныйПутьDAV || '/' || $путьФайла   )
       return

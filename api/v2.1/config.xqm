@@ -7,3 +7,10 @@ declare variable $config:param := function( $param ) as xs:string{
      then( $conf/text() )
      else( "" )
 };
+
+declare
+  %public
+function config:usersData() as element( table )*{
+  db:open( $config:param( 'dbName' ), 'data' )
+  /data/table
+};

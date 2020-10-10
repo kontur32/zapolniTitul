@@ -24,8 +24,7 @@ function publicSource:main(
 {
   let $data := 
     function( $ID ){ 
-      db:open( 'titul24', 'data' )
-      /data/table
+      config:usersData()
       [ row[ ends-with( @id/data(), $ID ) ] ]
       [ @status = 'active' ][ last() ]
       /row

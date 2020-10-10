@@ -113,13 +113,22 @@ declare function nextCloud:получитьВсеФайлыИзПапки( $toke
          map{ $fileName : $file }
 };
 
-declare function nextCloud:получитьРесурс( $resourceRecord, $data, $tokenRecordsFilePath ){
-
-  let $storeRecord := $data
+declare 
+  %public
+function nextCloud:получитьРесурс(
+    $resourceRecord as element( с:ресурсNextcloud ),
+    $storeRecord as element( row ),
+    $tokenRecordsFilePath as xs:string
+  ){
   
-  let $tokenRecords :=  fetch:xml( $tokenRecordsFilePath )//data
+  let $tokenRecords := fetch:xml( $tokenRecordsFilePath )//data
   
-  let $token := nextCloud:токен( $storeRecord, $tokenRecords, $tokenRecordsFilePath )
+  let $token := 
+    nextCloud:токен(
+      $storeRecord,
+      $tokenRecords,
+      $tokenRecordsFilePath
+    )
   
   return
     if( $token instance of element( err ) )

@@ -8,6 +8,9 @@ import module namespace yandex = "http://dbx.iro37.ru/zapolnititul/api/v2.1/reso
 
 import module namespace nextCloud = 'http://dbx.iro37.ru/zapolnititul/api/v2.1/nextCloud/'
   at '../functions/nextCloud.xqm';
+  
+import module namespace trciToRdf = 'http://dbx.iro37.ru/zapolnititul/api/v2.1/trciToRdf/'
+  at '../functions/trciToRdf.xqm';  
 
 import module namespace parseExcel = "http://dbx.iro37.ru/zapolnititul/api/v2.1/parse/excel/XML"
   at '../functions/parseExcel.xqm';
@@ -48,19 +51,25 @@ function publicSource:main(
   let $ресурс := $userData( $ресурсID, $userID  )
   
   let $хранилище :=
-    let $хранилищеID := 
-      $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/хранилище' ]/text()
-    return $userData( $хранилищеID, $userID )
+    $userData(
+      $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/хранилище' ]/text(),
+      $userID
+    )
   
+  let $sourceNamespace := tokenize( $ресурс/@id/data(), '#')[ 1 ]
   let $source := 
-    switch( tokenize( $ресурс/@id/data(), '#')[ 1 ] )
+    switch( $sourceNamespace )
+    
     case ( 'http://dbx.iro37.ru/zapolnititul/сущности/ресурсЯндексДиск' )
-      return publicSource:получениеРесурсаЯндекса( $ресурс, $хранилище )
+      return
+        publicSource:получениеРесурсаЯндекса( $ресурс, $хранилище )
+    
     case ( 'http://dbx.iro37.ru/zapolnititul/сущности/ресурсSaaS' )
     return
       let $fileData := 
         nextCloud:получитьРесурс(
-          $ресурс, $data,
+          trciToRdf:sourceData( $ресурс  ),
+          $хранилище,
           $config:param( 'tokenRecordsFilePath' )
         )
       return

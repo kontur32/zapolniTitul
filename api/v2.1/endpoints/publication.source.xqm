@@ -12,8 +12,6 @@ import module namespace nextCloud = 'http://dbx.iro37.ru/zapolnititul/api/v2.1/n
 import module namespace parseExcel = "http://dbx.iro37.ru/zapolnititul/api/v2.1/parse/excel/XML"
   at '../functions/parseExcel.xqm';
 
-
-
 declare
   %public
   %rest:GET
@@ -22,31 +20,53 @@ function publicSource:main(
   $publicationID as xs:string
 )
 {
-  let $data := 
+  let $publication := 
     function( $ID ){ 
-      db:open( 'titul24', 'data' )
-      /data/table
+      config:usersData()
       [ row[ ends-with( @id/data(), $ID ) ] ]
-      [ @status = 'active' ][ last() ]
+      [ last() ]
       /row
     }
   
-  let $публикация := $data( $publicationID )
+  let $userData := 
+    function( $rowID, $userID ){ 
+      config:userData( $userID )
+      [ row[ ends-with( @id/data(), $rowID ) ] ]
+      [ last() ]
+      /row
+    }
+  
+  let $публикация := $publication( $publicationID )
+  
+  let $userID := $публикация/parent::*/@userID/data()
   
   let $ресурсID := 
     $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/ресурс']/text()
   
-  let $ресурс := $data( $ресурсID  )
+  let $ресурс := $userData( $ресурсID, $userID )
+  
+  let $хранилище :=
+    let $хранилищеID := 
+      $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/хранилище']/text()
+    return
+      $userData( $хранилищеID, $userID )
+      
+  let $запрос :=
+    let $запросID := 
+      $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/запрос']/text()
+    return
+      $userData( $запросID, $userID )
+      
   
   let $source := 
     switch( tokenize( $ресурс/@id/data(), '#')[ 1 ] )
     case ( 'http://dbx.iro37.ru/zapolnititul/сущности/ресурсЯндексДиск' )
-      return publicSource:получениеРесурсаЯндекса( $ресурс, $data )
+      return publicSource:получениеРесурсаЯндекса( $ресурс, $хранилище )
     case ( 'http://dbx.iro37.ru/zapolnititul/сущности/ресурсSaaS' )
     return
       let $fileData := 
         nextCloud:получитьРесурс(
-          $ресурс, $data,
+          $ресурс,  $хранилище,
           $config:param( 'tokenRecordsFilePath' )
         )
       return
@@ -54,7 +74,7 @@ function publicSource:main(
     default
       return $ресурс
   
-  let $xquery := publicSource:получениеТекстаЗапроса( $публикация, $data )
+  let $xquery := publicSource:получениеТекстаЗапроса( $публикация, $запрос )
   
   let $params := 
       map:merge(
@@ -78,7 +98,7 @@ function publicSource:main(
             <http:header name="Content-type" value="{ $форматВывода }"/>
           </http:response>
       </rest:response>,
-     $result
+     $result update insert node attribute {'userID' } { $userID } into ./file
    )
 };
 
@@ -138,19 +158,7 @@ function
 declare
   %private
 function 
-  publicSource:получениеРесурсаЯндекса( $ресурс, $data ){
-    let $локальныйПутьРесурс :=  
-    iri-to-uri(
-      $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть']/text()
-    )
-    
-  let $типРесурса := 
-    $ресурс/cell[ @id = "http://dbx.iro37.ru/zapolnititul/признаки/типРесурса" ]/text()
-  
-  let $хранилищеID := 
-    $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/хранилище']/text()
-  
-  let $хранилище := $data( $хранилищеID )
+  publicSource:получениеРесурсаЯндекса( $ресурс, $хранилище ){
   
   let $токен := 
     $хранилище/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/сущности/токенДоступа' ]/text()
@@ -160,8 +168,15 @@ function
       $хранилище/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть' ]/text()
     )
   
+  let $локальныйПутьРесурс :=  
+    iri-to-uri(
+      $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть']/text()
+    )
+  
   let $полныйПуть := $хранилищеЛокальныйПуть || '/' ||  $локальныйПутьРесурс
-     
+  let $типРесурса := 
+    $ресурс/cell[ @id = "http://dbx.iro37.ru/zapolnititul/признаки/типРесурса" ]/text()
+  
   let $rawSource := 
     yandex:getResource(
       $типРесурса,
@@ -179,10 +194,7 @@ function
   
 declare 
   %private
-function publicSource:получениеТекстаЗапроса( $публикация, $data ){
-  let $запросID := 
-    $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/запрос']/text()
-  let $запрос := $data( $запросID  )
+function publicSource:получениеТекстаЗапроса( $публикация, $запрос ){
   let $запросURL := $запрос/cell[ @id = 'https://schema.org/url' ]/text()
   return
     if( $запросURL )

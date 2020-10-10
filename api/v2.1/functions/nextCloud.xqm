@@ -118,13 +118,11 @@ declare
 function
   nextCloud:получитьРесурс(
     $ресурс,
-    $data,
+    $storeRecord,
     $tokenRecordsFilePath
   ){
   let $resourceRecord := trciToRdf:sourceData( $ресурс  )
 
-  let $storeRecord := $data( $resourceRecord/п:хранилище/text() )
-  
   let $tokenRecords :=  fetch:xml( $tokenRecordsFilePath )//data
   
   let $token := nextCloud:токен( $storeRecord, $tokenRecords, $tokenRecordsFilePath )

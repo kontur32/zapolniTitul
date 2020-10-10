@@ -50,13 +50,12 @@ function publicSource:main(
   let $хранилище :=
     let $хранилищеID := 
       $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/хранилище' ]/text()
-    
     return $userData( $хранилищеID, $userID )
   
   let $source := 
     switch( tokenize( $ресурс/@id/data(), '#')[ 1 ] )
     case ( 'http://dbx.iro37.ru/zapolnititul/сущности/ресурсЯндексДиск' )
-      return publicSource:получениеРесурсаЯндекса( $ресурс, $data )
+      return publicSource:получениеРесурсаЯндекса( $ресурс, $хранилище )
     case ( 'http://dbx.iro37.ru/zapolnititul/сущности/ресурсSaaS' )
     return
       let $fileData := 

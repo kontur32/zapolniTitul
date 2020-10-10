@@ -26,16 +26,32 @@ function publicSource:main(
     function( $ID ){ 
       config:usersData()
       [ row[ ends-with( @id/data(), $ID ) ] ]
-      [ @status = 'active' ][ last() ]
+      [ last() ]
+      /row
+    }
+  
+  let $userData := 
+    function( $ID, $userID ){ 
+      config:userData( $userID )
+      [ row[ ends-with( @id/data(), $ID ) ] ]
+      [ last() ]
       /row
     }
   
   let $публикация := $data( $publicationID )
   
+  let $userID := $публикация/parent::*/@userID/data()
+  
   let $ресурсID := 
     $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/ресурс']/text()
   
-  let $ресурс := $data( $ресурсID  )
+  let $ресурс := $userData( $ресурсID, $userID  )
+  
+  let $хранилище :=
+    let $хранилищеID := 
+      $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/хранилище' ]/text()
+    
+    return $userData( $хранилищеID, $userID )
   
   let $source := 
     switch( tokenize( $ресурс/@id/data(), '#')[ 1 ] )
@@ -137,19 +153,14 @@ function
 declare
   %private
 function 
-  publicSource:получениеРесурсаЯндекса( $ресурс, $data ){
-    let $локальныйПутьРесурс :=  
+  publicSource:получениеРесурсаЯндекса( $ресурс, $хранилище ){
+  let $локальныйПутьРесурс :=  
     iri-to-uri(
       $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/локальныйПуть']/text()
     )
     
   let $типРесурса := 
     $ресурс/cell[ @id = "http://dbx.iro37.ru/zapolnititul/признаки/типРесурса" ]/text()
-  
-  let $хранилищеID := 
-    $ресурс/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/хранилище']/text()
-  
-  let $хранилище := $data( $хранилищеID )
   
   let $токен := 
     $хранилище/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/сущности/токенДоступа' ]/text()

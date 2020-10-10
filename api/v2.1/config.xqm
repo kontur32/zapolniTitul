@@ -13,4 +13,12 @@ declare
 function config:usersData() as element( table )*{
   db:open( $config:param( 'dbName' ), 'data' )
   /data/table
+  [ @status = 'active' ]
+};
+
+declare
+  %public
+function config:userData( $userID ) as element( table )*{
+  config:usersData()
+  [ @userID = $userID ]
 };

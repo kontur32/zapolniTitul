@@ -66,7 +66,7 @@ function
     $tokenRecords as element( data )*,
     $tokenRecordsFilePath,
     $fullDavPath
-  ){
+  ) as xs:string {
   let $storeData := trciToRdf:storeData( $storeRecord )
   let $tokenData := 
     trciToRdf:tokenData( 

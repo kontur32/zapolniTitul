@@ -77,7 +77,12 @@ function publicSource:main(
     default
       return $ресурс
   
-  let $xquery := publicSource:получениеТекстаЗапроса( $публикация, $data )
+  let $запросID := 
+    $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/запрос']/text()
+  let $запрос := $userData( $запросID, $userID  )
+  
+  let $xquery := 
+    publicSource:получениеТекстаЗапроса( $запрос )
   
   let $params := 
       map:merge(
@@ -91,8 +96,9 @@ function publicSource:main(
       $xquery,
       map{ '' :  $source, 'params' : $params, 'ID' : $publicationID }
     )
-  
-  let $форматВывода := publicSource:форматВывода( $публикация )
+  let $формат :=
+      $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/форматВывода']/text()
+  let $форматВывода := publicSource:форматВывода( $формат )
   
   return
     (
@@ -111,11 +117,8 @@ function publicSource:main(
 :)
 declare
   %private
-function publicSource:форматВывода( $публикация ){
-  let $формат :=
-      $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/форматВывода']/text()
-    return
-      switch ( $формат )
+function publicSource:форматВывода( $форматВывода ){
+      switch ( $форматВывода )
       case 'plain' return 'text/plain'
       case 'html' return 'text/html'
       case 'json' return 'application/json'
@@ -197,10 +200,8 @@ function
   
 declare 
   %private
-function publicSource:получениеТекстаЗапроса( $публикация, $data ){
-  let $запросID := 
-    $публикация/cell[ @id = 'http://dbx.iro37.ru/zapolnititul/признаки/запрос']/text()
-  let $запрос := $data( $запросID  )
+function publicSource:получениеТекстаЗапроса( $запрос ){
+  
   let $запросURL := $запрос/cell[ @id = 'https://schema.org/url' ]/text()
   return
     if( $запросURL )

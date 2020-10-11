@@ -39,13 +39,13 @@ function
 };
 
 declare
-  %private
+  %public
 function trciToRdf:storeData( $storeData as element( row ) ){
   trciToRdf:transform( $storeData, 'с:хранилищеNextcloud' )
 };
 
 declare
-  %private
+  %public
 function trciToRdf:sourceData( $sourceData as element( row ) ){
   trciToRdf:transform( $sourceData, 'с:ресурсNextcloud' )
 };

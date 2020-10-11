@@ -4,6 +4,8 @@
 
 module namespace nextCloud = 'http://dbx.iro37.ru/zapolnititul/api/v2.1/nextCloud/';
 
+declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+
 declare namespace iro = "http://dbx.iro37.ru/";
 declare namespace с = 'http://dbx.iro37.ru/сущности/';
 declare namespace п = 'http://dbx.iro37.ru/признаки/';
@@ -116,7 +118,7 @@ declare function nextCloud:получитьВсеФайлыИзПапки( $toke
 declare 
   %public
 function nextCloud:получитьРесурс(
-    $resourceRecord as element( с:ресурсNextcloud ),
+    $resourceRecord as element( rdf:Description ),
     $storeRecord as element( row ),
     $tokenRecordsFilePath as xs:string
   ){

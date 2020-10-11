@@ -25,11 +25,11 @@ declare
 function
   trciToRdf:transform(
     $data as element( row ),
-    $nodeName as xs:string
+    $type as xs:string
  ){
- element { xs:QName( $nodeName ) }{
+ element { xs:QName( 'rdf:Description' ) }{
     attribute { 'about' } { $data/@id/data() },
-    attribute { 'type' } { $nodeName },
+    attribute { 'type' } { $type },
     for $i in $data/cell
     let $признак :=
       replace( tokenize( $i/@id/data(), '/' )[ last() ], ' ', '-' )
@@ -42,11 +42,11 @@ function
 declare
   %public
 function trciToRdf:storeData( $storeData as element( row ) ){
-  trciToRdf:transform( $storeData, 'с:хранилищеNextcloud' )
+  trciToRdf:transform( $storeData, 'o:хранилищеNextcloud' )
 };
 
 declare
   %public
 function trciToRdf:sourceData( $sourceData as element( row ) ){
-  trciToRdf:transform( $sourceData, 'с:ресурсNextcloud' )
+  trciToRdf:transform( $sourceData, 'o:ресурсNextcloud' )
 };

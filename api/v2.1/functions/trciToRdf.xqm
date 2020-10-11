@@ -4,14 +4,15 @@
 
 module namespace trciToRdf = 'http://dbx.iro37.ru/zapolnititul/api/v2.1/trciToRdf/';
 
+declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 declare namespace о = 'http://dbx.iro37.ru/отнтология/';
 declare namespace с = 'http://dbx.iro37.ru/сущности/';
 declare namespace п = 'http://dbx.iro37.ru/признаки/';
 
-(: преобразует TRCI в RDF :)
+(: преобразует TRCI в RDF 'с:токенДоступаOAuth2' :)
 
 declare function trciToRdf:tokenData( $tokenData as element( table )* ){
-  element { xs:QName( 'с:токенДоступаOAuth2' ) }{
+  element { xs:QName( 'rdf:Description' ) }{
     attribute { 'about' } { $tokenData//row/@id/data() },
     for $i in $tokenData//cell
     return

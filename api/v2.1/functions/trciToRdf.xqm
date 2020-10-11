@@ -4,6 +4,7 @@
 
 module namespace trciToRdf = 'http://dbx.iro37.ru/zapolnititul/api/v2.1/trciToRdf/';
 
+declare namespace о = 'http://dbx.iro37.ru/отнтология/';
 declare namespace с = 'http://dbx.iro37.ru/сущности/';
 declare namespace п = 'http://dbx.iro37.ru/признаки/';
 
@@ -18,26 +19,29 @@ declare function trciToRdf:tokenData( $tokenData as element( table )* ){
   }
 };
 
-declare function trciToRdf:storeData( $storeData as element( row ) ){
- element { xs:QName( 'с:хранилищеNextcloud' ) }{
-    attribute { 'about' } { $storeData/@id/data() },
-    for $i in $storeData/cell
+declare 
+  %private
+function
+  trciToRdf:transform(
+    $data as element( row ),
+    $nodeName as xs:string
+ ){
+ element { xs:QName( $nodeName ) }{
+    attribute { 'about' } { $data/@id/data() },
+    attribute { 'type' } { $nodeName },
+    for $i in $data/cell
     let $признак :=
       replace( tokenize( $i/@id/data(), '/' )[ last() ], ' ', '-' )
     return
       element { xs:QName( 'п:' || $признак ) } { $i/text() },
-    element { 'п:userID' } {  $storeData/@userID/data() }
+    element { 'п:userID' } {  $data/@userID/data() }
   }
 };
 
+declare function trciToRdf:storeData( $storeData as element( row ) ){
+  trciToRdf:transform( $storeData, 'с:хранилищеNextcloud' )
+};
+
 declare function trciToRdf:sourceData( $sourceData as element( row ) ){
- element { xs:QName( 'с:ресурсNextcloud' ) }{
-    attribute { 'about' } { $sourceData/@id/data() },
-    for $i in $sourceData/cell
-    let $признак :=
-      replace( tokenize( $i/@id/data(), '/' )[ last() ], ' ', '-' )
-    return
-      element { xs:QName( 'п:' || $признак ) } { $i/text() },
-    element { 'п:userID' } {  $sourceData/@userID/data() }
-  }
+  trciToRdf:transform( $sourceData, 'с:ресурсNextcloud' )
 };

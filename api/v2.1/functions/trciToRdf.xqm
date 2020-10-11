@@ -38,10 +38,14 @@ function
   }
 };
 
-declare function trciToRdf:storeData( $storeData as element( row ) ){
+declare
+  %private
+function trciToRdf:storeData( $storeData as element( row ) ){
   trciToRdf:transform( $storeData, 'с:хранилищеNextcloud' )
 };
 
-declare function trciToRdf:sourceData( $sourceData as element( row ) ){
+declare
+  %private
+function trciToRdf:sourceData( $sourceData as element( row ) ){
   trciToRdf:transform( $sourceData, 'с:ресурсNextcloud' )
 };

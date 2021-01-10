@@ -146,3 +146,22 @@ function nextCloud:получитьРесурс(
          $source
     )
 };
+
+declare function nextCloud:получитьФайл( $storeRecord, $tokenRecordsFilePath, $path  ){
+
+  let $tokenRecords := fetch:xml( $tokenRecordsFilePath )//data
+  
+  let $fullDavPath := nextCloud:полныйПутьDAV( $storeRecord/row )
+  
+  let $token :=
+    nextCloud:токен(
+        $storeRecord/row,
+        $tokenRecords,
+        $tokenRecordsFilePath,
+        $fullDavPath
+      )
+  let $rawData := 
+      dav:получитьФайл( $token, iri-to-uri( $fullDavPath || '/' || $path )  )
+  return
+    $rawData
+};
